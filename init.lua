@@ -35,18 +35,17 @@ local cpml = {
 	_DESCRIPTION = "Cirno's Perfect Math Library: Just about everything you need for 3D games. Hopefully."
 }
 
-local mat4 = require(current_folder .. "cpml.mat4")
-local vec3 = require(current_folder .. "cpml.vec3")
-local quat = require(current_folder .. "cpml.quat")
-local simplex = require(current_folder .. "cpml.simplex")
-local intersect = require(current_folder .. "cpml.intersect")
-local constants = require(current_folder .. "cpml.constants")
+local files = {
+	"constants",
+	"mat4",
+	"vec3",
+	"quat",
+	"simplex",
+	"intersect"
+}
 
-cpml.mat4 = mat4
-cpml.vec3 = vec3
-cpml.quat = quat
-cpml.simplex = simplex
-cpml.intersect = intersect
-cpml.constants = constants
+for _, v in ipairs(files) do
+	cpml[v] = require(current_folder .. "cpml." .. v)
+end
 
 return cpml
