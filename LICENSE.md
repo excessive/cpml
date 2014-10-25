@@ -1,6 +1,12 @@
-The MIT License (MIT)
+Licenses
+======================
+CPML is Copyright (c) 2014 Colby Klein <shakesoda@gmail.com>.
+Portions of mat4.lua are from LuaMatrix, (c) 2010 Michael Lutz. MIT.
+Code in simplex.lua is (c) 2011 Stefan Gustavson. MIT.
+Code in quat.lua is from Andrew Stacey and covered under the CC0 license.
 
-Copyright (c) 2014 Colby Klein <shakesoda@gmail.com>
+The MIT License (MIT)
+======================
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,4 +25,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
