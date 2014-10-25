@@ -1,7 +1,7 @@
 -- double 4x4, 1-based, column major
 -- local matrix = {}
 
-local current_folder = (...):gsub('%.[^%.]+$', '')
+local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local constants = require(current_folder .. "constants")
 
 local mat4 = {}

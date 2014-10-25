@@ -1,9 +1,11 @@
-local current_folder = (...):gsub('%.[^%.]+$', '')
+local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3 = require(current_folder .. "vec3")
 local constants = require(current_folder .. "constants")
 
+local intersect = {}
+
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
-function cpml.ray_triangle(ray, triangle)
+function intersect.ray_triangle(ray, triangle)
 	assert(ray.point ~= nil)
 	assert(ray.direction ~= nil)
 	assert(#triangle == 3)
@@ -53,7 +55,7 @@ end
 -- Algorithm is ported from the C algorithm of 
 -- Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
 -- Archive.org am hero \o/
-function cpml.line_line(p1, p2, p3, p4)
+function intersect.line_line(p1, p2, p3, p4)
 	local epsilon = constants.FLT_EPSILON
 	local resultSegmentPoint1 = vec3(0,0,0)
 	local resultSegmentPoint2 = vec3(0,0,0)
@@ -87,3 +89,5 @@ function cpml.line_line(p1, p2, p3, p4)
 
 	return true, resultSegmentPoint1, resultSegmentPoint2
 end
+
+return intersect
