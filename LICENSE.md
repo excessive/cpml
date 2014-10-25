@@ -1,8 +1,11 @@
 Licenses
 ======================
 CPML is Copyright (c) 2014 Colby Klein <shakesoda@gmail.com>.
+
 Portions of mat4.lua are from LuaMatrix, (c) 2010 Michael Lutz. MIT.
+
 Code in simplex.lua is (c) 2011 Stefan Gustavson. MIT.
+
 Code in quat.lua is from Andrew Stacey and covered under the CC0 license.
 
 The MIT License (MIT)
