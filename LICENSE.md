@@ -2,6 +2,8 @@ Licenses
 ======================
 CPML is Copyright (c) 2014 Colby Klein <shakesoda@gmail.com>.
 
+Code in vec3.lua is derived from hump.vector. (c) 2010-2013 Matthias Richter. MIT.
+
 Portions of mat4.lua are from LuaMatrix, (c) 2010 Michael Lutz. MIT.
 
 Code in simplex.lua is (c) 2011 Stefan Gustavson. MIT.
