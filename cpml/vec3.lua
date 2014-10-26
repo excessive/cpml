@@ -74,9 +74,8 @@ function vector.__mul(a,b)
 	elseif type(b) == "number" then
 		return new(b*a.x, b*a.y, b*a.z)
 	else
-		-- This is the dot product.
 		assert(isvector(a) and isvector(b), "Mul: wrong argument types (<vector> or <number> expected)")
-		return a.x*b.x + a.y*b.y + a.z*b.z
+		return new(a.x*b.x, a.y*b.y, a.z*b.z)
 	end
 end
 
@@ -99,9 +98,9 @@ function vector.__le(a,b)
 	return a.x <= b.x and a.y <= b.y and a.z <= b.z
 end
 
-function vector.permul(a,b)
-	assert(isvector(a) and isvector(b), "permul: wrong argument types (<vector> expected)")
-	return new(a.x*b.x, a.y*b.y, a.z*b*z)
+function vector.dot(a,b)
+	assert(isvector(a) and isvector(b), "dot: wrong argument types (<vector> expected)")
+	return a.x*b.x + a.y*b.y + a.z*b.z
 end
 
 function vector:tuple()
