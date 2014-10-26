@@ -155,7 +155,7 @@ function vector:rotated(phi, axis)
 	local m3 = new((u.z * u.x * (1-c) - u.y * s), (u.z * u.y * (1-c) + u.x * s), (c + u.z * u.z * (1-c))      )
 
 	-- Return rotated vector
-	return new( m1 * self, m2 * self, m3 * self )
+	return new( m1:dot(self), m2:dot(self), m3:dot(self) )
 end
 
 function vector:rotate_inplace(phi, axis)
