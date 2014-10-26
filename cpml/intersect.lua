@@ -20,7 +20,7 @@ function intersect.ray_triangle(ray, triangle)
 
 	h = d:clone():cross(e2)
 
-	a = (e1*h) -- dot product
+	a = (e1:dot(h))
 
 	if a > -0.00001 and a < 0.00001 then
 		return false
@@ -28,14 +28,14 @@ function intersect.ray_triangle(ray, triangle)
 
 	f = 1/a
 	s = p - triangle[1]
-	u = f * (s*h)
+	u = f * (s:dot(h))
 
 	if u < 0 or u > 1 then
 		return false
 	end
 
 	q = s:clone():cross(e1)
-	v = f * (d*q)
+	v = f * (d:dot(q))
 
 	if v < 0 or u + v > 1 then
 		return false
@@ -43,7 +43,7 @@ function intersect.ray_triangle(ray, triangle)
 
 	-- at this stage we can compute t to find out where
 	-- the intersection point is on the line
-	t = f * (e2*q)
+	t = f * (e2:dot(q))
 
 	if t > constants.FLT_EPSILON then
 		return p + t * d -- we've got a hit!
