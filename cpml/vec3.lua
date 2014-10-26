@@ -166,21 +166,21 @@ function vector:perpendicular()
 	return new(-self.y, self.x, 0)
 end
 
-function vector:projectOn(v)
+function vector:project_on(v)
 	assert(isvector(v), "invalid argument: cannot project vector on " .. type(v))
 	-- (self * v) * v / v:len2()
 	local s = (self.x * v.x + self.y * v.y + self.z * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z)
 	return new(s * v.x, s * v.y, s * v.z)
 end
 
-function vector:projectFrom(v)
+function vector:project_from(v)
 	assert(isvector(v), "invalid argument: cannot project vector on " .. type(v))
 	-- Does the reverse of projectOn.
 	local s = (v.x * v.x + v.y * v.y + v.z * v.z) / (self.x * v.x + self.y * v.y + self.z * v.z)
 	return new(s * v.x, s * v.y, s * v.z)
 end
 
-function vector:mirrorOn(v)
+function vector:mirror_on(v)
 	assert(isvector(v), "invalid argument: cannot mirror vector on " .. type(v))
 	-- 2 * self:projectOn(v) - self
 	local s = 2 * (self.x * v.x + self.y * v.y + self.z * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z)
@@ -202,7 +202,7 @@ function vector:trim_inplace(maxLen)
 	return self
 end
 
-function vector:angleTo(other)
+function vector:angle_to(other)
 	-- Only makes sense in 2D.
 	if other then
 		return atan2(self.y, self.x) - atan2(other.y, other.x)
@@ -210,7 +210,7 @@ function vector:angleTo(other)
 	return atan2(self.y, self.x)
 end
 
-function vector:angleBetween(other)
+function vector:angle_between(other)
 	if other then
 		return acos(self*other / (self:len() * other:len()))
 	end
@@ -220,7 +220,6 @@ end
 function vector:trimmed(maxLen)
 	return self:clone():trim_inplace(maxLen)
 end
-
 
 -- the module
 return setmetatable({new = new, isvector = isvector, zero = zero},
