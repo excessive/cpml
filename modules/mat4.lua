@@ -103,27 +103,21 @@ function mat4:persp(fovy, aspect, near, far)
 	return out
 end
 
-function mat4:translate(x, y, z)
-	if type(x) == "table" then
-		x, y, z = unpack(x)
-	end
+function mat4:translate(t)
 	local m = {
 		1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1, 0,
-		x, y, z, 1
+		t.x, t.y, t.z, 1
 	}
 	return mat4(m) * mat4(self)
 end
 
-function mat4:scale(x, y, z)
-	if type(x) == "table" then
-		x, y, z = unpack(x)
-	end
+function mat4:scale(s)
 	local m = {
-		x, 0, 0, 0,
-		0, y, 0, 0,
-		0, 0, z, 0,
+		s.x, 0, 0, 0,
+		0, s.y, 0, 0,
+		0, 0, s.z, 0,
 		0, 0, 0, 1
 	}
 	return mat4(m) * mat4(self)
@@ -296,8 +290,8 @@ function mat4:invert()
 end
 
 -- THREE broken projections! ARGH!
-function mat4.project(objx, objy, objz, model, view, projection, viewport)
-	local position = projection * view * model * { objx, objy, objz, 1 }
+function mat4.project(obj, model, view, projection, viewport)
+	local position = projection * view * model * { obj.x, obj.y, obj.z, 1 }
 
 	-- perspective division
 	position[4] = 1 / position[4]
@@ -312,7 +306,7 @@ function mat4.project(objx, objy, objz, model, view, projection, viewport)
 	return out
 end
 
-function mat4.unproject(winx, winy, winz, modelview, projection, viewport)
+function mat4.unproject(win, modelview, projection, viewport)
 	local m = (projection * modelview):inverse()
 	if not m then
 		return false
@@ -320,9 +314,9 @@ function mat4.unproject(winx, winy, winz, modelview, projection, viewport)
 
 	-- Transformation of normalized coordinates between -1 and 1
 	local view = {}
-	view[1] = (winx - viewport[1]) / viewport[3] * 2 - 1
-	view[2] = (winy - viewport[2]) / viewport[4] * 2 - 1
-	view[3] = 2 * winz - 1
+	view[1] = (win.x - viewport[1]) / viewport[3] * 2 - 1
+	view[2] = (win.y - viewport[2]) / viewport[4] * 2 - 1
+	view[3] = 2 * win.z - 1
 	view[4] = 1
 
 	local out = m * view
@@ -364,7 +358,7 @@ function mat4:look_at(eye, center, up)
 	-- Fix 1u offset
 	local new_eye = eye + forward
 
-	local out = mat4():translate(-new_eye.x, -new_eye.y, -new_eye.z) * view
+	local out = mat4():translate(-new_eye) * view
 	return out * self
 end
 
@@ -407,41 +401,6 @@ function mat4:__mul(m)
 			out[i+j] = m[j] * self[i+1] + m[j+4] * self[i+2] + m[j+8] * self[i+3] + m[j+12] * self[i+4]
 		end
 	end
-	return out
-end
-
--- Multiply mat4 by a mat4. Tested OK
-function mat4:debug_mul(m)
-	if #m == 4 then
-		-- should, hopefully, return a 4x1 matrix
-		-- i.e. a vec4
-		local tmp = matrix_mult_nxn(self:to_vec4s(), { {m[1]}, {m[2]}, {m[3]}, {m[4]} })
-		local v = {}
-		for i=1, 4 do
-			v[i] = tmp[i][1]
-		end
-		return v
-	end
-
-	-- local tmp = matrix_mult_nxn(self:to_vec4s(), m:to_vec4s())
-	-- return mat4(tmp)
-
-	console.i("beginning mult")
-	console.i("input a: " .. tostring(self))
-	console.i("input b: " .. tostring(m))
-	local out = mat4()
-	local step = 1
-	for i=0, 12, 4 do
-		for j=1, 4 do
-			-- if type(m[j]) == "table" then
-			-- 	error("Whoa, this is broken!")
-			-- end
-			out[i+j] = m[j] * self[i+1] + m[j+4] * self[i+2] + m[j+8] * self[i+3] + m[j+12] * self[i+4]
-			console.i(string.format("step %d %s", step, out))
-			step = step + 1
-		end
-	end
-	console.i(out)
 	return out
 end
 
