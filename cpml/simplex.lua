@@ -26,9 +26,19 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
+-- Bail out with dummy module if FFI is missing.
+local has_ffi, ffi = pcall(require, "ffi")
+
+if not has_ffi then
+	return {
+		Simplex2D = function() return 0 end,
+		Simplex3D = function() return 0 end,
+		Simplex4D = function() return 0 end
+	}
+end
+
 -- Modules --
 local bit = require("bit")
-local ffi = require("ffi")
 local math = require("math")
 
 -- Imports --
@@ -125,12 +135,12 @@ do
 				iy, y1 = iy + 1, y1 - 1
 			end
 		]]
-		local xi = rshift(floor(y0 - x0), 31) -- x0 >= y0
+		local xi = rshift(floor(y0 - x0), 31) -- y0 < x0
 		local n1 = GetN(ix + xi, iy + (1 - xi), x0 + 0.211324865 - xi, y0 - 0.788675135 + xi) -- x0 + G - xi, y0 + G - (1 - xi)
 
 		-- Add contributions from each corner to get the final noise value.
 		-- The result is scaled to return values in the interval [-1,1].
-		return 70 * (n0 + n1 + n2)
+		return 70.1480580019 * (n0 + n1 + n2)
 	end
 end
 
@@ -178,48 +188,44 @@ do
 
 		--[[
 			Determine other corners based on simplex (skewed tetrahedron) we are in:
-			local ix2, iy2, iz2 = ix, iy, iz
 
-			if x0 >= y0 then
-				ix2, x2 = ix + 1, x2 - 1
-
-				if y0 >= z0 then -- X Y Z
-					ix, iy2, x1, y2 = ix + 1, iy + 1, x1 - 1, y2 - 1
-				elseif x0 >= z0 then -- X Z Y
-					ix, iz2, x1, z2 = ix + 1, iz + 1, x1 - 1, z2 - 1
-				else -- Z X Y
-					iz, iz2, z1, z2 = iz + 1, iz + 1, z1 - 1, z2 - 1
+			if x0 >= y0 then -- ~A
+				if y0 >= z0 then -- ~A and ~B
+					i1, j1, k1, i2, j2, k2 = 1, 0, 0, 1, 1, 0
+				elseif x0 >= z0 then -- ~A and B and ~C
+					i1, j1, k1, i2, j2, k2 = 1, 0, 0, 1, 0, 1
+				else -- ~A and B and C
+					i1, j1, k1, i2, j2, k2 = 0, 0, 1, 1, 0, 1
 				end
-			else
-				iy2, y2 = iy + 1, y2 - 1
-
-				if y0 < z0 then -- Z Y X
-					iz, iz2, z1, z2 = iz + 1, iz + 1, z1 - 1, z2 - 1
-				elseif x0 < z0 then -- Y Z X
-					iy, iz2, y1, z2 = iy + 1, iz + 1, y1 - 1, z2 - 1
-				else -- Y X Z
-					iy, ix2, y1, x2 = iy + 1, ix + 1, y1 - 1, x2 - 1
+			else -- A
+				if y0 < z0 then -- A and B
+					i1, j1, k1, i2, j2, k2 = 0, 0, 1, 0, 1, 1
+				elseif x0 < z0 then -- A and ~B and C
+					i1, j1, k1, i2, j2, k2 = 0, 1, 0, 0, 1, 1
+				else -- A and ~B and ~C
+					i1, j1, k1, i2, j2, k2 = 0, 1, 0, 1, 1, 0
 				end
-			end		
+			end
 		]]
-		local yx = rshift(floor(y0 - x0), 31) -- x0 >= y0
-		local zy = rshift(floor(z0 - y0), 31) -- y0 >= z0
-		local zx = rshift(floor(z0 - x0), 31) -- x0 >= z0
 
-		local i1 = band(yx, bor(zy, zx)) -- x >= y and (y >= z or x >= z)
-		local j1 = band(1 - yx, zy) -- x < y and y >= z
-		local k1 = band(1 - zy, 1 - band(yx, zx)) -- y < z and not (x >= y and x >= z)
+		local xLy = rshift(floor(x0 - y0), 31) -- x0 < y0
+		local yLz = rshift(floor(y0 - z0), 31) -- y0 < z0
+		local xLz = rshift(floor(x0 - z0), 31) -- x0 < z0
 
-		local i2 = bor(yx, band(zy, zx)) -- x >= z or (y >= z and x >= z)
-		local j2 = bor(1 - yx, zy) -- x < y or y >= z
-		local k2 = bxor(yx, zy) -- (x >= y and y < z) xor (x < y and y >= z)
+		local i1 = band(1 - xLy, bor(1 - yLz, 1 - xLz)) -- x0 >= y0 and (y0 >= z0 or x0 >= z0)
+		local j1 = band(xLy, 1 - yLz) -- x0 < y0 and y0 >= z0
+		local k1 = band(yLz, bor(xLy, xLz)) -- y0 < z0 and (x0 < y0 or x0 < z0)
+
+		local i2 = bor(1 - xLy, band(1 - yLz, 1 - xLz)) -- x0 >= y0 or (y0 >= z0 and x0 >= z0)
+		local j2 = bor(xLy, 1 - yLz) -- x0 < y0 or y0 >= z0
+		local k2 = bor(band(1 - xLy, yLz), band(xLy, bor(yLz, xLz))) -- (x0 >= y0 and y0 < z0) or (x0 < y0 and (y0 < z0 or x0 < z0))
 
 		local n1 = GetN(ix + i1, iy + j1, iz + k1, x0 + 0.166666667 - i1, y0 + 0.166666667 - j1, z0 + 0.166666667 - k1) -- G
 		local n2 = GetN(ix + i2, iy + j2, iz + k2, x0 + 0.333333333 - i2, y0 + 0.333333333 - j2, z0 + 0.333333333 - k2) -- G2
 
 		-- Add contributions from each corner to get the final noise value.
 		-- The result is scaled to stay just inside [-1,1]
-		return 32 * (n0 + n1 + n2 + n3)
+		return 28.452842 * (n0 + n1 + n2 + n3)
 	end
 end
 
@@ -296,7 +302,7 @@ do
 		-- To find out which of the 24 possible simplices we're in, we need to
 		-- determine the magnitude ordering of x0, y0, z0 and w0.
 		-- The method below is a good way of finding the ordering of x,y,z,w and
-		-- then find the correct traversal order for the simplex we’re in.
+		-- then find the correct traversal order for the simplex weï¿½re in.
 		-- First, six pair-wise comparisons are performed between each possible pair
 		-- of the four coordinates, and the results are used to add up binary bits
 		-- for an integer index.
@@ -341,7 +347,7 @@ do
 		local n3 = GetN(ix + i3, iy + j3, iz + k3, iw + l3, x0 + 0.414589803 - i3, y0 + 0.414589803 - j3, z0 + 0.414589803 - k3, w0 + 0.414589803 - l3) -- G3
 		local n4 = GetN(ix + 1, iy + 1, iz + 1, iw + 1, x0 - 0.447213595, y0 - 0.447213595, z0 - 0.447213595, w0 - 0.447213595) -- G4
 
-		return 27 * (n0 + n1 + n2 + n3 + n4)
+		return 2.210600293 * (n0 + n1 + n2 + n3 + n4)
 	end
 end
 
