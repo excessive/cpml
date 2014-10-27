@@ -364,7 +364,8 @@ function mat4:look_at(eye, center, up)
 	-- Fix 1u offset
 	local new_eye = eye + forward
 
-	return mat4():identity():translate(-new_eye.x, -new_eye.y, -new_eye.z) * view
+	local out = mat4():translate(-new_eye.x, -new_eye.y, -new_eye.z) * view
+	return out * self
 end
 
 

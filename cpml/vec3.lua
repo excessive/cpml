@@ -223,9 +223,9 @@ end
 
 function vector:orientation_to_direction()
 	return new(0, 1, 0)
-		:rotated(self.x, new(1, 0, 0))
-		:rotated(self.y, new(0, 1, 0))
 		:rotated(self.z, new(0, 0, 1))
+		:rotated(self.y, new(0, 1, 0))
+		:rotated(self.x, new(1, 0, 0))
 end
 
 -- the module
