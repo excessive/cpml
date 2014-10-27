@@ -41,11 +41,12 @@ local files = {
 	"vec3",
 	"quat",
 	"simplex",
-	"intersect"
+	"intersect",
+  "mesh"
 }
 
 for _, v in ipairs(files) do
-	cpml[v] = require(current_folder .. "cpml." .. v)
+	cpml[v] = require(current_folder .. "modules." .. v)
 end
 
 return cpml

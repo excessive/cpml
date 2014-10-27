@@ -8,8 +8,8 @@ This is a class for handling quaternion numbers.  It was originally
 designed as a way of encoding rotations of 3 dimensional space.
 --]]
 
-local Class = require "libs.hump.class"
-local quaternion = Class {}
+local quaternion = {}
+quaternion.__index = quaternion
 local FLT_EPSILON = 1.19209290e-07
 
 --[[
@@ -17,32 +17,33 @@ A quaternion can either be specified by giving the four coordinates as
 real numbers or by giving the scalar part and the vector part.
 --]]
 
-
-function quaternion:init(...)
+local function new(...)
+	local a, b, c, d
 	-- copy
 	local arg = {...}
 	if #arg == 1 and type(arg[1]) == "table" then
-		self.a = arg[1].a
-		self.b = arg[1].b
-		self.c = arg[1].c
-		self.d = arg[1].d
+		a = arg[1].a
+		b = arg[1].b
+		c = arg[1].c
+		d = arg[1].d
 	-- four numbers
 	elseif #arg == 4 then
-		self.a = arg[1]
-		self.b = arg[2]
-		self.c = arg[3]
-		self.d = arg[4]
+		a = arg[1]
+		b = arg[2]
+		c = arg[3]
+		d = arg[4]
 	-- real number plus vector
 	elseif #arg == 2 then
-		self.a = arg[1]
-		self.b = arg[2].x
-		self.c = arg[2].y
-		self.d = arg[2].z
+		a = arg[1]
+		b = arg[2].x
+		c = arg[2].y
+		d = arg[2].z
 	else
 		error("Incorrect number of arguments to quaternion")
 	end
-end
 
+	return setmetatable({ a = a or 0, b = b or 0, c = c or 0, d = d or 0 }, quaternion)
+end
 
 function quaternion:to_axis_angle()
 	local tmp = self
@@ -63,7 +64,6 @@ function quaternion:to_axis_angle()
 	end
 	return angle, { x, y, z }
 end
-
 
 --[[
 Test if we are zero.
@@ -497,4 +497,7 @@ function quaternion.unit()
 	return quaternion(1,0,0,0)
 end
 
-return quaternion
+--return quaternion
+-- the module
+return setmetatable({ new = new },
+{ __call = function(_, ...) return new(...) end })
