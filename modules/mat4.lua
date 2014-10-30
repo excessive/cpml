@@ -3,6 +3,7 @@
 
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local constants = require(current_folder .. "constants")
+local vec3 = require(current_folder .. "vec3")
 
 local mat4 = {}
 mat4.__index = mat4
@@ -92,15 +93,25 @@ function mat4:ortho(left, right, top, bottom, near, far)
 	return out
 end
 
-function mat4:persp(fovy, aspect, near, far)
-	local out = mat4()
-	local f = math.tan(fovy / 2)
-	out[1] = 1 / (aspect * f)
-	out[6] = 1 / f
-	out[11] = -((far + near) / (far - near))
-	out[12] = -1
-	out[15] = -((2 * far * near) / (far - near))
-	return out
+function mat4:perspective(fovy, aspect, near, far)
+	assert(aspect ~= 0)
+	assert(near ~= far)
+
+	local t = math.tan(fovy / 2)
+	local result = mat4(
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0,
+		0, 0, 0, 0
+	)
+
+	result[1] = 1 / (aspect * t)
+	result[6] = 1 / t
+	result[11] = - (far + near) / (far - near)
+	result[12] = - 1
+	result[15] = - (2 * far * near) / (far - near)
+
+	return result
 end
 
 function mat4:translate(t)
@@ -289,50 +300,46 @@ function mat4:invert()
 	return out
 end
 
--- THREE broken projections! ARGH!
-function mat4.project(obj, model, view, projection, viewport)
-	local position = projection * view * model * { obj.x, obj.y, obj.z, 1 }
+-- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L317
+-- Note: GLM calls the view matrix "model"
+function mat4.project(obj, view, projection, viewport)
+	local position = { obj.x, obj.y, obj.z, 1 }
 
-	-- perspective division
-	position[4] = 1 / position[4]
-	position[1] = position[1] * position[4]
-	position[2] = position[2] * position[4]
-	position[3] = position[3] * position[4]
+	position = view:transpose() * position
+	position = projection:transpose() * position
 
-	local out = {}
-	out[1] = ((position[1] + 1) * 0.5) * viewport.w + viewport.x
-	out[2] = ((position[2] + 1) * 0.5) * viewport.h + viewport.y
-	out[3] = ((position[3] + 1) * 0.5) * viewport.f + viewport.n
-	return out
+	position[1] = position[1] / position[4] * 0.5 + 0.5
+	position[2] = position[2] / position[4] * 0.5 + 0.5
+	position[3] = position[3] / position[4] * 0.5 + 0.5
+	position[4] = position[4] / position[4] * 0.5 + 0.5
+
+	position[1] = position[1] * viewport[3] + viewport[1]
+	position[2] = position[2] * viewport[4] + viewport[2]
+
+	return vec3(position[1], position[2], position[3])
 end
 
-function mat4.unproject(win, modelview, projection, viewport)
-	local m = (projection * modelview):inverse()
-	if not m then
-		return false
-	end
+-- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L338
+-- Note: GLM calls the view matrix "model"
+function mat4.unproject(win, view, projection, viewport)
+	local inverse = (projection:transpose() * view:transpose()):invert()
+	local position = { win.x, win.y, win.z, 1 }
+	position[1] = (position[1] - viewport[1]) / viewport[3]
+	position[2] = (position[2] - viewport[2]) / viewport[4]
 
-	-- Transformation of normalized coordinates between -1 and 1
-	local view = {}
-	view[1] = (win.x - viewport[1]) / viewport[3] * 2 - 1
-	view[2] = (win.y - viewport[2]) / viewport[4] * 2 - 1
-	view[3] = 2 * win.z - 1
-	view[4] = 1
+	position[1] = position[1] * 2 - 1
+	position[2] = position[2] * 2 - 1
+	position[3] = position[3] * 2 - 1
+	position[4] = position[4] * 2 - 1
 
-	local out = m * view
+	position = inverse * position
 
-	if out[4] == 0 then
-		return false
-	end
+	position[1] = position[1] / position[4]
+	position[2] = position[2] / position[4]
+	position[3] = position[3] / position[4]
+	position[4] = position[4] / position[4]
 
-	out[4] = 1 / out[4]
-
-	objectCoordinate = {}
-	objectCoordinate[1] = out[1] * out[4]
-	objectCoordinate[2] = out[2] * out[4]
-	objectCoordinate[3] = out[3] * out[4]
-
-	return objectCoordinate
+	return vec3(position[1], position[2], position[3])
 end
 
 function mat4:look_at(eye, center, up)
@@ -380,8 +387,6 @@ end
 -- Multiply mat4 by a mat4. Tested OK
 function mat4:__mul(m)
 	if #m == 4 then
-		-- should, hopefully, return a 4x1 matrix
-		-- i.e. a vec4
 		local tmp = matrix_mult_nxn(self:to_vec4s(), { {m[1]}, {m[2]}, {m[3]}, {m[4]} })
 		local v = {}
 		for i=1, 4 do
@@ -390,14 +395,9 @@ function mat4:__mul(m)
 		return v
 	end
 
-	-- local tmp = matrix_mult_nxn(self:to_vec4s(), m:to_vec4s())
-	-- return mat4(tmp)
 	local out = mat4()
 	for i=0, 12, 4 do
 		for j=1, 4 do
-			-- if type(m[j]) == "table" then
-			-- 	error("Whoa, this is broken!")
-			-- end
 			out[i+j] = m[j] * self[i+1] + m[j+4] * self[i+2] + m[j+8] * self[i+3] + m[j+12] * self[i+4]
 		end
 	end
