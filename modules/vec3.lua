@@ -34,6 +34,10 @@ local vector = {}
 vector.__index = vector
 
 local function new(x,y,z)
+	if type(x) == "table" then
+		return setmetatable({x = x.x or x[1] or 0, y = x.y or x[2] or 0, z = x.z or x[3] or 0}, vector)
+	end
+
 	return setmetatable({x = x or 0, y = y or 0, z = z or 0}, vector)
 end
 local zero = new(0,0,0)
@@ -221,8 +225,9 @@ function vector:trimmed(maxLen)
 	return self:clone():trim_inplace(maxLen)
 end
 
-function vector:orientation_to_direction()
-	return new(0, 1, 0)
+function vector:orientation_to_direction(orientation)
+	orientation = orientation or new(0, 1, 0)
+	return orientation
 		:rotated(self.z, new(0, 0, 1))
 		:rotated(self.y, new(0, 1, 0))
 		:rotated(self.x, new(1, 0, 0))

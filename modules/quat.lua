@@ -8,9 +8,11 @@ This is a class for handling quaternion numbers.  It was originally
 designed as a way of encoding rotations of 3 dimensional space.
 --]]
 
+local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
+local constants = require(current_folder .. "constants")
+
 local quaternion = {}
 quaternion.__index = quaternion
-local FLT_EPSILON = 1.19209290e-07
 
 --[[
 A quaternion can either be specified by giving the four coordinates as
@@ -53,7 +55,7 @@ function quaternion:to_axis_angle()
 	local angle = 2 * math.acos(tmp.a)
 	local s = math.sqrt(1-tmp.a*tmp.a)
 	local x, y, z
-	if s < FLT_EPSILON then
+	if s < constants.FLT_EPSILON then
 		x = tmp.b
 		y = tmp.c
 		z = tmp.d
@@ -172,7 +174,7 @@ Scale the quaternion.
 --]]
 
 function quaternion:scale(l)
-	return quaternion(self.a * l,self.b * l,self.c * l, self.d * l)
+	return new(self.a * l,self.b * l,self.c * l, self.d * l)
 end
 
 --[[
@@ -181,9 +183,9 @@ Add two quaternions.  Or add a real number to a quaternion.
 
 function quaternion:add(q)
 	if type(q) == "number" then
-		return quaternion(self.a + q, self.b, self.c, self.d)
+		return new(self.a + q, self.b, self.c, self.d)
 	else
-		return quaternion(self.a + q.a, self.b + q.b, self.c + q.c, self.d + q.d)
+		return new(self.a + q.a, self.b + q.b, self.c + q.c, self.d + q.d)
 	end
 end
 
@@ -200,7 +202,7 @@ Subtraction
 --]]
 
 function quaternion:subtract(q)
-	return quaternion(self.a - q.a, self.b - q.b, self.c - q.c, self.d - q.d)
+	return new(self.a - q.a, self.b - q.b, self.c - q.c, self.d - q.d)
 end
 
 --[[
@@ -239,7 +241,7 @@ function quaternion:multiplyRight(q)
 	b = self.a * q.b + self.b * q.a + self.c * q.d - self.d * q.c
 	c = self.a * q.c - self.b * q.d + self.c * q.a + self.d * q.b
 	d = self.a * q.d + self.b * q.c - self.c * q.b + self.d * q.a
-	return quaternion(a,b,c,d)
+	return new(a,b,c,d)
 end
 
 --[[
@@ -269,7 +271,7 @@ Conjugation (corresponds to inverting a rotation).
 --]]
 
 function quaternion:conjugate()
-	return quaternion(self.a, - self.b, - self.c, - self.d)
+	return new(self.a, - self.b, - self.c, - self.d)
 end
 
 function quaternion:co()
@@ -301,7 +303,7 @@ function quaternion:power(n)
 		return false
 	end
 	if n == 0 then
-		return quaternion(1,0,0,0)
+		return new(1,0,0,0)
 	elseif n > 0 then
 		return self:multiplyRight(self:power(n-1))
 	elseif n < 0 then
@@ -412,7 +414,7 @@ When we have access to the compass, the x-axis behaviour might change.
 function quaternion.gravity()
 	local gxy, gy, gygxy, a, b, c, d
 	if Gravity.x == 0 and Gravity.y == 0 then
-		return quaternion(1,0,0,0)
+		return new(1,0,0,0)
 	else
 		gy = - Gravity.y
 		gxy = math.sqrt(math.pow(Gravity.x,2) + math.pow(Gravity.y,2))
@@ -433,7 +435,7 @@ function quaternion.gravity()
 			c = - c
 			d = - d
 		end
-		return quaternion(a,b,c,d)
+		return new(a,b,c,d)
 	end
 end
 --]]
@@ -446,7 +448,7 @@ as three numbers.
 
 function quaternion.rotation(a,...)
 	local q,c,s
-	q = quaternion(0,...)
+	q = new(0,...)
 	q = q:normalize()
 	c = math.cos(a/2)
 	s = math.sin(a/2)
@@ -494,7 +496,7 @@ The unit quaternion.
 --]]
 
 function quaternion.unit()
-	return quaternion(1,0,0,0)
+	return new(1,0,0,0)
 end
 
 --return quaternion
