@@ -90,4 +90,12 @@ function intersect.line_line(p1, p2, p3, p4)
 	return true, resultSegmentPoint1, resultSegmentPoint2
 end
 
+function intersect.circle_circle(c1, c2)
+	assert(type(c1.point)	== "table", "c1 point must be a table")
+	assert(type(c1.radius)	== "number", "c1 radius must be a number")
+	assert(type(c2.point)	== "table", "c2 point must be a table")
+	assert(type(c2.radius)	== "number", "c2 radius must be a number")
+	return c1.point:dist(c2.point) <= c1.radius + c2.radius
+end
+
 return intersect
