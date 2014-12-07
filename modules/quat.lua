@@ -499,6 +499,32 @@ function quaternion.unit()
 	return new(1,0,0,0)
 end
 
+-- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
+function quaternion.lerp(a, b, dt)
+	return a + dt * (b - a)
+end
+
+-- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
+function quaternion.nlerp(a, b, dt)
+	return quaternion.lerp(a, b, dt):normalize()
+end
+
+-- http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
+function quaternion.slerp(a, b, dt)
+	local function clamp(n, low, high) return math.min(math.max(n, low), high) end
+	local dot = a:dot(b)
+
+	if dot > constants.DOT_THRESHOLD then
+		return quaternion.nlerp(a, b, dt)
+	end
+
+	clamp(dot, -1, 1)
+	local theta = math.acos(dot) * dt
+	local c = (b - a * dot):normalize()
+
+	return a * math.cos(theta) + c * math.sin(theta)
+end
+
 --return quaternion
 -- the module
 return setmetatable({ new = new },
