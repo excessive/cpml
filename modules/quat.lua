@@ -500,26 +500,29 @@ function quaternion.unit()
 end
 
 -- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
-function quaternion.lerp(a, b, dt)
-	return a + dt * (b - a)
-end
-
--- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
-function quaternion.nlerp(a, b, dt)
-	return quaternion.lerp(a, b, dt):normalize()
+-- non-normalized rotations do not work out for quats!
+function quaternion.lerp(a, b, s)
+	local v = a + (b - a) * s
+	return v:normalize()
 end
 
 -- http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
-function quaternion.slerp(a, b, dt)
+function quaternion.slerp(a, b, s)
 	local function clamp(n, low, high) return math.min(math.max(n, low), high) end
 	local dot = a:dot(b)
 
+	-- http://www.gamedev.net/topic/312067-shortest-slerp-path/#entry2995591
+	if dot < 0 then
+		a = -a
+		dot = -dot
+	end
+
 	if dot > constants.DOT_THRESHOLD then
-		return quaternion.nlerp(a, b, dt)
+		return quaternion.lerp(a, b, s)
 	end
 
 	clamp(dot, -1, 1)
-	local theta = math.acos(dot) * dt
+	local theta = math.acos(dot) * s
 	local c = (b - a * dot):normalize()
 
 	return a * math.cos(theta) + c * math.sin(theta)

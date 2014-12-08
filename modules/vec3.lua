@@ -233,6 +233,11 @@ function vector:orientation_to_direction(orientation)
 		:rotated(self.x, new(1, 0, 0))
 end
 
+-- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
+function vector.lerp(a, b, s)
+	return a + s * (b - a)
+end
+
 -- the module
 return setmetatable({new = new, isvector = isvector, zero = zero},
 {__call = function(_, ...) return new(...) end})
