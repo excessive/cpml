@@ -37,12 +37,13 @@ local cpml = {
 
 local files = {
 	"constants",
+  "intersect",
 	"mat4",
+  "mesh",
+  "quat",
+  "simplex",
+  "vec2",
 	"vec3",
-	"quat",
-	"simplex",
-	"intersect",
-  "mesh"
 }
 
 for _, v in ipairs(files) do
