@@ -128,7 +128,7 @@ function vector:normalize_inplace()
 	return self
 end
 
-function vector:normalized()
+function vector:normalize()
 	return self:clone():normalize_inplace()
 end
 
