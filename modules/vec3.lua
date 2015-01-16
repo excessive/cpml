@@ -147,7 +147,7 @@ function vector:normalize()
 	return self:clone():normalize_inplace()
 end
 
-function vector:rotated(phi, axis)
+function vector:rotate(phi, axis)
 	if axis == nil then return self end
 
 	local u = axis:normalize() or Vector(0,0,1) -- default is to rotate in the xy plane
@@ -221,7 +221,7 @@ function vector:angle_between(other)
 	return 0
 end
 
-function vector:trimmed(maxLen)
+function vector:trim(maxLen)
 	return self:clone():trim_inplace(maxLen)
 end
 

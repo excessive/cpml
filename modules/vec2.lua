@@ -138,7 +138,7 @@ function vector:rotate_inplace(phi)
 	return self
 end
 
-function vector:rotated(phi)
+function vector:rotate(phi)
 	local c, s = cos(phi), sin(phi)
 	return new(c * self.x - s * self.y, s * self.x + c * self.y)
 end
@@ -147,14 +147,14 @@ function vector:perpendicular()
 	return new(-self.y, self.x)
 end
 
-function vector:projectOn(v)
+function vector:project_on(v)
 	assert(isvector(v), "invalid argument: cannot project vector on " .. type(v))
 	-- (self * v) * v / v:len2()
 	local s = (self.x * v.x + self.y * v.y) / (v.x * v.x + v.y * v.y)
 	return new(s * v.x, s * v.y)
 end
 
-function vector:mirrorOn(v)
+function vector:mirror_on(v)
 	assert(isvector(v), "invalid argument: cannot mirror vector on " .. type(v))
 	-- 2 * self:projectOn(v) - self
 	local s = 2 * (self.x * v.x + self.y * v.y) / (v.x * v.x + v.y * v.y)
@@ -174,14 +174,14 @@ function vector:trim_inplace(maxLen)
 	return self
 end
 
-function vector:angleTo(other)
+function vector:angle_to(other)
 	if other then
 		return atan2(self.y, self.x) - atan2(other.y, other.x)
 	end
 	return atan2(self.y, self.x)
 end
 
-function vector:trimmed(maxLen)
+function vector:trim(maxLen)
 	return self:clone():trim_inplace(maxLen)
 end
 
