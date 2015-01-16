@@ -126,8 +126,8 @@ end
 The inner product of two quaternions.
 --]]
 
-function quaternion:dot(q)
-	return self.a * q.a + self.b * q.b + self.c * q.c + self.d * q.d
+function quaternion.dot(a, b)
+	return a.a * b.a + a.b * b.b + a.c * b.c + a.d * b.d
 end
 
 --[[
@@ -145,14 +145,14 @@ Length of a quaternion.
 --]]
 
 function quaternion:len()
-	return math.sqrt(self:lensq())
+	return math.sqrt(self:len2())
 end
 
 --[[
 Often enough to know the length squared, which is quicker.
 --]]
 
-function quaternion:lensq()
+function quaternion:len2()
 	return self.a * self.a + self.b * self.b + self.c * self.c + self.d * self.d
 end
 
@@ -235,7 +235,7 @@ Multiply the current quaternion on the right.
 Corresponds to composition of rotations.
 --]]
 
-function quaternion:multiplyRight(q)
+function quaternion:multiply_right(q)
 	local a,b,c,d
 	a = self.a * q.a - self.b * q.b - self.c * q.c - self.d * q.d
 	b = self.a * q.b + self.b * q.a + self.c * q.d - self.d * q.c
@@ -252,7 +252,7 @@ function quaternion:__mul(q)
 	if type(q) == "number" then
 		return self:scale(q)
 	elseif type(q) == "table" then
-		return self:multiplyRight(q)
+		return self:multiply_right(q)
 	end
 end
 
@@ -262,8 +262,8 @@ Multiply the current quaternion on the left.
 Corresponds to composition of rotations.
 --]]
 
-function quaternion:multiplyLeft(q)
-	return q:multiplyRight(self)
+function quaternion:multiply_left(q)
+	return q:multiply_right(self)
 end
 
 --[[
@@ -288,7 +288,7 @@ function quaternion:reciprocal()
 		return false
 	end
 	local q = self:conjugate()
-	local l = self:lensq()
+	local l = self:len2()
 	q = q:scale(1/l)
 	return q
 end
@@ -351,7 +351,7 @@ end
 Returns the vector (imaginary) part as a Vec3 object.
 --]]
 
-function quaternion:vector()
+function quaternion:to_vec3()
 	return Vec3(self.b, self.c, self.d)
 end
 
@@ -446,7 +446,7 @@ to rotate, the rest must specify an axis, either as a Vec3 object or
 as three numbers.
 --]]
 
-function quaternion.rotation(a,...)
+function quaternion.rotate(a,...)
 	local q,c,s
 	q = new(0,...)
 	q = q:normalize()
