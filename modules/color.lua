@@ -170,4 +170,54 @@ function color.value(color, percent)
 	return hsv_to_color(c)
 end
 
+-- http://en.wikipedia.org/wiki/SRGB#The_reverse_transformation
+function color.gamma_to_linear(r, g, b, a)
+	local function convert(c)
+		if c > 1.0 then
+			return 1.0
+		elseif c < 0.0 then
+			return 0.0
+		elseif c <= 0.04045 then
+			return c / 12.92
+		else
+			return math.pow((c + 0.055) / 1.055, 2.4)
+		end
+	end
+	if type(r) == "table" then
+		local c = {}
+		for i=1,3 do
+			c[i] = convert(r[i] / 255) * 255
+		end
+		c[4] = convert(r[4] / 255) * 255
+		return c
+	else
+		return convert(r / 255) * 255, convert(g / 255) * 255, convert(b / 255) * 255, a or 255
+	end
+end
+
+-- http://en.wikipedia.org/wiki/SRGB#The_forward_transformation_.28CIE_xyY_or_CIE_XYZ_to_sRGB.29
+function color.linear_to_gamma(r, g, b, a)
+	local function convert(c)
+		if c > 1.0 then
+			return 1.0
+		elseif c < 0.0 then
+			return 0.0
+		elseif c < 0.0031308 then
+			return c * 12.92
+		else
+			return 1.055 * math.pow(c, 0.41666) - 0.055
+		end
+	end
+	if type(r) == "table" then
+		local c = {}
+		for i=1,3 do
+			c[i] = convert(r[i] / 255) * 255
+		end
+		c[4] = convert(r[4] / 255) * 255
+		return c
+	else
+		return convert(r / 255) * 255, convert(g / 255) * 255, convert(b / 255) * 255, a or 255
+	end
+end
+
 return setmetatable({new = new}, color)
