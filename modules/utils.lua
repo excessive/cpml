@@ -23,4 +23,10 @@ function utils.wrap(v, n)
 	return v % n
 end
 
+-- from undef: https://love2d.org/forums/viewtopic.php?p=182219#p182219
+-- check if a number is a power-of-two
+function utils.is_pot(n)
+  return 0.5 == (math.frexp(n))
+end
+
 return utils
