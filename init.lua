@@ -41,6 +41,8 @@ local files = {
 	"intersect",
 	"mat4",
 	"mesh",
+	"octree",
+	"quadtree",
 	"quat",
 	"simplex",
 	"utils",
