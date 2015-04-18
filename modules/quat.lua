@@ -9,10 +9,10 @@ designed as a way of encoding rotations of 3 dimensional space.
 --]]
 
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
-local constants = require(current_folder .. "constants")
-
-local quaternion = {}
-quaternion.__index = quaternion
+local constants      = require(current_folder .. "constants")
+local vec3           = require(current_folder .. "vec3")
+local quaternion     = {}
+quaternion.__index   = quaternion
 
 --[[
 A quaternion can either be specified by giving the four coordinates as
@@ -20,146 +20,158 @@ real numbers or by giving the scalar part and the vector part.
 --]]
 
 local function new(...)
-	local a, b, c, d
+	local x, y, z, w
 	-- copy
 	local arg = {...}
 	if #arg == 1 and type(arg[1]) == "table" then
-		a = arg[1].a
-		b = arg[1].b
-		c = arg[1].c
-		d = arg[1].d
+		x = arg[1].x
+		y = arg[1].y
+		z = arg[1].z
+		w = arg[1].w
 	-- four numbers
 	elseif #arg == 4 then
-		a = arg[1]
-		b = arg[2]
-		c = arg[3]
-		d = arg[4]
+		x = arg[1]
+		y = arg[2]
+		z = arg[3]
+		w = arg[4]
 	-- real number plus vector
 	elseif #arg == 2 then
-		a = arg[1]
-		b = arg[2].x
-		c = arg[2].y
-		d = arg[2].z
+		x = arg[1].x or arg[1][1]
+		y = arg[1].y or arg[1][2]
+		z = arg[1].z or arg[1][3]
+		w = arg[2]
 	else
 		error("Incorrect number of arguments to quaternion")
 	end
 
-	return setmetatable({ a = a or 0, b = b or 0, c = c or 0, d = d or 0 }, quaternion)
+	return setmetatable({ x = x or 0, y = y or 0, z = z or 0, w = w or 0 }, quaternion)
+end
+
+function quaternion:__add(q)
+	if type(q) == "number" then
+		return new(self.x, self.y, self.z, self.w + q)
+	else
+		return new(self.x + q.x, self.y + q.y, self.z + q.z, self.w + q.w)
+	end
+end
+
+function quaternion:__sub(q)
+	return new(self.x - q.x, self.y - q.y, self.z - q.z, self.w - q.w)
+end
+
+function quaternion:__unm()
+	return self:scale(-1)
+end
+
+function quaternion:__mul(q)
+	if type(q) == "number" then
+		return self:scale(q)
+	elseif type(q) == "table" then
+		local x,y,z,w
+		x = self.w * q.x + self.x * q.w + self.y * q.z - self.z * q.y
+		y = self.w * q.y - self.x * q.z + self.y * q.w + self.z * q.x
+		z = self.w * q.z + self.x * q.y - self.y * q.x + self.z * q.w
+		w = self.w * q.w - self.x * q.x - self.y * q.y - self.z * q.z
+		return new(x,y,z,w)
+	end
+end
+
+function quaternion:__div(q)
+	if type(q) == "number" then
+		return self:scale(1/q)
+	elseif type(q) == "table" then
+		return self * q:reciprocal()
+	end
+end
+
+function quaternion:__pow(n)
+	if n == 0 then
+		return self.unit()
+	elseif n > 0 then
+		return self * self^(n-1)
+	elseif n < 0 then
+		return self:reciprocal()^(-n)
+	end
+end
+
+function quaternion:__eq(q)
+	if self.x ~= q.x or self.y ~= q.y or self.z ~= q.z or self.w ~= q.w then
+		return false
+	end
+	return true
+end
+
+function quaternion:__tostring()
+	return "("..tonumber(self.x)..","..tonumber(self.y)..","..tonumber(self.z)..","..tonumber(self.w)..")"
+end
+
+function quaternion.unit()
+	return new(0,0,0,1)
 end
 
 function quaternion:to_axis_angle()
 	local tmp = self
-	if tmp.a > 1 then
+	if tmp.w > 1 then
 		tmp = tmp:normalize()
 	end
-	local angle = 2 * math.acos(tmp.a)
-	local s = math.sqrt(1-tmp.a*tmp.a)
+	local angle = 2 * math.acos(tmp.w)
+	local s = math.sqrt(1-tmp.w*tmp.w)
 	local x, y, z
 	if s < constants.FLT_EPSILON then
-		x = tmp.b
-		y = tmp.c
-		z = tmp.d
+		x = tmp.x
+		y = tmp.y
+		z = tmp.z
 	else
-		x = tmp.b / s -- normalize axis
-		y = tmp.c / s
-		z = tmp.d / s
+		x = tmp.x / s -- normalize axis
+		y = tmp.y / s
+		z = tmp.z / s
 	end
 	return angle, { x, y, z }
 end
 
---[[
-Test if we are zero.
---]]
-
+-- Test if we are zero
 function quaternion:is_zero()
 	-- are we the zero vector
-	if self.a ~= 0 or self.b ~= 0 or self.c ~= 0 or self.d ~= 0 then
+	if self.x ~= 0 or self.y ~= 0 or self.z ~= 0 or self.w ~= 0 then
 		return false
 	end
 	return true
 end
 
---[[
-Test if we are real.
---]]
-
+-- Test if we are real
 function quaternion:is_real()
 	-- are we the zero vector
-	if self.b ~= 0 or self.c ~= 0 or self.d ~= 0 then
+	if self.x ~= 0 or self.y ~= 0 or self.z ~= 0 then
 		return false
 	end
 	return true
 end
 
---[[
-Test if the real part is zero.
---]]
-
+-- Test if the real part is zero
 function quaternion:is_imaginary()
 	-- are we the zero vector
-	if self.a ~= 0 then
+	if self.w ~= 0 then
 		return false
 	end
 	return true
 end
 
---[[
-Test for equality.
---]]
-
-function quaternion:is_eq(q)
-	if self.a ~= q.a or self.b ~= q.b or self.c ~= q.c or self.d ~= q.d then
-		return false
-	end
-	return true
-end
-
---[[
-Defines the "==" shortcut.
---]]
-
-function quaternion:__eq(q)
-	return self:is_eq(q)
-end
-
---[[
-The inner product of two quaternions.
---]]
-
+-- The dot product of two quaternions
 function quaternion.dot(a, b)
-	return a.a * b.a + a.b * b.b + a.c * b.c + a.d * b.d
+	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
 end
 
---[[
-Makes "q .. p" return the inner product.
-
-Probably a bad choice and likely to be removed in future versions.
---]]
-
-function quaternion:__concat(q)
-	return self:dot(q)
-end
-
---[[
-Length of a quaternion.
---]]
-
+-- Length of a quaternion
 function quaternion:len()
 	return math.sqrt(self:len2())
 end
 
---[[
-Often enough to know the length squared, which is quicker.
---]]
-
+-- Length squared of a quaternion
 function quaternion:len2()
-	return self.a * self.a + self.b * self.b + self.c * self.c + self.d * self.d
+	return self.x * self.x + self.y * self.y + self.z * self.z + self.w * self.w
 end
 
---[[
-Normalize a quaternion to have length 1, if possible.
---]]
-
+-- Normalize a quaternion to have length 1
 function quaternion:normalize()
 	if self:is_zero() then
 		error("Unable to normalize a zero-length quaternion")
@@ -169,119 +181,17 @@ function quaternion:normalize()
 	return self:scale(l)
 end
 
---[[
-Scale the quaternion.
---]]
-
+-- Scale the quaternion
 function quaternion:scale(l)
-	return new(self.a * l,self.b * l,self.c * l, self.d * l)
+	return new(self.x * l,self.y * l,self.z * l, self.w * l)
 end
 
---[[
-Add two quaternions.  Or add a real number to a quaternion.
---]]
-
-function quaternion:add(q)
-	if type(q) == "number" then
-		return new(self.a + q, self.b, self.c, self.d)
-	else
-		return new(self.a + q.a, self.b + q.b, self.c + q.c, self.d + q.d)
-	end
-end
-
---[[
-q + p
---]]
-
-function quaternion:__add(q)
-	return self:add(q)
-end
-
---[[
-Subtraction
---]]
-
-function quaternion:subtract(q)
-	return new(self.a - q.a, self.b - q.b, self.c - q.c, self.d - q.d)
-end
-
---[[
-q - p
---]]
-
-function quaternion:__sub(q)
-	return self:subtract(q)
-end
-
---[[
-Negation (-q)
---]]
-
-function quaternion:__unm()
-	return self:scale(-1)
-end
-
---[[
-Length (#q)
---]]
-
-function quaternion:__len()
-	return self:len()
-end
-
---[[
-Multiply the current quaternion on the right.
-
-Corresponds to composition of rotations.
---]]
-
-function quaternion:multiply_right(q)
-	local a,b,c,d
-	a = self.a * q.a - self.b * q.b - self.c * q.c - self.d * q.d
-	b = self.a * q.b + self.b * q.a + self.c * q.d - self.d * q.c
-	c = self.a * q.c - self.b * q.d + self.c * q.a + self.d * q.b
-	d = self.a * q.d + self.b * q.c - self.c * q.b + self.d * q.a
-	return new(a,b,c,d)
-end
-
---[[
-q * p
---]]
-
-function quaternion:__mul(q)
-	if type(q) == "number" then
-		return self:scale(q)
-	elseif type(q) == "table" then
-		return self:multiply_right(q)
-	end
-end
-
---[[
-Multiply the current quaternion on the left.
-
-Corresponds to composition of rotations.
---]]
-
-function quaternion:multiply_left(q)
-	return q:multiply_right(self)
-end
-
---[[
-Conjugation (corresponds to inverting a rotation).
---]]
-
+-- Conjugation (corresponds to inverting a rotation)
 function quaternion:conjugate()
-	return new(self.a, - self.b, - self.c, - self.d)
+	return new(-self.x, -self.y, -self.z, self.w)
 end
 
-function quaternion:co()
-	return self:conjugate()
-end
-
---[[
-Reciprocal: 1/q
---]]
-
+-- Reciprocal: 1/q
 function quaternion:reciprocal()
 	if self.is_zero() then
 		error("Cannot reciprocate a zero quaternion")
@@ -293,185 +203,47 @@ function quaternion:reciprocal()
 	return q
 end
 
---[[
-Integral powers.
---]]
-
-function quaternion:power(n)
-	if n ~= math.floor(n) then
-		error("Only able to do integer powers")
-		return false
-	end
-	if n == 0 then
-		return new(1,0,0,0)
-	elseif n > 0 then
-		return self:multiplyRight(self:power(n-1))
-	elseif n < 0 then
-		return self:reciprocal():power(-n)
-	end
-end
-
---[[
-q^n
-
-This is overloaded so that a non-number exponent returns the
-conjugate.  This means that one can write things like q^* or q^"" to
-get the conjugate of a quaternion.
---]]
-
-function quaternion:__pow(n)
-	if type(n) == "number" then
-		return self:power(n)
-	else
-		return self:conjugate()
-	end
-end
-
---[[
-Division: q/p
---]]
-
-function quaternion:__div(q)
-	if type(q) == "number" then
-		return self:scale(1/q)
-	elseif type(q) == "table" then
-		return self:multiplyRight(q:reciprocal())
-	end
-end
-
---[[
-Returns the real part.
---]]
-
+-- Returns the real part
 function quaternion:real()
-	return self.a
+	return self.w
 end
 
---[[
-Returns the vector (imaginary) part as a Vec3 object.
---]]
-
+-- Returns the vector (imaginary) part as a Vec3 object
 function quaternion:to_vec3()
-	return Vec3(self.b, self.c, self.d)
+	return vec3(self.x, self.y, self.z)
 end
 
 --[[
-Represents a quaternion as a string.
+Converts a rotation to a quaternion. The first argument is the angle
+to rotate, the second must specify an axis as a Vec3 object.
 --]]
 
-function quaternion:__tostring()
-	local s
-	local im ={{self.b,"i"},{self.c,"j"},{self.d,"k"}}
-	if self.a ~= 0 then
-		s = self.a
-	end
-	for k,v in pairs(im) do
-	if v[1] ~= 0 then
-		if s then 
-			if v[1] > 0 then
-				if v[1] == 1 then
-					s = s .. " + " .. v[2]
-				else
-					s = s .. " + " .. v[1] .. v[2]
-				end
-			else
-				if v[1] == -1 then
-					s = s .. " - " .. v[2]
-				else
-					s = s .. " - " .. (-v[1]) .. v[2]
-				end
-				end
-		else
-			if v[1] == 1 then
-				s = v[2]
-			elseif v[1] == - 1 then
-				s = "-" .. v[2]
-			else
-				s = v[1] .. v[2]
-			end
-		end
-	end
-	end
-	if s then
-		return s
-	else
-		return "0"
-	end
-end
-
---[[
-(Not a class function)
-
-Returns a quaternion corresponding to the current gravitational vector
-so that after applying the corresponding rotation, the y-axis points
-in the gravitational direction and the x-axis is in the plane of the
-iPad screen.
-
-When we have access to the compass, the x-axis behaviour might change.
---]]
-
---[[
-function quaternion.gravity()
-	local gxy, gy, gygxy, a, b, c, d
-	if Gravity.x == 0 and Gravity.y == 0 then
-		return new(1,0,0,0)
-	else
-		gy = - Gravity.y
-		gxy = math.sqrt(math.pow(Gravity.x,2) + math.pow(Gravity.y,2))
-		gygxy = gy/gxy
-		a = math.sqrt(1 + gxy - gygxy - gy)/2
-		b = math.sqrt(1 - gxy - gygxy + gy)/2
-		c = math.sqrt(1 - gxy + gygxy - gy)/2
-		d = math.sqrt(1 + gxy + gygxy + gy)/2
-		if Gravity.y > 0 then
-			a = a
-			b = b
-		end
-		if Gravity.z < 0 then
-			b = - b
-			c = - c
-		end
-		if Gravity.x > 0 then
-			c = - c
-			d = - d
-		end
-		return new(a,b,c,d)
-	end
-end
---]]
-
---[[
-Converts a rotation to a quaternion.  The first argument is the angle
-to rotate, the rest must specify an axis, either as a Vec3 object or
-as three numbers.
---]]
-
-function quaternion.rotate(a,...)
+function quaternion:rotate(a,axis)
 	local q,c,s
-	q = new(0,...)
+	q = new(axis, 0)
 	q = q:normalize()
-	c = math.cos(a/2)
-	s = math.sin(a/2)
+	c = math.cos(a)
+	s = math.sin(a)
 	q = q:scale(s)
-	q = q:add(c)
+	q = q + c
 	return q
 end
 
 function quaternion:to_euler()
-	local sqw = self.a*self.a
-	local sqx = self.b*self.b
-	local sqy = self.c*self.c
-	local sqz = self.d*self.d
+	local sqx = self.x*self.x
+	local sqy = self.y*self.y
+	local sqz = self.z*self.z
+	local sqw = self.w*self.w
 
 	 -- if normalised is one, otherwise is correction factor
 	local unit = sqx + sqy + sqz + sqw
-	local test = self.b*self.c + self.d*self.a
+	local test = self.x*self.y + self.z*self.w
 
 	local pitch, yaw, roll
 
 	 -- singularity at north pole
 	if test > 0.499*unit then
-		yaw = 2 * math.atan2(self.b,self.a)
+		yaw = 2 * math.atan2(self.x,self.w)
 		pitch = math.pi/2
 		roll = 0
 		return pitch, yaw, roll
@@ -479,24 +251,16 @@ function quaternion:to_euler()
 
 	 -- singularity at south pole
 	if test < -0.499*unit then
-		yaw = -2 * math.atan2(self.b,self.a)
+		yaw = -2 * math.atan2(self.x,self.w)
 		pitch = -math.pi/2
 		roll = 0
 		return pitch, yaw, roll
 	end
-	yaw = math.atan2(2*self.c*self.a-2*self.b*self.d , sqx - sqy - sqz + sqw)
+	yaw = math.atan2(2*self.y*self.w-2*self.x*self.z , sqx - sqy - sqz + sqw)
 	pitch = math.asin(2*test/unit)
-	roll = math.atan2(2*self.b*self.a-2*self.c*self.d , -sqx + sqy - sqz + sqw)
+	roll = math.atan2(2*self.x*self.w-2*self.y*self.z , -sqx + sqy - sqz + sqw)
 
 	return pitch, roll, yaw
-end
-
---[[
-The unit quaternion.
---]]
-
-function quaternion.unit()
-	return new(1,0,0,0)
 end
 
 -- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
@@ -528,7 +292,7 @@ function quaternion.slerp(a, b, s)
 	return a * math.cos(theta) + c * math.sin(theta)
 end
 
---return quaternion
+-- return quaternion
 -- the module
 return setmetatable({ new = new },
 { __call = function(_, ...) return new(...) end })
