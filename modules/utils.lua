@@ -12,7 +12,8 @@ function utils.lerp(v, l, h)
 	return v * (h - l) + l
 end
 
-function utils.round(v)
+function utils.round(v, precision)
+	if precision then return utils.round(v / precision) * precision end
 	return v >= 0 and math.floor(v+0.5) or math.ceil(v-0.5)
 end
 

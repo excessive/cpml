@@ -1,7 +1,7 @@
 local vec3 = require "modules.vec3"
 
-describe("vec3 tests", function()
-	it("tests basic operators", function()
+describe("vec3:", function()
+	it("testing basic operators", function()
 		-- add
 		assert.is.equal(vec3(1, 1, 1) + vec3(2, 3, 4), vec3(3, 4, 5))
 		assert.has.errors(function() return vec3(1, 1, 1) + 5 end)
@@ -24,7 +24,7 @@ describe("vec3 tests", function()
 		assert.has.errors(function() return vec3(1, 1, 1) / vec3(2, 2, 2) end)
 	end)
 
-	it("tests comparison operators", function()
+	it("testing comparison operators", function()
 		-- eq
 		assert.is_true(vec3(5,5,5) == vec3(5,5,5))
 
@@ -37,7 +37,7 @@ describe("vec3 tests", function()
 		assert.is_false(vec3(3,3,3) >= vec3(5,5,5))
 	end)
 
-	it("tests misc operators", function()
+	it("testing misc operators", function()
 		-- tostring
 		assert.has_no.errors(function() return tostring(vec3(1,1,1)) end)
 
@@ -46,7 +46,7 @@ describe("vec3 tests", function()
 		assert.is_true(vec3.isvector{x=1, y=2, z=3})
 	end)
 
-	it("tests clone", function()
+	it("testing clone", function()
 		local v = vec3(1,1,1)
 		local c = v:clone()
 		c.x = 2
