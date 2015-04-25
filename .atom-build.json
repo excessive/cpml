@@ -1,0 +1,6 @@
+{
+	"cmd": "busted",
+	"args": [ "spec" ],
+	"sh": false,
+	"cwd": "{PROJECT_PATH}"
+}
