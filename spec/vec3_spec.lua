@@ -53,23 +53,38 @@ describe("vec3:", function()
 		assert.is_not.equal(v, c)
 	end)
 
+	it("testing dot", function()
+		assert.is.equal(vec3(5,10,-5):dot(vec3(3,1,1)), 20)
+		assert.is.equal(vec3(2,-1,2):dot(vec3(1,2,1)), 2)
+		assert.is.equal(vec3(5,5,5):dot(vec3(5,5,5)), 75)
+	end)
+
+	it("testing cross", function()
+		assert.is.equal(vec3(1,0,0):cross(vec3(0,1,0)), vec3(0,0,1))
+	end)
+
+	it("testing len and normalize", function()
+		assert.is.equal(vec3(1,0,0):len(), 1)
+		assert.is.equal(vec3(5,-10,9):normalize():len(), 1)
+	end)
+
+	it("testing len2", function()
+		assert.is.equal(vec3(1,0,0):len2(), 1)
+		assert.is.equal(vec3(2,0,2):len2(), 8)
+	end)
+
 	describe("vec3 pending tests", function()
 		pending "lerp"
 		pending "trim"
 		pending "angle_to"
 		pending "angle_between"
-		pending "dot"
-		pending "cross"
 		pending "mirror_on"
 		pending "orientation_to_direction"
 		pending "project_from"
 		pending "project_on"
 		pending "perpendicular"
 		pending "rotate"
-		pending "normalize"
 		pending "dist"
 		pending "dist2"
-		pending "len"
-		pending "len2"
 	end)
 end)
