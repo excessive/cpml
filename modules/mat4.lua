@@ -4,6 +4,7 @@
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local constants = require(current_folder .. "constants")
 local vec3 = require(current_folder .. "vec3")
+local quat = require(current_folder .. "quat")
 
 local mat4 = {}
 mat4.__index = mat4
@@ -25,6 +26,47 @@ local function matrix_mult_nxn(m1, m2)
 		end
 	end
 	return mtx
+end
+
+function mat4.from_direction(direction, up)
+	local forward = direction:normalize()
+	local side = forward:cross(up):normalize()
+	local new_up = side:cross(forward):normalize()
+
+	local view = mat4()
+	view[1]  = side.x
+	view[5]  = side.y
+	view[9]  = side.z
+
+	view[2]  = new_up.x
+	view[6]  = new_up.y
+	view[10] = new_up.z
+
+	view[3]  = forward.x
+	view[7]  = forward.y
+	view[11] = forward.z
+
+	view[16] = 1
+
+	return view
+end
+
+function mat4:to_quat()
+	local m = self:transpose():to_vec4s()
+	local w = math.sqrt(1 + m[1][1] + m[2][2] + m[3][3]) / 2
+	local scale = w * 4
+	-- return quat(
+	-- 	m[2][3] - m[3][2] / scale,
+	-- 	m[3][1] - m[1][3] / scale,
+	-- 	m[1][2] - m[2][1] / scale,
+	-- 	w
+	-- ):normalize()
+	return quat(
+		m[3][2] - m[2][3] / scale,
+		m[1][3] - m[3][1] / scale,
+		m[2][1] - m[1][2] / scale,
+		w
+	):normalize()
 end
 
 function mat4:__call(v)
@@ -97,21 +139,21 @@ function mat4:perspective(fovy, aspect, near, far)
 	assert(aspect ~= 0)
 	assert(near ~= far)
 
-	local t = math.tan(fovy / 2)
-	local result = mat4(
+	local t = math.tan(math.rad(fovy) / 2)
+	local result = {
 		0, 0, 0, 0,
 		0, 0, 0, 0,
 		0, 0, 0, 0,
 		0, 0, 0, 0
-	)
+	}
 
-	result[1] = 1 / (aspect * t)
-	result[6] = 1 / t
-	result[11] = - (far + near) / (far - near)
-	result[12] = - 1
-	result[15] = - (2 * far * near) / (far - near)
+	result[1]  = 1 / (t * aspect)
+	result[6]  = 1 / t
+	result[11] = -(far + near) / (far - near)
+	result[12] = -1
+	result[15] = -(2 * far * near) / (far - near)
 
-	return result
+	return mat4(result)
 end
 
 function mat4:translate(t)
@@ -322,7 +364,7 @@ end
 -- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L338
 -- Note: GLM calls the view matrix "model"
 function mat4.unproject(win, view, projection, viewport)
-	local inverse = (projection:transpose() * view:transpose()):invert()
+	local inverse = (view * projection):invert()
 	local position = { win.x, win.y, win.z, 1 }
 	position[1] = (position[1] - viewport[1]) / viewport[3]
 	position[2] = (position[2] - viewport[2]) / viewport[4]
@@ -348,24 +390,21 @@ function mat4:look_at(eye, center, up)
 	local new_up = side:cross(forward):normalize()
 
 	local view = mat4()
-	view[1]	= side.x
-	view[5]	= side.y
-	view[9]	= side.z
+	view[1]  = side.x
+	view[5]  = side.y
+	view[9]  = side.z
 
-	view[2]	= new_up.x
-	view[6]	= new_up.y
-	view[10]= new_up.z
+	view[2]  = new_up.x
+	view[6]  = new_up.y
+	view[10] = new_up.z
 
-	view[3]	= -forward.x
-	view[7]	= -forward.y
-	view[11]= -forward.z
+	view[3]  = -forward.x
+	view[7]  = -forward.y
+	view[11] = -forward.z
 
-	view[16]= 1
+	view[16] = 1
 
-	-- Fix 1u offset
-	local new_eye = eye + forward
-
-	local out = mat4():translate(-new_eye) * view
+	local out = mat4():translate(-eye) * view
 	return out * self
 end
 
@@ -387,7 +426,7 @@ end
 -- Multiply mat4 by a mat4. Tested OK
 function mat4:__mul(m)
 	if #m == 4 then
-		local tmp = matrix_mult_nxn(self:to_vec4s(), { {m[1]}, {m[2]}, {m[3]}, {m[4]} })
+		local tmp = matrix_mult_nxn(self:transpose():to_vec4s(), { {m[1]}, {m[2]}, {m[3]}, {m[4]} })
 		local v = {}
 		for i=1, 4 do
 			v[i] = tmp[i][1]
