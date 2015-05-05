@@ -208,6 +208,10 @@ function quaternion:real()
 	return self.w
 end
 
+function quaternion:clone()
+	return new(self.x, self.y, self.z, self.w)
+end
+
 -- Returns the vector (imaginary) part as a Vec3 object
 function quaternion:to_vec3()
 	return vec3(self.x, self.y, self.z)
