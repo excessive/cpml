@@ -55,7 +55,7 @@ function vector:unpack()
 end
 
 function vector:__tostring()
-	return "("..tonumber(self.x)..","..tonumber(self.y)..","..tonumber(self.z)..")"
+	return string.format("(%+0.3f,%+0.3f,%+0.3f)", self.x, self.y, self.z)
 end
 
 function vector.__unm(a)
