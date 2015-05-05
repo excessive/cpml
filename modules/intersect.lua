@@ -4,6 +4,65 @@ local constants = require(current_folder .. "constants")
 
 local intersect = {}
 
+-- *COMPLETELY* untested!
+function intersect.ray_aabb(ray, lb, rt)
+	local min = math.min
+	local max = math.max
+
+	-- ray.direction is unit direction vector of ray
+	local dir = ray.direction:normalize()
+	local dirfrac = cpml.vec3(1/dir.x,1/dir.y,1/dir.z)
+
+	-- lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
+	-- ray.point is origin of ray
+	local t1 = (lb.x - ray.point.x)*dirfrac.x
+	local t2 = (rt.x - ray.point.x)*dirfrac.x
+	local t3 = (lb.y - ray.point.y)*dirfrac.y
+	local t4 = (rt.y - ray.point.y)*dirfrac.y
+	local t5 = (lb.z - ray.point.z)*dirfrac.z
+	local t6 = (rt.z - ray.point.z)*dirfrac.z
+
+	local tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6))
+	local tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6))
+
+	-- if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+	if tmax < 0 then
+	    return false
+	end
+
+	-- if tmin > tmax, ray doesn't intersect AABB
+	if tmin > tmax then
+	    return false
+	end
+
+	return true, tmin
+end
+
+-- ray = { point, direction }
+-- plane = { point, normal }
+-- https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
+function intersect.ray_plane(ray, plane)
+	-- t = distance of direction
+	-- d = distance from ray point to plane point
+	-- p = point of intersection
+
+	local d = ray.point:dist(plane.point)
+	local r = ray.direction:dot(plane.normal)
+
+	if r <= 0 then
+		return false
+	end
+
+	local t = -(ray.point:dot(plane.normal) + d) / r
+	local p = ray.point + t * ray.direction
+
+	if p:dot(plane.normal) + d < constants.FLT_EPSILON then
+		return p
+	end
+
+	return false
+end
+
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 function intersect.ray_triangle(ray, triangle)
 	assert(ray.point ~= nil)
@@ -18,7 +77,7 @@ function intersect.ray_triangle(ray, triangle)
 	local e1 = triangle[2] - triangle[1]
 	local e2 = triangle[3] - triangle[1]
 
-	h = d:clone():cross(e2)
+	h = d:cross(e2)
 
 	a = (e1:dot(h))
 
@@ -34,7 +93,7 @@ function intersect.ray_triangle(ray, triangle)
 		return false
 	end
 
-	q = s:clone():cross(e1)
+	q = s:cross(e1)
 	v = f * (d:dot(q))
 
 	if v < 0 or u + v > 1 then
@@ -52,7 +111,7 @@ function intersect.ray_triangle(ray, triangle)
 	end
 end
 
--- Algorithm is ported from the C algorithm of 
+-- Algorithm is ported from the C algorithm of
 -- Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
 -- Archive.org am hero \o/
 function intersect.line_line(p1, p2, p3, p4)
