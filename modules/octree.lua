@@ -4,6 +4,11 @@ local octree = {}
 
 octree.__index = octree
 
+-- TODO: Make placement aware of object sizes
+-- TODO: bounding box query
+-- TODO: ray-octree intersection - find all nodes a ray intersects with, possibly given a distance limit
+-- TODO: ability to store tables would be nice!
+
 function new()
   local t = { 
 		root = {
