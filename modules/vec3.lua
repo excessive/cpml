@@ -107,6 +107,10 @@ function vector.dot(a,b)
 	return a.x*b.x + a.y*b.y + a.z*b.z
 end
 
+function vector:tuple()
+	return self.x, self.y, self.z
+end
+
 function vector:len2()
 	return self.x * self.x + self.y * self.y + self.z * self.z
 end
@@ -182,16 +186,13 @@ end
 
 function vector:mirror_on(v)
 	assert(isvector(v), "invalid argument: cannot mirror vector on " .. type(v))
-	-- 2 * self:projectOn(v) - self
 	local s = 2 * (self.x * v.x + self.y * v.y + self.z * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z)
 	return new(s * v.x - self.x, s * v.y - self.y, s * v.z - self.z)
 end
 
 function vector:cross(v)
-	-- Cross product.
 	assert(isvector(v), "cross: wrong argument types (<vector> expected)")
 	return new(self.y*v.z - self.z*v.y, self.z*v.x - self.x*v.z, self.x*v.y - self.y*v.x)
-	--return self.x * v.y - self.y * v.x
 end
 
 -- ref.: http://blog.signalsondisplay.com/?p=336
