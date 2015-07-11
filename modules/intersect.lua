@@ -149,6 +149,31 @@ function intersect.line_line(p1, p2, p3, p4)
 	return true, resultSegmentPoint1, resultSegmentPoint2
 end
 
+function intersect.segment_segment(p1, p2, p3, p4)
+	local collision, c1, c2 = intersect.line_line(p1, p2, p3, p4)
+
+	if collision then
+		if  ((p1 <= c1 and c1 <= p2) or (p1 >= c1 and c1 >= p2))
+		and ((p3 <= c2 and c2 <= p4) or (p3 >= c2 and c2 >= p4)) then
+			return true, c1, c2
+		end
+	end
+end
+
+-- point is a vec3
+-- box.position is a vec3
+-- box.volume is a vec3
+function intersect.point_AABB(point, box)
+	if  box.position.x                <= point.x
+	and box.position.x + box.volume.x >= point.x
+	and box.position.y                <= point.y
+	and box.position.y + box.volume.y >= point.y
+	and box.position.z                <= point.z
+	and box.position.z + box.volume.z >= point.z then
+		return true
+	end
+end
+
 function intersect.circle_circle(c1, c2)
 	assert(type(c1.point)	== "table", "c1 point must be a table")
 	assert(type(c1.radius)	== "number", "c1 radius must be a number")
