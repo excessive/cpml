@@ -206,7 +206,7 @@ end
 function vector:angle_to(other)
 	-- Only makes sense in 2D.
 	if other then
-		return atan2(self.y, self.x) - atan2(other.y, other.x)
+		return atan2(self.y-other.y, self.x-other.x)
 	end
 	return atan2(self.y, self.x)
 end
