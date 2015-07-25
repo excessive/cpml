@@ -2,7 +2,13 @@ local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local utils = require(current_folder .. "utils")
 local color = {}
 local function new(r, g, b, a)
-	return setmetatable({r or 0, g or 0, b or 0, a or 255}, color)
+	return setmetatable({
+		r, g, b, a
+		-- utils.clamp(r or 0, 0, 255),
+		-- utils.clamp(g or 0, 0, 255),
+		-- utils.clamp(b or 0, 0, 255),
+		-- utils.clamp(a or 255, 0, 255)
+	}, color)
 end
 color.__index = color
 color.__call = function(_, ...) return new(...) end
@@ -18,6 +24,32 @@ function color.lighten(c, v)
 		utils.clamp(c[3] + v * 255, 0, 255),
 		c[4]
 	)
+end
+
+function color.__tostring(a)
+	return string.format("[ %3.0f, %3.0f, %3.0f, %3.0f ]", a[1], a[2], a[3], a[4])
+end
+
+function color.__add(a, b)
+	return new(a[1] + b[1], a[2] + b[2], a[3] + b[3], a[4] + b[4])
+end
+
+function color.__sub(a, b)
+	return new(a[1] - b[1], a[2] - b[2], a[3] - b[3], a[4] - b[4])
+end
+
+function color.__mul(a, b)
+	if type(a) == "number" then
+		return new(a * b[1], a * b[2], a * b[3], a * b[4])
+	elseif type(b) == "number" then
+		return new(b * a[1], b * a[2], b * a[3], b * a[4])
+	else
+		return new(a[1] * b[1], a[2] * b[2], a[3] * b[3], a[4] * b[4])
+	end
+end
+
+function color.lerp(a, b, s)
+	return a + s * (b - a)
 end
 
 function color.darken(c, v)
