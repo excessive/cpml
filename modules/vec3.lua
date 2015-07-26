@@ -107,10 +107,6 @@ function vector.dot(a,b)
 	return a.x*b.x + a.y*b.y + a.z*b.z
 end
 
-function vector:tuple()
-	return self.x, self.y, self.z
-end
-
 function vector:len2()
 	return self.x * self.x + self.y * self.y + self.z * self.z
 end
