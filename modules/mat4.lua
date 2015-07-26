@@ -152,6 +152,7 @@ function mat4:perspective(fovy, aspect, near, far)
 	result[11] = -(far + near) / (far - near)
 	result[12] = -1
 	result[15] = -(2 * far * near) / (far - near)
+	result[16] = 1
 
 	return mat4(result)
 end
