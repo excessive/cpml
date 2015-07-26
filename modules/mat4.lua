@@ -3,6 +3,7 @@
 
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local constants = require(current_folder .. "constants")
+local vec2 = require(current_folder .. "vec2")
 local vec3 = require(current_folder .. "vec3")
 local quat = require(current_folder .. "quat")
 
@@ -78,7 +79,7 @@ function mat4:__call(v)
 	}
 	if type(v) == "table" and #v == 16 then
 		for i=1,16 do
-			m[i] = v[i]
+			m[i] = tonumber(v[i])
 		end
 	elseif type(v) == "table" and #v == 9 then
 		m[1], m[2], m[3] = v[1], v[2], v[3]
@@ -133,6 +134,88 @@ function mat4:ortho(left, right, top, bottom, near, far)
 	out[15] = -((far + near) / (far - near))
 	out[16] = 1
 	return out
+end
+
+-- Adapted from the Oculus SDK.
+function mat4:hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity)
+	-- CPML is right-handed and intended for GL, so these don't need to be arguments.
+	local rightHanded = true
+	local isOpenGL    = true
+	local function CreateNDCScaleAndOffsetFromFov(tanHalfFov)
+		x_scale  = 2 / (tanHalfFov.LeftTan + tanHalfFov.RightTan)
+		x_offset =     (tanHalfFov.LeftTan - tanHalfFov.RightTan) * x_scale * 0.5
+		y_scale  = 2 / (tanHalfFov.UpTan   + tanHalfFov.DownTan )
+		y_offset =     (tanHalfFov.UpTan   - tanHalfFov.DownTan ) * y_scale * 0.5
+
+		local result = {
+			Scale  = vec2(x_scale, y_scale),
+			Offset = vec2(x_offset, y_offset)
+		}
+
+		-- Hey - why is that Y.Offset negated?
+		-- It's because a projection matrix transforms from world coords with Y=up,
+		-- whereas this is from NDC which is Y=down.
+		 return result
+	end
+
+	if not flipZ and farAtInfinity then
+		print("Error: Cannot push Far Clip to Infinity when Z-order is not flipped")
+		farAtInfinity = false
+	end
+
+	 -- A projection matrix is very like a scaling from NDC, so we can start with that.
+	local scaleAndOffset = CreateNDCScaleAndOffsetFromFov(tanHalfFov)
+	local handednessScale = rightHanded and -1.0 or 1.0
+	local projection = mat4()
+
+	-- Produces X result, mapping clip edges to [-w,+w]
+	projection[1] = scaleAndOffset.Scale.x
+	projection[2] = 0
+	projection[3] = handednessScale * scaleAndOffset.Offset.x
+	projection[4] = 0
+
+	-- Produces Y result, mapping clip edges to [-w,+w]
+	-- Hey - why is that YOffset negated?
+	-- It's because a projection matrix transforms from world coords with Y=up,
+	-- whereas this is derived from an NDC scaling, which is Y=down.
+	projection[5] = 0
+	projection[6] = scaleAndOffset.Scale.y
+	projection[7] = handednessScale * -scaleAndOffset.Offset.y
+	projection[8] = 0
+
+	-- Produces Z-buffer result - app needs to fill this in with whatever Z range it wants.
+	-- We'll just use some defaults for now.
+	projection[9]  = 0
+	projection[10] = 0
+
+	if farAtInfinity then
+		if isOpenGL then
+			-- It's not clear this makes sense for OpenGL - you don't get the same precision benefits you do in D3D.
+			projection[11] = -handednessScale
+			projection[12] = 2.0 * zNear
+		else
+			projection[11] = 0
+			projection[12] = zNear
+		end
+	else
+		if isOpenGL then
+			-- Clip range is [-w,+w], so 0 is at the middle of the range.
+			projection[11] = -handednessScale * (flipZ and -1.0 or 1.0) * (zNear + zFar) / (zNear - zFar)
+			projection[12] = 2.0 * ((flipZ and -zFar or zFar) * zNear) / (zNear - zFar)
+		else
+			-- Clip range is [0,+w], so 0 is at the start of the range.
+			projection[11] = -handednessScale * (flipZ and -zNear or zFar) / (zNear - zFar)
+			projection[12] = ((flipZ and -zFar or zFar) * zNear) / (zNear - zFar)
+		end
+	end
+
+	-- Produces W result (= Z in)
+	projection[13] = 0
+	projection[14] = 0
+	projection[15] = handednessScale
+	projection[16] = 0
+
+	return projection:transpose()
 end
 
 function mat4:perspective(fovy, aspect, near, far)
