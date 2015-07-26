@@ -118,6 +118,10 @@ function quaternion:__tostring()
 	return string.format("(%0.3f,%0.3f,%0.3f,%0.3f)", self.x, self.y, self.z, self.x)
 end
 
+function quaternion:unpack()
+	return self.x, self.y, self.z, self.w
+end
+
 function quaternion.unit()
 	return new(0, 0, 0, 1)
 end
