@@ -33,18 +33,28 @@ local sqrt, cos, sin, atan2, acos = math.sqrt, math.cos, math.sin, math.atan2, m
 local vector = {}
 vector.__index = vector
 
-local function new(x,y,z)
-	if type(x) == "table" then
-		return setmetatable({x = x.x or x[1] or 0, y = x.y or x[2] or 0, z = x.z or x[3] or 0}, vector)
+
+-- Courtesy of slime
+local hasffi, ffi = pcall(require, "ffi")
+local jitenabled = jit and jit.status() or false
+local new, isvector
+
+if hasffi and jitenabled then
+	ffi.cdef "struct cpml_vec3 { double x, y, z; };"
+	new = ffi.typeof("struct cpml_vec3")
+	function isvector(v)
+		return ffi.istype(new, v)
 	end
-
-	return setmetatable({x = x or 0, y = y or 0, z = z or 0}, vector)
+else
+	function new(x,y,z)
+		return setmetatable({x = x or 0, y = y or 0, z = z or 0}, vector)
+	end
+	function isvector(v)
+		return getmetatable(v) == vector
+	end
 end
+
 local zero = new(0,0,0)
-
-local function isvector(v)
-	return type(v) == 'table' and type(v.x) == 'number' and type(v.y) == 'number' and type(v.z) == 'number'
-end
 
 function vector:clone()
 	return new(self.x, self.y, self.z)
@@ -229,6 +239,10 @@ end
 -- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
 function vector.lerp(a, b, s)
 	return a + s * (b - a)
+end
+
+if hasffi and jitenabled then
+	ffi.metatype(new, vector)
 end
 
 -- the module

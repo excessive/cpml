@@ -30,14 +30,27 @@ local sqrt, cos, sin, atan2 = math.sqrt, math.cos, math.sin, math.atan2
 local vector = {}
 vector.__index = vector
 
-local function new(x,y)
-	return setmetatable({x = x or 0, y = y or 0}, vector)
-end
-local zero = new(0,0)
+-- Courtesy of slime
+local hasffi, ffi = pcall(require, "ffi")
+local jitenabled = jit and jit.status() or false
+local new, isvector
 
-local function isvector(v)
-	return type(v) == 'table' and type(v.x) == 'number' and type(v.y) == 'number'
+if hasffi and jitenabled then
+	ffi.cdef "struct cpml_vec2 { double x, y; };"
+	new = ffi.typeof("struct cpml_vec2")
+	function isvector(v)
+		return ffi.istype(new, v)
+	end
+else
+	function new(x,y)
+		return setmetatable({x = x or 0, y = y or 0}, vector)
+	end
+	function isvector(v)
+		return getmetatable(v) == vector
+	end
 end
+
+local zero = new(0,0)
 
 function vector:clone()
 	return new(self.x, self.y)
@@ -185,6 +198,9 @@ function vector:trim(maxLen)
 	return self:clone():trim_inplace(maxLen)
 end
 
+if hasffi and jitenabled then
+	ffi.metatype(new, vector)
+end
 
 -- the module
 return setmetatable({new = new, isvector = isvector, zero = zero},
