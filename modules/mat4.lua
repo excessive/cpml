@@ -488,7 +488,7 @@ function mat4:look_at(eye, center, up)
 
 	view[16] = 1
 
-	local out = mat4():translate(-eye) * view
+	local out = mat4():translate(-eye - forward) * view
 	return out * self
 end
 
