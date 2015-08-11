@@ -11,7 +11,7 @@ function intersect.ray_aabb(ray, lb, rt)
 
 	-- ray.direction is unit direction vector of ray
 	local dir = ray.direction:normalize()
-	local dirfrac = cpml.vec3(1/dir.x,1/dir.y,1/dir.z)
+	local dirfrac = vec3(1/dir.x,1/dir.y,1/dir.z)
 
 	-- lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
 	-- ray.point is origin of ray
@@ -27,12 +27,12 @@ function intersect.ray_aabb(ray, lb, rt)
 
 	-- if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
 	if tmax < 0 then
-	    return false
+		return false
 	end
 
 	-- if tmin > tmax, ray doesn't intersect AABB
 	if tmin > tmax then
-	    return false
+		return false
 	end
 
 	return true, tmin
