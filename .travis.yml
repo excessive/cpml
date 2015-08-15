@@ -17,7 +17,7 @@ install:
 script: "busted spec"
 
 notifications:
-  irc: "irc.oftc.net#hate"
+  irc: "irc.oftc.net#excessive"
   # webhooks:
   #   - http://whatever/travis-results
   recipients:
