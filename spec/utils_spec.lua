@@ -35,5 +35,26 @@ describe("utils:", function()
 		assert.is.is_true(math.abs(utils.round(5.5555, 0.1) - 5.6) < constants.FLT_EPSILON)
 	end)
 
-	pending "lerp"
+	it("testing deadzone", function()
+		assert.is.equal(utils.deadzone(0.5, 0.05), 0.5)
+		assert.is.equal(utils.deadzone(0.02, 0.05), 0.0)
+		assert.is.equal(utils.deadzone(-0.1, 0.02), -0.1)
+	end)
+
+	it("testing threshold", function()
+		assert.is_true(utils.threshold(0.5, 0.25))
+		assert.is_true(utils.threshold(0.25, 0.25))
+		assert.is_false(utils.threshold(-0.1, 0.5))
+		assert.is_true(utils.threshold(-0.25, 0.1))
+	end)
+
+	it("testing lerp", function()
+		local l = 0.5
+		local h = 20.0
+		assert.is.equal(utils.lerp(0, l, h), l)
+		assert.is.equal(utils.lerp(1, l, h), h)
+		assert.is.equal(utils.lerp(0.5, l, h), (l+h)/2)
+	end)
+
+	pending "smoothstep"
 end)

@@ -4,6 +4,15 @@ function utils.clamp(v, min, max)
 	return math.max(math.min(v, max), min)
 end
 
+function utils.deadzone(value, size)
+	return math.abs(value) >= size and value or 0
+end
+
+-- I know, it barely saves any typing at all.
+function utils.threshold(value, threshold)
+	return math.abs(value) >= threshold
+end
+
 function utils.map(v, min_in, max_in, min_out, max_out)
 	return ((v) - (min_in)) * ((max_out) - (min_out)) / ((max_in) - (min_in)) + (min_out)
 end
