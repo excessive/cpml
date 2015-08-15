@@ -43,18 +43,25 @@ if hasffi and jitenabled then
 	ffi.cdef "struct cpml_vec3 { double x, y, z; };"
 	new = ffi.typeof("struct cpml_vec3")
 	function isvector(v)
-		return ffi.istype(new, v)
+		return ffi.istype(new, v) or type(v.x and v.y and v.z) == "number"
 	end
 else
 	function new(x,y,z)
+		-- allow construction via vec3(a, b, c), vec3 { a, b, c } or vec3 { x = a, y = b, z = c }
+		if type(x) == "table" then
+			return setmetatable({x=x.x or x[1] or 0, y=x.y or x[2] or 0, z=x.z or x[3] or 0}, vector)
+		end
 		return setmetatable({x = x or 0, y = y or 0, z = z or 0}, vector)
 	end
 	function isvector(v)
-		return getmetatable(v) == vector
+		return getmetatable(v) == vector or type(v.x and v.y and v.z) == "number"
 	end
 end
 
 local zero = new(0,0,0)
+local unit_x = new(1,0,0)
+local unit_y = new(0,1,0)
+local unit_z = new(0,0,1)
 
 function vector:clone()
 	return new(self.x, self.y, self.z)
@@ -246,5 +253,15 @@ if hasffi and jitenabled then
 end
 
 -- the module
-return setmetatable({new = new, isvector = isvector, zero = zero},
-{__call = function(_, ...) return new(...) end})
+return setmetatable(
+	{
+		new      = new,
+		isvector = isvector,
+		zero     = zero,
+		unit_x   = unit_x,
+		unit_y   = unit_y,
+		unit_z   = unit_z
+	}, {
+		__call = function(_, ...) return new(...) end
+	}
+)

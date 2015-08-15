@@ -37,10 +37,28 @@ describe("vec3:", function()
 		assert.is_false(vec3(3,3,3) >= vec3(5,5,5))
 	end)
 
-	it("testing misc operators", function()
-		-- tostring
-		assert.has_no.errors(function() return tostring(vec3(1,1,1)) end)
+	it("testing new", function()
+		local v = vec3()
+		assert.is_true(v.x == 0)
+		assert.is_true(v.y == 0)
+		assert.is_true(v.z == 0)
 
+		v = vec3{1, 2, 3}
+		assert.is_true(v.x == 1)
+		assert.is_true(v.y == 2)
+		assert.is_true(v.z == 3)
+
+		v = vec3(4, 5, 6)
+		assert.is_true(v.x == 4)
+		assert.is_true(v.y == 5)
+		assert.is_true(v.z == 6)
+	end)
+
+	it("testing tostring", function()
+		assert.has_no.errors(function() return tostring(vec3(1,1,1)) end)
+	end)
+
+	it("testing isvector", function()
 		assert.is_true(vec3.isvector(vec3()))
 		assert.is_true(vec3.isvector(vec3{1,1}))
 		assert.is_true(vec3.isvector{x=1, y=2, z=3})
@@ -60,7 +78,7 @@ describe("vec3:", function()
 	end)
 
 	it("testing cross", function()
-		assert.is.equal(vec3(1,0,0):cross(vec3(0,1,0)), vec3(0,0,1))
+		assert.is.equal(vec3.unit_x:cross(vec3.unit_y), vec3.unit_z)
 	end)
 
 	it("testing len and normalize", function()
@@ -73,8 +91,11 @@ describe("vec3:", function()
 		assert.is.equal(vec3(2,0,2):len2(), 8)
 	end)
 
+	it("testing lerp", function()
+		assert.is.equal(vec3(0, 0, 0):lerp(vec3(1, 1, 1), 0.5), vec3(0.5, 0.5, 0.5))
+	end)
+
 	describe("vec3 pending tests", function()
-		pending "lerp"
 		pending "trim"
 		pending "angle_to"
 		pending "angle_between"
