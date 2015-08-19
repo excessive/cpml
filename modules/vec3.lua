@@ -37,11 +37,17 @@ vector.__index = vector
 -- Courtesy of slime
 local hasffi, ffi = pcall(require, "ffi")
 local jitenabled = jit and jit.status() or false
+local hot_loaded = false
 local new, isvector
 
 if hasffi and jitenabled then
-	ffi.cdef "struct cpml_vec3 { double x, y, z; };"
-	new = ffi.typeof("struct cpml_vec3")
+	xpcall(function()
+		hot_loaded = true
+		new = ffi.typeof("struct cpml_vec3")
+	end, function()
+		ffi.cdef "struct cpml_vec3 { double x, y, z; };"
+		new = ffi.typeof("struct cpml_vec3")
+	end)
 	function isvector(v)
 		return ffi.istype(new, v) or type(v.x and v.y and v.z) == "number"
 	end
@@ -248,7 +254,7 @@ function vector.lerp(a, b, s)
 	return a + s * (b - a)
 end
 
-if hasffi and jitenabled then
+if hasffi and jitenabled and not hot_loaded then
 	ffi.metatype(new, vector)
 end
 
