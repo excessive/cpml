@@ -33,35 +33,16 @@ local sqrt, cos, sin, atan2, acos = math.sqrt, math.cos, math.sin, math.atan2, m
 local vector = {}
 vector.__index = vector
 
+local function new(x,y,z)
+	-- allow construction via vec3(a, b, c), vec3 { a, b, c } or vec3 { x = a, y = b, z = c }
+	if type(x) == "table" then
+		return setmetatable({x=x.x or x[1] or 0, y=x.y or x[2] or 0, z=x.z or x[3] or 0}, vector)
+	end
+	return setmetatable({x = x or 0, y = y or 0, z = z or 0}, vector)
+end
 
--- Courtesy of slime
-local hasffi, ffi = pcall(require, "ffi")
-local jitenabled = jit and jit.status() or false
-local hot_loaded = false
-local new, isvector
-
-if hasffi and jitenabled then
-	xpcall(function()
-		hot_loaded = true
-		new = ffi.typeof("struct cpml_vec3")
-	end, function()
-		ffi.cdef "struct cpml_vec3 { double x, y, z; };"
-		new = ffi.typeof("struct cpml_vec3")
-	end)
-	function isvector(v)
-		return ffi.istype(new, v) or type(v.x and v.y and v.z) == "number"
-	end
-else
-	function new(x,y,z)
-		-- allow construction via vec3(a, b, c), vec3 { a, b, c } or vec3 { x = a, y = b, z = c }
-		if type(x) == "table" then
-			return setmetatable({x=x.x or x[1] or 0, y=x.y or x[2] or 0, z=x.z or x[3] or 0}, vector)
-		end
-		return setmetatable({x = x or 0, y = y or 0, z = z or 0}, vector)
-	end
-	function isvector(v)
-		return getmetatable(v) == vector or type(v.x and v.y and v.z) == "number"
-	end
+local function isvector(v)
+	return getmetatable(v) == vector or type(v.x and v.y and v.z) == "number"
 end
 
 local zero = new(0,0,0)
@@ -252,10 +233,6 @@ end
 -- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
 function vector.lerp(a, b, s)
 	return a + s * (b - a)
-end
-
-if hasffi and jitenabled and not hot_loaded then
-	ffi.metatype(new, vector)
 end
 
 -- the module

@@ -23,6 +23,15 @@ describe("vec3:", function()
 		assert.is.equal(vec3(1, 1, 1) / 2, vec3(0.5, 0.5, 0.5))
 		assert.has.errors(function() return vec3(1, 1, 1) / vec3(2, 2, 2) end)
 	end)
+	
+	it("testing value ranges", function()
+		-- This makes sure we are initializing reasonably and that
+		-- we haven't broken everything with some FFI magic.
+		assert.is.equal(vec3(256, 0, 0).x, 256)
+		assert.is.equal(vec3(0, 65537, 0).y, 65537)
+		assert.is.equal(vec3(953, 0, 491.5).z, 491.5)
+		assert.is.equal(vec3(0, 1.2222, 0).y, 1.2222)
+	end)
 
 	it("testing comparison operators", function()
 		-- eq
