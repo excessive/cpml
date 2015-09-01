@@ -73,7 +73,7 @@ function vector.__mul(a,b)
 		return new(b*a.x, b*a.y)
 	else
 		assert(isvector(a) and isvector(b), "Mul: wrong argument types (<vector> or <number> expected)")
-		return a.x*b.x + a.y*b.y
+		return new(a.x*b.x, a.y*b.y)
 	end
 end
 
@@ -94,9 +94,9 @@ function vector.__le(a,b)
 	return a.x <= b.x and a.y <= b.y
 end
 
-function vector.permul(a,b)
-	assert(isvector(a) and isvector(b), "permul: wrong argument types (<vector> expected)")
-	return new(a.x*b.x, a.y*b.y)
+function vector.dot(a, b)
+	assert(isvector(a) and isvector(b), "dot: wrong argument types (<vector> expected)")
+	return a.x*b.x + a.y*b.y
 end
 
 function vector:len2()
