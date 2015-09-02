@@ -9,7 +9,7 @@ octree.__index = octree
 -- TODO: ray-octree intersection - find all nodes a ray intersects with, possibly given a distance limit
 -- TODO: ability to store tables would be nice!
 
-function new()
+local function new()
   local t = { 
 		root = {
 			size = 1, 

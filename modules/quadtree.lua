@@ -4,7 +4,7 @@ local quadtree = {}
 
 quadtree.__index = quadtree
 
-function new()
+local function new()
   local t = { 
 		root = {
 			size = 1, 
