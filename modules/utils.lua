@@ -5,9 +5,9 @@ local utils = {}
 local log2 = math.log(2)
 
 local frexp = math.frexp or function(x)
-    if x == 0 then return 0, 0 end
-    local e = math.floor(math.log(math.abs(x)) / log2 + 1)
-    return x / 2 ^ e, e
+	if x == 0 then return 0, 0 end
+	local e = math.floor(math.log(math.abs(x)) / log2 + 1)
+	return x / 2 ^ e, e
 end
 
 function utils.clamp(v, min, max)
