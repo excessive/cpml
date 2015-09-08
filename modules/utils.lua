@@ -1,5 +1,13 @@
 local utils = {}
 
+-- reimplementation of math.frexp, due to its removal from Lua 5.3 :(
+-- courtesy of airstruck
+local frexp = math.frexp or function(x)
+	if x == 0 then return 0, 0 end
+	local e = math.floor(math.log(x) / math.log(2) + 1)
+	return x / 2 ^ e, e
+end
+
 function utils.clamp(v, min, max)
 	return math.max(math.min(v, max), min)
 end
