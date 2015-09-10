@@ -88,8 +88,14 @@ function vector.__mul(a,b)
 end
 
 function vector.__div(a,b)
-	assert(isvector(a) and type(b) == "number", "wrong argument types (expected <vector> / <number>)")
-	return new(a.x / b, a.y / b, a.z / b)
+	if type(a) == "number" then
+		return new(a / b.x, a / b.y, a / b.z)
+	elseif type(b) == "number" then
+		return new(a.x / b, a.y / b, a.z / b)
+	else
+		assert(isvector(a) and isvector(b), "Div: wrong argument types (<vector> or <number> expected)")
+		return new(a.x/b.x, a.y/b.y, a.z/b.z)
+	end
 end
 
 function vector.__eq(a,b)
