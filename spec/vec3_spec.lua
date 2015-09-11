@@ -21,9 +21,10 @@ describe("vec3:", function()
 
 		-- div
 		assert.is.equal(vec3(1, 1, 1) / 2, vec3(0.5, 0.5, 0.5))
-		assert.has.errors(function() return vec3(1, 1, 1) / vec3(2, 2, 2) end)
+		assert.is.equal(vec3(1, 1, 1) / vec3(2, 2, 2), vec3(0.5, 0.5, 0.5))
+		assert.is.equal(1 / vec3(2, 2, 2), vec3(0.5, 0.5, 0.5))
 	end)
-	
+
 	it("testing value ranges", function()
 		-- This makes sure we are initializing reasonably and that
 		-- we haven't broken everything with some FFI magic.
