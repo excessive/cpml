@@ -56,7 +56,7 @@
 <div id="content">
 
 <h1>Module <code>vec3</code></h1>
-<p>3 dimensional vectors</p>
+<p>3 dimensional vectors.</p>
 <p>
 
 </p>
@@ -66,7 +66,43 @@
 <table class="function_list">
 	<tr>
 	<td class="name" nowrap><a href="#clone">clone ()</a></td>
-	<td class="summary">Create a copy of the vec3 which does not reference the original data</td>
+	<td class="summary">Create a new vector containing the same data.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unpack">unpack ()</a></td>
+	<td class="summary">Unpack the vector into its components.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#dot">dot (a, b)</a></td>
+	<td class="summary">Dot product.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#len">len ()</a></td>
+	<td class="summary">Vector length/magnitude.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#dist">dist (a, b)</a></td>
+	<td class="summary">Distance between two points.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#dist2">dist2 (a, b)</a></td>
+	<td class="summary">Squared distance between two points.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize_inplace">normalize_inplace ()</a></td>
+	<td class="summary">Normalize vector.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize">normalize ()</a></td>
+	<td class="summary">Normalize vector.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate">rotate (phi, axis)</a></td>
+	<td class="summary">Rotate vector about an axis.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cross">cross (v)</a></td>
+	<td class="summary">Cross product.</td>
 	</tr>
 </table>
 
@@ -82,9 +118,228 @@
     <strong>clone ()</strong>
     </dt>
     <dd>
-    Create a copy of the vec3 which does not reference the original data
+    Create a new vector containing the same data.
 
 
+
+    <h3>Returns:</h3>
+    <ol>
+
+        vec3
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "unpack"></a>
+    <strong>unpack ()</strong>
+    </dt>
+    <dd>
+    Unpack the vector into its components.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+        float</li>
+        <li>
+        float</li>
+        <li>
+        float</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "dot"></a>
+    <strong>dot (a, b)</strong>
+    </dt>
+    <dd>
+    Dot product.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+         first vec3 to dot with
+        </li>
+        <li><span class="parameter">b</span>
+         second vec3 to dot with
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        float
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "len"></a>
+    <strong>len ()</strong>
+    </dt>
+    <dd>
+    Vector length/magnitude.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        float
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "dist"></a>
+    <strong>dist (a, b)</strong>
+    </dt>
+    <dd>
+    Distance between two points.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+         first point
+        </li>
+        <li><span class="parameter">b</span>
+         second point
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        float
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "dist2"></a>
+    <strong>dist2 (a, b)</strong>
+    </dt>
+    <dd>
+    Squared distance between two points.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+         first point
+        </li>
+        <li><span class="parameter">b</span>
+         second point
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        float
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize_inplace"></a>
+    <strong>normalize_inplace ()</strong>
+    </dt>
+    <dd>
+    Normalize vector.
+ Scales the vector in place such that its length is 1.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        vec3
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize"></a>
+    <strong>normalize ()</strong>
+    </dt>
+    <dd>
+    Normalize vector.
+ Returns a copy of the vector scaled such that its length is 1.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        vec3
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate"></a>
+    <strong>rotate (phi, axis)</strong>
+    </dt>
+    <dd>
+    Rotate vector about an axis.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">phi</span>
+         Amount to rotate, in radians
+        </li>
+        <li><span class="parameter">axis</span>
+         Axis to rotate by
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        vec3
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cross"></a>
+    <strong>cross (v)</strong>
+    </dt>
+    <dd>
+    Cross product.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">v</span>
+         vec3 to cross with
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
@@ -103,7 +358,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
-<i style="float:right;">Last updated 2015-09-11 10:05:30 </i>
+<i style="float:right;">Last updated 2015-09-11 13:37:09 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
