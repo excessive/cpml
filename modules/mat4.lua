@@ -1,3 +1,6 @@
+--- 4x4 matrices
+-- @module mat4
+
 -- double 4x4, 1-based, column major
 -- local matrix = {}
 

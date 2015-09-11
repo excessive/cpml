@@ -1,3 +1,6 @@
+--- Mesh utilities
+-- @module mesh
+
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3 = require(current_folder .. "vec3")
 

@@ -2,5 +2,14 @@
 	"cmd": "busted",
 	"args": [ "spec" ],
 	"sh": false,
-	"cwd": "{PROJECT_PATH}"
+	"targets": {
+		"LDoc": {
+			"cmd": "ldoc",
+			"args": ["-c doc/config.ld", "-o index", "."]
+		},
+		"View Docs": {
+			"cmd": "xdg-open",
+			"args": ["doc/doc/index.html"]
+		}
+	}
 }

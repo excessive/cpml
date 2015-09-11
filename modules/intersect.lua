@@ -1,3 +1,6 @@
+--- Various geometric intersections
+-- @module intersect
+
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3 = require(current_folder .. "vec3")
 local constants = require(current_folder .. "constants")

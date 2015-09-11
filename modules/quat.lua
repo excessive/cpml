@@ -1,5 +1,9 @@
+--- Quaternions
+-- @module quat
+-- @alias quaternion
+
 -- quaternions
--- Author: Andrew Stacey
+-- @author Andrew Stacey
 -- Website: http://www.math.ntnu.no/~stacey/HowDidIDoThat/iPad/Codea.html
 -- Licence: CC0 http://wiki.creativecommons.org/CC0
 

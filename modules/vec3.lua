@@ -27,12 +27,21 @@ THE SOFTWARE.
 -- Modified to include 3D capabilities by Bill Shillito, April 2014
 -- Various bug fixes by Colby Klein, October 2014
 
+--- 3 dimensional vectors
+-- @module vec3
+-- @alias vector
+
 local assert = assert
 local sqrt, cos, sin, atan2, acos = math.sqrt, math.cos, math.sin, math.atan2, math.acos
 
 local vector = {}
 vector.__index = vector
 
+--- Instance a new vec3.
+-- @param x X value, table containing 3 elements, or another vector.
+-- @param y Y value
+-- @param z Z value
+-- @return vec3
 local function new(x,y,z)
 	-- allow construction via vec3(a, b, c), vec3 { a, b, c } or vec3 { x = a, y = b, z = c }
 	if type(x) == "table" then
@@ -50,6 +59,8 @@ local unit_x = new(1,0,0)
 local unit_y = new(0,1,0)
 local unit_z = new(0,0,1)
 
+--- Create a copy of the vec3 which does not reference the original data
+-- @return vec3
 function vector:clone()
 	return new(self.x, self.y, self.z)
 end

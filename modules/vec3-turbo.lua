@@ -1,3 +1,4 @@
+
 local assert = assert -- function() end
 local sqrt, cos, sin, atan2, acos = math.sqrt, math.cos, math.sin, math.atan2, math.acos
 local ffi = require "ffi"

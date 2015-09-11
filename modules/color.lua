@@ -1,3 +1,6 @@
+--- Color utilities
+-- @module color
+
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local utils = require(current_folder .. "utils")
 local color = {}

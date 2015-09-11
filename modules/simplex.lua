@@ -1,3 +1,6 @@
+--- Simplex Noise
+-- @module simplex
+
 --
 -- Based on code in "Simplex noise demystified", by Stefan Gustavson
 -- www.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
@@ -280,7 +283,7 @@ do
 	function M.Simplex4D (x, y, z, w)
 		--[[
 			4D skew factors:
-			F = (math.sqrt(5) - 1) / 4 
+			F = (math.sqrt(5) - 1) / 4
 			G = (5 - math.sqrt(5)) / 20
 			G2 = 2 * G
 			G3 = 3 * G

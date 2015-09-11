@@ -1,3 +1,5 @@
+-- @module constants
+
 local constants = {}
 
 -- same as C's FLT_EPSILON
