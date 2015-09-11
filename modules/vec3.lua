@@ -27,7 +27,7 @@ THE SOFTWARE.
 -- Modified to include 3D capabilities by Bill Shillito, April 2014
 -- Various bug fixes by Colby Klein, October 2014
 
---- 3 dimensional vectors
+--- 3 dimensional vectors.
 -- @module vec3
 -- @alias vector
 
@@ -59,12 +59,16 @@ local unit_x = new(1,0,0)
 local unit_y = new(0,1,0)
 local unit_z = new(0,0,1)
 
---- Create a copy of the vec3 which does not reference the original data
+--- Create a new vector containing the same data.
 -- @return vec3
 function vector:clone()
 	return new(self.x, self.y, self.z)
 end
 
+--- Unpack the vector into its components.
+-- @return float
+-- @return float
+-- @return float
 function vector:unpack()
 	return self.x, self.y, self.z
 end
@@ -123,6 +127,10 @@ function vector.__le(a,b)
 	return a.x <= b.x and a.y <= b.y and a.z <= b.z
 end
 
+--- Dot product.
+-- @param a first vec3 to dot with
+-- @param b second vec3 to dot with
+-- @return float
 function vector.dot(a,b)
 	assert(isvector(a) and isvector(b), "dot: wrong argument types (<vector> expected)")
 	return a.x*b.x + a.y*b.y + a.z*b.z
@@ -132,10 +140,16 @@ function vector:len2()
 	return self.x * self.x + self.y * self.y + self.z * self.z
 end
 
+--- Vector length/magnitude.
+-- @return float
 function vector:len()
 	return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 end
 
+--- Distance between two points.
+-- @param a first point
+-- @param b second point
+-- @return float
 function vector.dist(a, b)
 	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
@@ -144,6 +158,10 @@ function vector.dist(a, b)
 	return sqrt(dx * dx + dy * dy + dz * dz)
 end
 
+--- Squared distance between two points.
+-- @param a first point
+-- @param b second point
+-- @return float
 function vector.dist2(a, b)
 	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
@@ -152,6 +170,9 @@ function vector.dist2(a, b)
 	return (dx * dx + dy * dy + dz * dz)
 end
 
+--- Normalize vector.
+-- Scales the vector in place such that its length is 1.
+-- @return vec3
 function vector:normalize_inplace()
 	local l = self:len()
 	if l > 0 then
@@ -160,10 +181,17 @@ function vector:normalize_inplace()
 	return self
 end
 
+--- Normalize vector.
+-- Returns a copy of the vector scaled such that its length is 1.
+-- @return vec3
 function vector:normalize()
 	return self:clone():normalize_inplace()
 end
 
+--- Rotate vector about an axis.
+-- @param phi Amount to rotate, in radians
+-- @param axis Axis to rotate by
+-- @return vec3
 function vector:rotate(phi, axis)
 	if axis == nil then return self end
 
@@ -207,6 +235,9 @@ function vector:mirror_on(v)
 	return new(s * v.x - self.x, s * v.y - self.y, s * v.z - self.z)
 end
 
+--- Cross product.
+-- @param v vec3 to cross with
+-- @return vec3
 function vector:cross(v)
 	assert(isvector(v), "cross: wrong argument types (<vector> expected)")
 	return new(self.y*v.z - self.z*v.y, self.z*v.x - self.x*v.z, self.x*v.y - self.y*v.x)
