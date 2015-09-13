@@ -105,6 +105,11 @@ describe("vec3:", function()
 		assert.is.equal(vec3(0, 0, 0):lerp(vec3(1, 1, 1), 0.5), vec3(0.5, 0.5, 0.5))
 	end)
 
+	it("testing rotate", function()
+		local t = 1.0e-15
+		assert.is_true(vec3(1,0,0):rotate(math.pi, vec3.unit_z) - vec3(-1, 0, 0) < vec3(t, t, t))
+	end)
+
 	describe("vec3 pending tests", function()
 		pending "trim"
 		pending "angle_to"

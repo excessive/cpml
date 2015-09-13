@@ -66,9 +66,9 @@ function vector:clone()
 end
 
 --- Unpack the vector into its components.
--- @return float
--- @return float
--- @return float
+-- @return number
+-- @return number
+-- @return number
 function vector:unpack()
 	return self.x, self.y, self.z
 end
@@ -130,7 +130,7 @@ end
 --- Dot product.
 -- @param a first vec3 to dot with
 -- @param b second vec3 to dot with
--- @return float
+-- @return number
 function vector.dot(a,b)
 	assert(isvector(a) and isvector(b), "dot: wrong argument types (<vector> expected)")
 	return a.x*b.x + a.y*b.y + a.z*b.z
@@ -141,7 +141,7 @@ function vector:len2()
 end
 
 --- Vector length/magnitude.
--- @return float
+-- @return number
 function vector:len()
 	return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 end
@@ -149,7 +149,7 @@ end
 --- Distance between two points.
 -- @param a first point
 -- @param b second point
--- @return float
+-- @return number
 function vector.dist(a, b)
 	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
@@ -161,7 +161,7 @@ end
 --- Squared distance between two points.
 -- @param a first point
 -- @param b second point
--- @return float
+-- @return number
 function vector.dist2(a, b)
 	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
@@ -243,14 +243,21 @@ function vector:cross(v)
 	return new(self.y*v.z - self.z*v.y, self.z*v.x - self.x*v.z, self.x*v.y - self.y*v.x)
 end
 
--- ref.: http://blog.signalsondisplay.com/?p=336
+-- @return vec3
 function vector:trim_inplace(maxLen)
+	-- ref.: http://blog.signalsondisplay.com/?p=336
 	local s = maxLen * maxLen / self:len2()
 	s = (s > 1 and 1) or math.sqrt(s)
 	self.x, self.y, self.z = self.x * s, self.y * s, self.z * s
 	return self
 end
 
+-- @return vec3
+function vector:trim(maxLen)
+	return self:clone():trim_inplace(maxLen)
+end
+
+-- @return number
 function vector:angle_to(other)
 	-- Only makes sense in 2D.
 	if other then
@@ -259,23 +266,21 @@ function vector:angle_to(other)
 	return atan2(self.y, self.x)
 end
 
+-- @return number
 function vector:angle_between(other)
 	if other then
-		return acos(self*other / (self:len() * other:len()))
+		return acos(self:dot(other) / (self:len() * other:len()))
 	end
 	return 0
 end
 
-function vector:trim(maxLen)
-	return self:clone():trim_inplace(maxLen)
-end
-
+-- @return vec3
 function vector:orientation_to_direction(orientation)
 	orientation = orientation or new(0, 1, 0)
 	return orientation
-		:rotated(self.z, new(0, 0, 1))
-		:rotated(self.y, new(0, 1, 0))
-		:rotated(self.x, new(1, 0, 0))
+		:rotated(self.z, unit_z)
+		:rotated(self.y, unit_y)
+		:rotated(self.x, unit_x)
 end
 
 -- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
