@@ -131,20 +131,13 @@ function quaternion.unit()
 end
 
 function quaternion:to_axis_angle()
-	if self.w > 1 then
+	if self.w > 1 or self.w < -1 then
 		self = self:normalize()
 	end
 
 	local angle = 2 * math.acos(self.w)
 	local s     = math.sqrt(1-self.w*self.w)
 	local x, y, z
-
-	-- HACK: Why the fuck is this ever NaN?
-	-- I suspect a LuaJIT optimization bug - it doesn't happen in the repl.
-	if angle ~= angle then
-		angle = math.pi * 2
-		s     = 0
-	end
 
 	if s < constants.FLT_EPSILON then
 		x = self.x
