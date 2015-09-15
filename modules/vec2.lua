@@ -35,11 +35,15 @@ local vector = {}
 vector.__index = vector
 
 local function new(x,y)
+	-- allow construction via vec2(a, b), vec2 { a, b } or vec3 { x = a, y = b }
+	if type(x) == "table" then
+		return setmetatable({x=x.x or x[1] or 0, y=x.y or x[2] or 0}, vector)
+	end
 	return setmetatable({x = x or 0, y = y or 0}, vector)
 end
 
 local function isvector(v)
-	return getmetatable(v) == vector
+	return getmetatable(v) == vector or (type(v) == "table" and type(v.x) == "number" and type(v.y) == "number")
 end
 
 local zero = new(0,0)
@@ -85,7 +89,7 @@ function vector.__div(a,b)
 	if type(a) == "number" then
 		return new(a/b.x, a/b.y)
 	elseif type(b) == "number" then
-		return new(b/a.x, b/a.y)
+		return new(a.x/b, a.y/b)
 	else
 		assert(isvector(a) and isvector(b), "Div: wrong argument types (<vector> or <number> expected)")
 		return new(a.x/b.x, a.y/b.y)
@@ -196,6 +200,19 @@ function vector:trim(maxLen)
 	return self:clone():trim_inplace(maxLen)
 end
 
+function vector.lerp(a, b, s)
+	return a + s * (b - a)
+end
+
 -- the module
-return setmetatable({new = new, isvector = isvector, zero = zero},
-{__call = function(_, ...) return new(...) end})
+return setmetatable(
+	{
+		new      = new,
+		lerp     = lerp,
+		isvector = isvector,
+		zero     = zero,
+		unit_x   = new(1, 0),
+		unit_y   = new(0, 1)
+	},
+	{ __call = function(_, ...) return new(...) end }
+)

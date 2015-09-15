@@ -292,6 +292,7 @@ end
 return setmetatable(
 	{
 		new      = new,
+		lerp     = lerp,
 		isvector = isvector,
 		zero     = zero,
 		unit_x   = unit_x,
