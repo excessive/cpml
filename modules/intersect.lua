@@ -149,32 +149,55 @@ function intersect.line_line(p1, p2, p3, p4)
 	resultSegmentPoint2.y = p3.y + mub * p43.y
 	resultSegmentPoint2.z = p3.z + mub * p43.z
 
-	return true, resultSegmentPoint1, resultSegmentPoint2
+	return resultSegmentPoint1, resultSegmentPoint2
 end
 
 function intersect.segment_segment(p1, p2, p3, p4)
-	local collision, c1, c2 = intersect.line_line(p1, p2, p3, p4)
+	local c1, c2 = intersect.line_line(p1, p2, p3, p4)
 
-	if collision then
+	if c1 and c2 then
 		if  ((p1 <= c1 and c1 <= p2) or (p1 >= c1 and c1 >= p2))
 		and ((p3 <= c2 and c2 <= p4) or (p3 >= c2 and c2 >= p4)) then
-			return true, c1, c2
+			return c1, c2
 		end
 	end
 end
 
 -- point is a vec3
--- box.position is a vec3
--- box.volume is a vec3
-function intersect.point_AABB(point, box)
-	if  box.position.x                <= point.x
-	and box.position.x + box.volume.x >= point.x
-	and box.position.y                <= point.y
-	and box.position.y + box.volume.y >= point.y
-	and box.position.z                <= point.z
-	and box.position.z + box.volume.z >= point.z then
-		return true
-	end
+-- box.min is a vec3
+-- box.max is a vec3
+function intersect.point_aabb(point, box)
+	return
+		box.min.x <= point.x and
+		box.max.x >= point.x and
+		box.min.y <= point.y and
+		box.max.y >= point.y and
+		box.min.z <= point.z and
+		box.max.z >= point.z
+end
+
+-- a.min is a vec3
+-- a.max is a vec3
+-- b.min is a vec3
+-- b.max is a vec3
+function intersect.aabb_aabb(a, b)
+	return
+		a.min.x <= b.max.x and
+		b.min.x <= a.max.x and
+		a.min.y <= b.max.y and
+		b.min.y <= a.max.y and
+		a.min.z <= b.max.z and
+		b.min.z <= a.max.z
+end
+
+-- outer.min is a vec3
+-- outer.max is a vec3
+-- inner.min is a vec3
+-- inner.max is a vec3
+function intersect.encapsulate_aabb(outer, inner)
+	return
+		outer.min <= inner.min and
+		outer.max >= inner.max
 end
 
 function intersect.circle_circle(c1, c2)
