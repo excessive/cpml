@@ -196,15 +196,15 @@ end
 -- inner.max is a vec3
 function intersect.encapsulate_aabb(outer, inner)
 	return
-		outer.min <= inner.min and
-		outer.max >= inner.max
+		outer.min < inner.min and
+		outer.max > inner.max
 end
 
 function intersect.circle_circle(c1, c2)
-	assert(type(c1.point)	== "table", "c1 point must be a table")
-	assert(type(c1.radius)	== "number", "c1 radius must be a number")
-	assert(type(c2.point)	== "table", "c2 point must be a table")
-	assert(type(c2.radius)	== "number", "c2 radius must be a number")
+	assert(type(c1.point)  == "table",  "c1 point must be a table")
+	assert(type(c1.radius) == "number", "c1 radius must be a number")
+	assert(type(c2.point)  == "table",  "c2 point must be a table")
+	assert(type(c2.radius) == "number", "c2 radius must be a number")
 	return c1.point:dist(c2.point) <= c1.radius + c2.radius
 end
 
