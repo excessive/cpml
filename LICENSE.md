@@ -1,6 +1,8 @@
-Licenses
-======================
+# Licenses
+
 CPML is Copyright (c) 2014 Colby Klein <shakesoda@gmail.com>.
+
+CPML is Copyright (c) 2014 Landon Manning <lmanning17@gmail.com>.
 
 Code in vec3.lua is derived from hump.vector. (c) 2010-2013 Matthias Richter. MIT.
 
@@ -10,8 +12,9 @@ Code in simplex.lua is (c) 2011 Stefan Gustavson. MIT.
 
 Code in quat.lua is from Andrew Stacey and covered under the CC0 license.
 
-The MIT License (MIT)
-======================
+Code in octree.lua is derived from UnityOctree. (c) 2014 Nition. BSD-2-Clause.
+
+# The MIT License (MIT)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
