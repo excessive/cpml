@@ -196,8 +196,8 @@ end
 -- inner.max is a vec3
 function intersect.encapsulate_aabb(outer, inner)
 	return
-		outer.min < inner.min and
-		outer.max > inner.max
+		outer.min <= inner.min and
+		outer.max >= inner.max
 end
 
 function intersect.circle_circle(c1, c2)
