@@ -10,7 +10,12 @@ local vec2 = require(current_folder .. "vec2")
 local vec3 = require(current_folder .. "vec3")
 local quat = require(current_folder .. "quat")
 
-local mat4 = {}
+local mat4 = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	}
 mat4.__index = mat4
 setmetatable(mat4, mat4)
 
@@ -74,22 +79,17 @@ function mat4:to_quat()
 end
 
 function mat4:__call(v)
-	local m = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	}
+	local m
 	if type(v) == "table" and #v == 16 then
-		for i=1,16 do
-			m[i] = tonumber(v[i])
-		end
+		m = v
 	elseif type(v) == "table" and #v == 9 then
+		m = {}
 		m[1], m[2], m[3] = v[1], v[2], v[3]
 		m[5], m[6], m[7] = v[4], v[5], v[6]
 		m[9], m[10], m[11] = v[7], v[8], v[9]
 		m[16] = 1
 	elseif type(v) == "table" and type(v[1]) == "table" then
+		m = {}
 		local idx = 1
 		for i=1, 4 do
 			for j=1, 4 do
@@ -97,6 +97,8 @@ function mat4:__call(v)
 				idx = idx + 1
 			end
 		end
+	else
+		m = {}
 	end
 
 	-- Look in mat4 for metamethods
@@ -250,7 +252,7 @@ function mat4:translate(t)
 		0, 0, 1, 0,
 		t.x, t.y, t.z, 1
 	}
-	return mat4(m) * mat4(self)
+	return mat4(m) * self
 end
 
 function mat4:scale(s)
@@ -260,7 +262,7 @@ function mat4:scale(s)
 		0, 0, s.z, 0,
 		0, 0, 0, 1
 	}
-	return mat4(m) * mat4(self)
+	return mat4(m) * self
 end
 
 local function len(v)
@@ -284,7 +286,7 @@ function mat4:rotate(angle, axis)
 		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c, 0,
 		0, 0, 0, 1,
 	}
-	return mat4(m) * mat4(self)
+	return mat4(m) * self
 end
 
 -- Set mat4 to identity mat4. Tested OK
@@ -297,7 +299,12 @@ function mat4:identity()
 end
 
 function mat4:clone()
-	return mat4(self)
+	local m = mat4()
+	for i = 1, 16 do
+		m[i] = self[i]
+	end
+
+	return m
 end
 
 -- Inverse of matrix. Tested OK
