@@ -125,12 +125,12 @@ end
 
 function vector.__div(a,b)
 	if type(a) == "number" then
-		return new(a / b.x, a / b.y, a / b.z)
+		return vector.new(a / b.x, a / b.y, a / b.z)
 	elseif type(b) == "number" then
-		return new(a.x / b, a.y / b, a.z / b)
+		return vector.new(a.x / b, a.y / b, a.z / b)
 	else
-		assert(isvector(a) and isvector(b), "Div: wrong argument types (<vector> or <number> expected)")
-		return new(a.x/b.x, a.y/b.y, a.z/b.z)
+		assert(vector.isvector(a) and vector.isvector(b), "Div: wrong argument types (<vector> or <number> expected)")
+		return vector.new(a.x/b.x, a.y/b.y, a.z/b.z)
 	end
 end
 
