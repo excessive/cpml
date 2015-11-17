@@ -73,7 +73,7 @@ function vector.new(x,y,z)
 	return setmetatable({x = x, y = y, z = z}, vector)
 end
 
-local function isvector(v)
+function vector.isvector(v)
 	return getmetatable(v) == vector or type(v.x and v.y and v.z) == "number"
 end
 -- end
