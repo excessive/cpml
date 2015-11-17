@@ -63,10 +63,12 @@ local isvector
 --- @return vec3
 function vector.new(x,y,z)
 		-- allow construction via vec3(a, b, c), vec3 { a, b, c } or vec3 { x = a, y = b, z = c }
-	if type(x) == "table" and x.x and x.y and x.z then
-		return setmetatable(x, vector)
-	elseif type(x) == "table" then
-		return setmetatable({x[1], x[2], x[3]}, vector)
+	if type(x) == "table" then
+		if x.x then
+			return setmetatable(x, vector)
+		else
+			return setmetatable({x = x[1], y = x[2], z = x[3]}, vector)
+		end
 	end
 	return setmetatable({x = x, y = y, z = z}, vector)
 end
@@ -76,10 +78,10 @@ local function isvector(v)
 end
 -- end
 
-local zero = vector.new(0,0,0)
-local unit_x = vector.new(1,0,0)
-local unit_y = vector.new(0,1,0)
-local unit_z = vector.new(0,0,1)
+vector.zero = vector.new(0,0,0)
+vector.unit_x = vector.new(1,0,0)
+vector.unit_y = vector.new(0,1,0)
+vector.unit_z = vector.new(0,0,1)
 
 function vector:clone()
 	return vector.new(self.x, self.y, self.z)
