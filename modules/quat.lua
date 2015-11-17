@@ -1,9 +1,5 @@
---- Quaternions
--- @module quat
--- @alias quaternion
-
 -- quaternions
--- @author Andrew Stacey
+-- Author: Andrew Stacey
 -- Website: http://www.math.ntnu.no/~stacey/HowDidIDoThat/iPad/Codea.html
 -- Licence: CC0 http://wiki.creativecommons.org/CC0
 
@@ -17,40 +13,34 @@ local constants      = require(current_folder .. "constants")
 local vec3           = require(current_folder .. "vec3")
 local quaternion     = {}
 quaternion.__index   = quaternion
+quaternion.x = 0
+quaternion.y = 0
+quaternion.z = 0
+quaternion.w = 0
 
 --[[
 A quaternion can either be specified by giving the four coordinates as
 real numbers or by giving the scalar part and the vector part.
 --]]
 
-local function new(...)
-	local x, y, z, w
-	-- copy
-	local arg = { select(1, ...) or 0, select(2, ...) or 0, select(3, ...) or 0, select(4, ...) or 0 }
-	local n = select('#', ...)
-	if n == 1 and type(arg[1]) == "table" then
-		x = arg[1].x or arg[1][1]
-		y = arg[1].y or arg[1][2]
-		z = arg[1].z or arg[1][3]
-		w = arg[1].w or arg[1][4]
-	-- four numbers
-	elseif n == 4 then
-		x = arg[1]
-		y = arg[2]
-		z = arg[3]
-		w = arg[4]
-	-- real number plus vector
-	elseif n == 2 then
-		x = arg[1].x or arg[1][1]
-		y = arg[1].y or arg[1][2]
-		z = arg[1].z or arg[1][3]
-		w = arg[2]
-	else
-		print(string.format("%s %s %s %s", select(1, ...), select(2, ...), select(3, ...), select(4, ...)))
-		error("Incorrect number of arguments to quaternion")
+local function new(x, y, z, w)
+
+	if type(x) == "table" then
+		local q = x
+		local rn = y
+
+		if not rn then
+			if q.x then
+				return setmetatable(q, quaternion)
+			else
+				return setmetatable({x = q[1], y = q[2], z = q[3], w = q[4]}, quaternion)
+			end
+		else
+			return setmetatable({x = q.x or q[1], y = q.y or q[2], z = q.z or q[3], w = rn}, quaternion)
+		end
 	end
 
-	return setmetatable({ x = x or 0, y = y or 0, z = z or 0, w = w or 1 }, quaternion)
+	return setmetatable({x = x, y = y, z = z, w = w}, quaternion)
 end
 
 function quaternion.__add(a, b)
@@ -131,7 +121,7 @@ function quaternion.unit()
 end
 
 function quaternion:to_axis_angle()
-	if self.w > 1 or self.w < -1 then
+	if self.w > 1 then
 		self = self:normalize()
 	end
 
