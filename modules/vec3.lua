@@ -41,7 +41,6 @@ vector.__index = vector
 local hasffi, ffi = pcall(require, "ffi")
 local jitenabled = jit and jit.status() or false
 local hot_loaded = false
-local isvector
 
 -- if hasffi and jitenabled then
 -- 	xpcall(function()
@@ -51,7 +50,7 @@ local isvector
 -- 		ffi.cdef "struct cpml_vec3 { double x, y, z; };"
 -- 		new = ffi.typeof("struct cpml_vec3")
 -- 	end)
--- 	function isvector(v)
+-- 	function vector.isvector(v)
 -- 		return ffi.istype(new, v) or type(v.x and v.y and v.z) == "number"
 -- 	end
 -- else
@@ -104,12 +103,12 @@ function vector.__unm(a)
 end
 
 function vector.__add(a,b)
-	assert(isvector(a) and isvector(b), "Add: wrong argument types (<vector> expected)")
+	assert(vector.isvector(a) and vector.isvector(b), "Add: wrong argument types (<vector> expected)")
 	return vector.new(a.x+b.x, a.y+b.y, a.z+b.z)
 end
 
 function vector.__sub(a,b)
-	assert(isvector(a) and isvector(b), "Sub: wrong argument types (<vector> expected)")
+	assert(vector.isvector(a) and vector.isvector(b), "Sub: wrong argument types (<vector> expected)")
 	return vector.new(a.x-b.x, a.y-b.y, a.z-b.z)
 end
 
@@ -119,13 +118,13 @@ function vector.__mul(a,b)
 	elseif type(b) == "number" then
 		return vector.new(b*a.x, b*a.y, b*a.z)
 	else
-		assert(isvector(a) and isvector(b), "Mul: wrong argument types (<vector> or <number> expected)")
+		assert(vector.isvector(a) and vector.isvector(b), "Mul: wrong argument types (<vector> or <number> expected)")
 		return vector.new(a.x*b.x, a.y*b.y, a.z*b.z)
 	end
 end
 
 function vector.__div(a,b)
-	assert(isvector(a) and type(b) == "number", "wrong argument types (expected <vector> / <number>)")
+	assert(vector.isvector(a) and type(b) == "number", "wrong argument types (expected <vector> / <number>)")
 	return vector.new(a.x / b, a.y / b, a.z / b)
 end
 
@@ -148,7 +147,7 @@ end
 --- @param b second vec3 to dot with
 --- @return number
 function vector.dot(a,b)
-	assert(isvector(a) and isvector(b), "dot: wrong argument types (<vector> expected)")
+	assert(vector.isvector(a) and vector.isvector(b), "dot: wrong argument types (<vector> expected)")
 	return a.x*b.x + a.y*b.y + a.z*b.z
 end
 
@@ -167,7 +166,7 @@ end
 --- @param b second point
 --- @return number
 function vector.dist(a, b)
-	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
+	assert(vector.isvector(a) and vector.isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
 	local dy = a.y - b.y
 	local dz = a.z - b.z
@@ -179,7 +178,7 @@ end
 --- @param b second point
 --- @return number
 function vector.dist2(a, b)
-	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
+	assert(vector.isvector(a) and vector.isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
 	local dy = a.y - b.y
 	local dz = a.z - b.z
@@ -232,21 +231,21 @@ function vector:perpendicular()
 end
 
 function vector:project_on(v)
-	assert(isvector(v), "invalid argument: cannot project vector on " .. type(v))
+	assert(vector.isvector(v), "invalid argument: cannot project vector on " .. type(v))
 	-- (self * v) * v / v:len2()
 	local s = (self.x * v.x + self.y * v.y + self.z * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z)
 	return vector.new(s * v.x, s * v.y, s * v.z)
 end
 
 function vector:project_from(v)
-	assert(isvector(v), "invalid argument: cannot project vector on " .. type(v))
+	assert(vector.isvector(v), "invalid argument: cannot project vector on " .. type(v))
 	-- Does the reverse of projectOn.
 	local s = (v.x * v.x + v.y * v.y + v.z * v.z) / (self.x * v.x + self.y * v.y + self.z * v.z)
 	return vector.new(s * v.x, s * v.y, s * v.z)
 end
 
 function vector:mirror_on(v)
-	assert(isvector(v), "invalid argument: cannot mirror vector on " .. type(v))
+	assert(vector.isvector(v), "invalid argument: cannot mirror vector on " .. type(v))
 	local s = 2 * (self.x * v.x + self.y * v.y + self.z * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z)
 	return vector.new(s * v.x - self.x, s * v.y - self.y, s * v.z - self.z)
 end
@@ -255,7 +254,7 @@ end
 --- @param v vec3 to cross with
 --- @return vec3
 function vector:cross(v)
-	assert(isvector(v), "cross: wrong argument types (<vector> expected)")
+	assert(vector.isvector(v), "cross: wrong argument types (<vector> expected)")
 	return vector.new(self.y*v.z - self.z*v.y, self.z*v.x - self.x*v.z, self.x*v.y - self.y*v.x)
 end
 
