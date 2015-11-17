@@ -1,5 +1,5 @@
 -- quaternions
--- Author: Andrew Stacey
+-- @author: Andrew Stacey
 -- Website: http://www.math.ntnu.no/~stacey/HowDidIDoThat/iPad/Codea.html
 -- Licence: CC0 http://wiki.creativecommons.org/CC0
 
@@ -121,7 +121,7 @@ function quaternion.unit()
 end
 
 function quaternion:to_axis_angle()
-	if self.w > 1 then
+	if self.w > 1 or self.w < -1 then
 		self = self:normalize()
 	end
 

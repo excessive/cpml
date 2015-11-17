@@ -56,6 +56,11 @@ local isvector
 -- 	end
 -- else
 
+---- Instance a new vec3.
+--- @param x X value, table containing 3 elements, or another vector.
+--- @param y Y value
+--- @param z Z value
+--- @return vec3
 function vector.new(x,y,z)
 		-- allow construction via vec3(a, b, c), vec3 { a, b, c } or vec3 { x = a, y = b, z = c }
 	if type(x) == "table" and x.x and x.y and x.z then
@@ -66,7 +71,7 @@ function vector.new(x,y,z)
 	return setmetatable({x = x, y = y, z = z}, vector)
 end
 
-function isvector(v)
+local function isvector(v)
 	return getmetatable(v) == vector or type(v.x and v.y and v.z) == "number"
 end
 -- end
@@ -80,6 +85,10 @@ function vector:clone()
 	return vector.new(self.x, self.y, self.z)
 end
 
+---- Unpack the vector into its components.
+--- @return number
+--- @return number
+--- @return number
 function vector:unpack()
 	return self.x, self.y, self.z
 end
@@ -132,6 +141,10 @@ function vector.__le(a,b)
 	return a.x <= b.x and a.y <= b.y and a.z <= b.z
 end
 
+---- Dot product.
+--- @param a first vec3 to dot with
+--- @param b second vec3 to dot with
+--- @return number
 function vector.dot(a,b)
 	assert(isvector(a) and isvector(b), "dot: wrong argument types (<vector> expected)")
 	return a.x*b.x + a.y*b.y + a.z*b.z
@@ -141,10 +154,16 @@ function vector:len2()
 	return self.x * self.x + self.y * self.y + self.z * self.z
 end
 
+---- Vector length/magnitude.
+--- @return number
 function vector:len()
 	return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 end
 
+---- Distance between two points.
+--- @param a first point
+--- @param b second point
+--- @return number
 function vector.dist(a, b)
 	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
@@ -153,6 +172,10 @@ function vector.dist(a, b)
 	return sqrt(dx * dx + dy * dy + dz * dz)
 end
 
+---- Squared distance between two points.
+--- @param a first point
+--- @param b second point
+--- @return number
 function vector.dist2(a, b)
 	assert(isvector(a) and isvector(b), "dist: wrong argument types (<vector> expected)")
 	local dx = a.x - b.x
@@ -161,6 +184,9 @@ function vector.dist2(a, b)
 	return (dx * dx + dy * dy + dz * dz)
 end
 
+---- Normalize vector.
+--- Scales the vector in place such that its length is 1.
+--- @return vec3
 function vector:normalize_inplace()
 	local l = self:len()
 	if l > 0 then
@@ -169,10 +195,17 @@ function vector:normalize_inplace()
 	return self
 end
 
+---- Normalize vector.
+--- Scales the vector in place such that its length is 1.
+--- @return vec3
 function vector:normalize()
 	return self:clone():normalize_inplace()
 end
 
+---- Rotate vector about an axis.
+--- @param phi Amount to rotate, in radians
+--- @param axis Axis to rotate by
+--- @return vec3
 function vector:rotate(phi, axis)
 	if axis == nil then return self end
 
@@ -216,6 +249,9 @@ function vector:mirror_on(v)
 	return vector.new(s * v.x - self.x, s * v.y - self.y, s * v.z - self.z)
 end
 
+---- Cross product.
+--- @param v vec3 to cross with
+--- @return vec3
 function vector:cross(v)
 	assert(isvector(v), "cross: wrong argument types (<vector> expected)")
 	return vector.new(self.y*v.z - self.z*v.y, self.z*v.x - self.x*v.z, self.x*v.y - self.y*v.x)
@@ -229,6 +265,7 @@ function vector:trim_inplace(maxLen)
 	return self
 end
 
+--- @return number
 function vector:angle_to(other)
 	-- Only makes sense in 2D.
 	if other then
@@ -237,6 +274,7 @@ function vector:angle_to(other)
 	return atan2(self.y, self.x)
 end
 
+--- @return number
 function vector:angle_between(other)
 	if other then
 		return acos(self*other / (self:len() * other:len()))
@@ -244,6 +282,7 @@ function vector:angle_between(other)
 	return 0
 end
 
+--- @return vec3
 function vector:trim(maxLen)
 	return self:clone():trim_inplace(maxLen)
 end
