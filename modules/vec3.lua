@@ -36,25 +36,6 @@ vector.y = 0
 vector.z = 0
 vector.__index = vector
 
-
--- Courtesy of slime
-local hasffi, ffi = pcall(require, "ffi")
-local jitenabled = jit and jit.status() or false
-local hot_loaded = false
-
--- if hasffi and jitenabled then
--- 	xpcall(function()
--- 		hot_loaded = true
--- 		new = ffi.typeof("struct cpml_vec3")
--- 	end, function()
--- 		ffi.cdef "struct cpml_vec3 { double x, y, z; };"
--- 		new = ffi.typeof("struct cpml_vec3")
--- 	end)
--- 	function vector.isvector(v)
--- 		return ffi.istype(new, v) or type(v.x and v.y and v.z) == "number"
--- 	end
--- else
-
 ---- Instance a new vec3.
 --- @param x X value, table containing 3 elements, or another vector.
 --- @param y Y value
@@ -75,7 +56,6 @@ end
 function vector.isvector(v)
 	return getmetatable(v) == vector or type(v.x and v.y and v.z) == "number"
 end
--- end
 
 vector.zero = vector.new(0,0,0)
 vector.unit_x = vector.new(1,0,0)

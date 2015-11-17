@@ -23,7 +23,7 @@ A quaternion can either be specified by giving the four coordinates as
 real numbers or by giving the scalar part and the vector part.
 --]]
 
-local function new(x, y, z, w)
+function quaternion.new(x, y, z, w)
 
 	if type(x) == "table" then
 		local q = x
@@ -45,14 +45,14 @@ end
 
 function quaternion.__add(a, b)
 	if type(b) == "number" then
-		return new(a.x, a.y, a.z, a.w + b)
+		return quaternion.new(a.x, a.y, a.z, a.w + b)
 	end
 
-	return new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
+	return quaternion.new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
 end
 
 function quaternion.__sub(a, b)
-	return new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
+	return quaternion.new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
 end
 
 function quaternion:__unm()
@@ -72,7 +72,7 @@ function quaternion.__mul(a, b)
 		z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
 		w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
 
-		return new(x, y, z, w)
+		return quaternion.new(x, y, z, w)
 	else
 		local qv  = vec3(a.x, a.y, a.z)
 		local uv  = qv:cross(b)
@@ -117,7 +117,7 @@ function quaternion:unpack()
 end
 
 function quaternion.unit()
-	return new(0, 0, 0, 1)
+	return quaternion.new(0, 0, 0, 1)
 end
 
 function quaternion:to_axis_angle()
@@ -178,7 +178,7 @@ function quaternion.dot(a, b)
 end
 
 function quaternion.cross(a, b)
-	return new(
+	return quaternion.new(
 		a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
 		a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
 		a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
@@ -209,12 +209,12 @@ end
 
 -- Scale the quaternion
 function quaternion:scale(l)
-	return new(self.x * l, self.y * l, self.z * l, self.w * l)
+	return quaternion.new(self.x * l, self.y * l, self.z * l, self.w * l)
 end
 
 -- Conjugation (corresponds to inverting a rotation)
 function quaternion:conjugate()
-	return new(-self.x, -self.y, -self.z, self.w)
+	return quaternion.new(-self.x, -self.y, -self.z, self.w)
 end
 
 function quaternion:inverse()
@@ -241,7 +241,7 @@ function quaternion:real()
 end
 
 function quaternion:clone()
-	return new(self.x, self.y, self.z, self.w)
+	return quaternion.new(self.x, self.y, self.z, self.w)
 end
 
 -- Returns the vector (imaginary) part as a Vec3 object
@@ -254,7 +254,7 @@ Converts a rotation to a quaternion. The first argument is the angle
 to rotate, the second must specify an axis as a Vec3 object.
 --]]
 
-local function rotate(angle, axis)
+function quaternion.rotate(angle, axis)
 	local len = axis:len()
 
 	if math.abs(len - 1) > 0.001 then
@@ -266,7 +266,7 @@ local function rotate(angle, axis)
 	local sin = math.sin(angle * 0.5)
 	local cos = math.cos(angle * 0.5)
 
-	return new(axis.x * sin, axis.y * sin, axis.z * sin, cos)
+	return quaternion.new(axis.x * sin, axis.y * sin, axis.z * sin, cos)
 end
 
 function quaternion:to_euler()
@@ -335,5 +335,7 @@ end
 
 -- return quaternion
 -- the module
-return setmetatable({ new = new, rotate = rotate },
-{ __call = function(_, ...) return new(...) end })
+return setmetatable({}, {
+		__call = function(_, ...) return quaternion.new(...) end,
+		__index = quaternion
+})
