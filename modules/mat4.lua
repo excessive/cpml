@@ -17,7 +17,6 @@ local mat4 = {
 		0, 0, 0, 1
 	}
 mat4.__index = mat4
-setmetatable(mat4, mat4)
 
 -- from https://github.com/davidm/lua-matrix/blob/master/lua/matrix.lua
 -- Multiply two matrices; m1 columns must be equal to m2 rows
@@ -42,7 +41,7 @@ function mat4.from_direction(direction, up)
 	local side = forward:cross(up):normalize()
 	local new_up = side:cross(forward):normalize()
 
-	local view = mat4()
+	local view = mat4.new()
 	view[1]  = side.x
 	view[5]  = side.y
 	view[9]  = side.z
@@ -78,7 +77,7 @@ function mat4:to_quat()
 	):normalize()
 end
 
-function mat4:__call(v)
+function mat4.new(v)
 	local m
 	if type(v) == "table" and #v == 16 then
 		m = v
@@ -130,7 +129,7 @@ function mat4:__tostring()
 end
 
 function mat4:ortho(left, right, top, bottom, near, far)
-	local out = mat4()
+	local out = mat4.new()
 	out[1] = 2 / (right - left)
 	out[6] = 2 / (top - bottom)
 	out[11] = -2 / (far - near)
@@ -171,7 +170,7 @@ function mat4:hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity)
 	 -- A projection matrix is very like a scaling from NDC, so we can start with that.
 	local scaleAndOffset = CreateNDCScaleAndOffsetFromFov(tanHalfFov)
 	local handednessScale = rightHanded and -1.0 or 1.0
-	local projection = mat4()
+	local projection = mat4.new()
 
 	-- Produces X result, mapping clip edges to [-w,+w]
 	projection[1] = scaleAndOffset.Scale.x
@@ -242,7 +241,7 @@ function mat4:perspective(fovy, aspect, near, far)
 	result[15] = -(2 * far * near) / (far - near)
 	result[16] = 1
 
-	return mat4(result)
+	return mat4.new(result)
 end
 
 function mat4:translate(t)
@@ -252,7 +251,7 @@ function mat4:translate(t)
 		0, 0, 1, 0,
 		t.x, t.y, t.z, 1
 	}
-	return mat4(m) * self
+	return mat4.new(m) * self
 end
 
 function mat4:scale(s)
@@ -262,7 +261,7 @@ function mat4:scale(s)
 		0, 0, s.z, 0,
 		0, 0, 0, 1
 	}
-	return mat4(m) * self
+	return mat4.new(m) * self
 end
 
 local function len(v)
@@ -286,12 +285,12 @@ function mat4:rotate(angle, axis)
 		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c, 0,
 		0, 0, 0, 1,
 	}
-	return mat4(m) * self
+	return mat4.new(m) * self
 end
 
 -- Set mat4 to identity mat4. Tested OK
 function mat4:identity()
-	local out = mat4()
+	local out = mat4.new()
 	for i=1, 16, 5 do
 		out[i] = 1
 	end
@@ -299,7 +298,7 @@ function mat4:identity()
 end
 
 function mat4:clone()
-	local m = mat4()
+	local m = mat4.new()
 	for i = 1, 16 do
 		m[i] = self[i]
 	end
@@ -309,7 +308,7 @@ end
 
 -- Inverse of matrix. Tested OK
 function mat4:invert()
-	local out = mat4()
+	local out = mat4.new()
 
 	out[1] =  self[6]  * self[11] * self[16] -
 		self[6]  * self[12] * self[15] -
@@ -483,7 +482,7 @@ function mat4:look_at(eye, center, up)
 	local side = forward:cross(up):normalize()
 	local new_up = side:cross(forward):normalize()
 
-	local view = mat4()
+	local view = mat4.new()
 	view[1]  = side.x
 	view[5]  = side.y
 	view[9]  = side.z
@@ -498,7 +497,7 @@ function mat4:look_at(eye, center, up)
 
 	view[16] = 1
 
-	local out = mat4():translate(-eye - forward) * view
+	local out = mat4.new():translate(-eye - forward) * view
 	return out * self
 end
 
@@ -510,7 +509,7 @@ function mat4:transpose()
 		self[3], self[7], self[11], self[15],
 		self[4], self[8], self[12], self[16]
 	}
-	return mat4(m)
+	return mat4.new(m)
 end
 
 function mat4:__unm()
@@ -528,7 +527,7 @@ function mat4:__mul(m)
 		return v
 	end
 
-	local out = mat4()
+	local out = mat4.new()
 	for i=0, 12, 4 do
 		for j=1, 4 do
 			out[i+j] = m[j] * self[i+1] + m[j+4] * self[i+2] + m[j+8] * self[i+3] + m[j+12] * self[i+4]
@@ -546,4 +545,7 @@ function mat4:to_vec4s()
 	}
 end
 
-return mat4
+return setmetatable({}, {
+		__call = function(_, ...) return mat4.new(...) end,
+		__index = mat4
+})
