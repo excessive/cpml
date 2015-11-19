@@ -1,47 +1,18 @@
---[[
-Copyright (c) 2014, Nition
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice, this
-  list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-https://github.com/Nition/UnityOctree
-https://github.com/Nition/UnityOctree/blob/master/LICENCE
-https://github.com/Nition/UnityOctree/blob/master/Scripts/BoundsOctree.cs
-https://github.com/Nition/UnityOctree/blob/master/Scripts/BoundsOctreeNode.cs
-
-Translated to Lua by Landon Manning
-https://github.com/karai17
-https://github.com/excessive/cpml
---]]
+-- https://github.com/Nition/UnityOctree
+-- https://github.com/Nition/UnityOctree/blob/master/LICENCE
+-- https://github.com/Nition/UnityOctree/blob/master/Scripts/BoundsOctree.cs
+-- https://github.com/Nition/UnityOctree/blob/master/Scripts/BoundsOctreeNode.cs
 
 --- Octree
 -- @module octree
-local intersect  = require "cpml.modules.intersect"
-local mat4       = require "cpml.modules.mat4"
-local utils      = require "cpml.modules.utils"
-local vec3       = require "cpml.modules.vec3"
-local lume       = require "lume"
-local Octree     = {}
-local OctreeNode = {}
+local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
+local intersect      = require(current_folder .. "intersect")
+local mat4           = require(current_folder .. "mat4")
+local utils          = require(current_folder .. "utils")
+local vec3           = require(current_folder .. "vec3")
+local lume           = require "lume"
+local Octree         = {}
+local OctreeNode     = {}
 local Node
 
 Octree.__index     = Octree
@@ -116,28 +87,37 @@ function Octree:remove(obj)
 	return removed
 end
 
---- Check if the specified bounds intersect with anything in the tree. See also: GetColliding.
+--- Check if the specified bounds intersect with anything in the tree. See also: get_colliding.
 -- @param checkBounds bounds to check
 -- @return bool True if there was a collision
-function Octree:isColliding(checkBounds)
-	return self.rootNode:isColliding(checkBounds)
+function Octree:is_colliding(checkBounds)
+	return self.rootNode:is_colliding(checkBounds)
 end
 
---- Returns an array of objects that intersect with the specified bounds, if any. Otherwise returns an empty array. See also: IsColliding.
+--- Returns an array of objects that intersect with the specified bounds, if any. Otherwise returns an empty array. See also: is_colliding.
 -- @param checkBounds bounds to check
 -- @return table Objects that intersect with the specified bounds
-function Octree:getColliding(checkBounds)
-	return self.rootNode:getColliding(checkBounds)
+function Octree:get_colliding(checkBounds)
+	return self.rootNode:get_colliding(checkBounds)
+end
+
+--- Cast a ray through the node and its children
+-- @param ray Ray with a position and a direction
+-- @param func Function to execute on any objects within child nodes
+-- @return boolean True is is an intersect detected
+function Octree:cast_ray(ray, func)
+	assert(func)
+	return self.rootNode:cast_ray(ray, func)
 end
 
 --- Draws node boundaries visually for debugging.
-function Octree:drawBounds(cube)
-	self.rootNode:drawBounds(cube)
+function Octree:draw_bounds(cube)
+	self.rootNode:draw_bounds(cube)
 end
 
 --- Draws the bounds of all objects in the tree visually for debugging.
-function Octree:drawObjects(cube)
-	self.rootNode:drawObjects(cube)
+function Octree:draw_objects(cube)
+	self.rootNode:draw_objects(cube)
 end
 
 --- Grow the octree to fit in all objects.
@@ -156,7 +136,7 @@ function Octree:grow(direction)
 	self.rootNode = Node(newLength, self.minSize, self.looseness, newCenter)
 
 	-- Create 7 new octree children to go with the old root as children of the new root
-	local rootPos  = self:getRootPosIndex(xDirection, yDirection, zDirection)
+	local rootPos  = self:get_root_pos_index(xDirection, yDirection, zDirection)
 	local children = {}
 
 	for i = 0, 7 do
@@ -171,12 +151,12 @@ function Octree:grow(direction)
 	end
 
 	-- Attach the new children to the new root node
-	self.rootNode:setChildren(children)
+	self.rootNode:set_children(children)
 end
 
 --- Shrink the octree if possible, else leave it the same.
 function Octree:shrink()
-	self.rootNode = self.rootNode:shrinkIfPossible(initialSize)
+	self.rootNode = self.rootNode:shrink_if_possible(initialSize)
 end
 
 --- Used when growing the octree. Works out where the old root node would fit inside a new, larger root node.
@@ -184,7 +164,7 @@ end
 -- @param yDir Y direction of growth. 1 or -1
 -- @param zDir Z direction of growth. 1 or -1
 -- @return Octant where the root node should be
-function Octree:getRootPosIndex(xDir, yDir, zDir)
+function Octree:get_root_pos_index(xDir, yDir, zDir)
 	local result = xDir > 0 and 1 or 0
 
 	if yDir < 0 then return result + 4 end
@@ -198,7 +178,7 @@ end
 -- @param minSize Minimum size of nodes in this octree
 -- @param looseness Multiplier for baseLengthVal to get the actual size
 -- @param center Centre position of this node
-local function newNode(baseLength, minSize, looseness, center)
+local function new_node(baseLength, minSize, looseness, center)
 	local node = setmetatable({}, OctreeNode)
 
 	-- Objects in this node
@@ -211,12 +191,12 @@ local function newNode(baseLength, minSize, looseness, center)
 	-- A generally good number seems to be something around 8-15
 	node.numObjectsAllowed = 8
 
-	node:setValues(baseLength, minSize, looseness, center)
+	node:set_values(baseLength, minSize, looseness, center)
 
 	return node
 end
 
-local function newBound(center, size)
+local function new_bound(center, size)
 	return {
 		center = center,
 		size   = size,
@@ -239,13 +219,13 @@ function OctreeNode:add(obj, objBounds)
 	if #self.objects < self.numObjectsAllowed
 	or self.baseLength / 2 < self.minSize then
 		table.insert(self.objects, {
-			obj=obj,
+			data=obj,
 			bounds=objBounds
 		})
 	else
 		-- Fits at this level, but we can go deeper. Would it fit there?
 
-		local bestFitChild
+		local best_fit_child
 
 		-- Create the 8 children
 		if #self.children == 0 then
@@ -260,24 +240,24 @@ function OctreeNode:add(obj, objBounds)
 			for i, object in lume.ripairs(self.objects) do
 				-- Find which child the object is closest to based on where the
 				-- object's center is located in relation to the octree's center.
-				bestFitChild = self:bestFitChild(object.bounds)
+				best_fit_child = self:best_fit_child(object.bounds)
 
 				-- Does it fit?
-				if intersect.encapsulate_aabb(self.children[bestFitChild].bounds, object.bounds) then
-					self.children[bestFitChild]:add(object.obj, object.bounds) -- Go a level deeper
+				if intersect.encapsulate_aabb(self.children[best_fit_child].bounds, object.bounds) then
+					self.children[best_fit_child]:add(object.data, object.bounds) -- Go a level deeper
 					table.remove(self.objects, i) -- Remove from here
 				end
 			end
 		end
 
 		-- Now handle the new object we're adding now
-		bestFitChild = self:bestFitChild(objBounds)
+		best_fit_child = self:best_fit_child(objBounds)
 
-		if intersect.encapsulate_aabb(self.children[bestFitChild].bounds, objBounds) then
-			self.children[bestFitChild]:add(obj, objBounds)
+		if intersect.encapsulate_aabb(self.children[best_fit_child].bounds, objBounds) then
+			self.children[best_fit_child]:add(obj, objBounds)
 		else
 			table.insert(self.objects, {
-				obj=obj,
+				data=obj,
 				bounds=objBounds
 			})
 		end
@@ -308,7 +288,7 @@ function OctreeNode:remove(obj)
 
 	if removed then
 		-- Check if we should merge nodes now that we've removed an item
-		if self:shouldMerge() then
+		if self:should_merge() then
 			self:merge()
 		end
 	end
@@ -316,10 +296,10 @@ function OctreeNode:remove(obj)
 	return removed
 end
 
---- Check if the specified bounds intersect with anything in the tree. See also: GetColliding.
+--- Check if the specified bounds intersect with anything in the tree. See also: get_colliding.
 -- @param checkBounds Bounds to check
 -- @return boolean True if there was a collision
-function OctreeNode:isColliding(checkBounds)
+function OctreeNode:is_colliding(checkBounds)
 	-- Are the input bounds at least partially in this node?
 	if not intersect.aabb_aabb(self.bounds, checkBounds) then
 		return false
@@ -334,7 +314,7 @@ function OctreeNode:isColliding(checkBounds)
 
 	-- Check children
 	for _, child in ipairs(self.children) do
-		if child:isColliding(checkBounds) then
+		if child:is_colliding(checkBounds) then
 			return true
 		end
 	end
@@ -342,11 +322,11 @@ function OctreeNode:isColliding(checkBounds)
 	return false
 end
 
---- Returns an array of objects that intersect with the specified bounds, if any. Otherwise returns an empty array. See also: IsColliding.
+--- Returns an array of objects that intersect with the specified bounds, if any. Otherwise returns an empty array. See also: is_colliding.
 -- @param checkBounds Bounds to check. Passing by ref as it improve performance with structs
 -- @param results List results
 -- @return table Objects that intersect with the specified bounds
-function OctreeNode:getColliding(checkBounds, results)
+function OctreeNode:get_colliding(checkBounds, results)
 	local results = results or {}
 
 	-- Are the input bounds at least partially in this node?
@@ -357,21 +337,49 @@ function OctreeNode:getColliding(checkBounds, results)
 	-- Check against any objects in this node
 	for _, object in ipairs(self.objects) do
 		if intersect.aabb_aabb(object.bounds, checkBounds) then
-			table.insert(results, object.obj)
+			table.insert(results, object.data)
 		end
 	end
 
 	-- Check children
 	for _, child in ipairs(self.children) do
-		results = child:getColliding(checkBounds, results)
+		results = child:get_colliding(checkBounds, results)
 	end
 
 	return results
 end
 
+--- Cast a ray through the node and its children
+-- @param ray Ray with a position and a direction
+-- @param func Function to execute on any objects within child nodes
+-- @return boolean True if an intersect is detected
+function OctreeNode:cast_ray(ray, func, level)
+	level = level or 1
+
+	if intersect.ray_aabb(ray, self.bounds.min, self.bounds.max) then
+		if #self.objects > 0 then
+			local hit = func(ray, self.objects)
+
+			if hit then
+				return hit
+			end
+		end
+
+		for _, child in ipairs(self.children) do
+			local hit = child:cast_ray(ray, func, level+1)
+
+			if hit then
+				return hit
+			end
+		end
+	end
+
+	return false
+end
+
 --- Set the 8 children of this octree.
 -- @param childOctrees The 8 new child nodes
-function OctreeNode:setChildren(childOctrees)
+function OctreeNode:set_children(childOctrees)
 	if #childOctrees ~= 8 then
 		print("Child octree array must be length 8. Was length: " .. #childOctrees)
 		return
@@ -387,7 +395,7 @@ end
 --- We can also shrink it if there are no objects left at all!
 -- @param minLength Minimum dimensions of a node in this octree
 -- @return table The new root, or the existing one if we didn't shrink
-function OctreeNode:shrinkIfPossible(minLength)
+function OctreeNode:shrink_if_possible(minLength)
 	if self.baseLength < 2 * minLength then
 		return self
 	end
@@ -400,7 +408,7 @@ function OctreeNode:shrinkIfPossible(minLength)
 	local bestFit = 0
 
 	for i, object in ipairs(self.objects) do
-		local newBestFit = self:bestFitChild(object.bounds)
+		local newBestFit = self:best_fit_child(object.bounds)
 
 		if i == 1 or newBestFit == bestFit then
 			-- In same octant as the other(s). Does it fit completely inside that octant?
@@ -422,7 +430,7 @@ function OctreeNode:shrinkIfPossible(minLength)
 		local childHadContent = false
 
 		for i, child in ipairs(self.children) do
-			if child:hasAnyObjects() then
+			if child:has_any_objects() then
 				if childHadContent then
 					return self -- Can't shrink - another child had content already
 				end
@@ -441,7 +449,7 @@ function OctreeNode:shrinkIfPossible(minLength)
 	if #self.children == 0 then
 		-- We don't have any children, so just shrink this node to the new size
 		-- We already know that everything will still fit in it
-		self:setValues(self.baseLength / 2, self.minSize, self.looseness, self.childBounds[bestFit].center)
+		self:set_values(self.baseLength / 2, self.minSize, self.looseness, self.childBounds[bestFit].center)
 		return self
 	end
 
@@ -454,7 +462,7 @@ end
 -- @param minSize Minimum size of nodes in this octree
 -- @param looseness Multiplier for baseLengthVal to get the actual size
 -- @param center Centre position of this node
-function OctreeNode:setValues(baseLength, minSize, looseness, center)
+function OctreeNode:set_values(baseLength, minSize, looseness, center)
 	-- Length of this node if it has a looseness of 1.0
 	self.baseLength = baseLength
 
@@ -474,7 +482,7 @@ function OctreeNode:setValues(baseLength, minSize, looseness, center)
 	self.size = vec3(self.adjLength, self.adjLength, self.adjLength)
 
 	-- Bounding box that represents this node
-	self.bounds = newBound(self.center, self.size)
+	self.bounds = new_bound(self.center, self.size)
 
 	self.quarter           = self.baseLength / 4
 	self.childActualLength = (self.baseLength / 2) * self.looseness
@@ -482,14 +490,14 @@ function OctreeNode:setValues(baseLength, minSize, looseness, center)
 
 	-- Bounds of potential children to this node. These are actual size (with looseness taken into account), not base size
 	self.childBounds =  {
-		newBound(self.center + vec3(-self.quarter,  self.quarter, -self.quarter), self.childActualSize),
-		newBound(self.center + vec3( self.quarter,  self.quarter, -self.quarter), self.childActualSize),
-		newBound(self.center + vec3(-self.quarter,  self.quarter,  self.quarter), self.childActualSize),
-		newBound(self.center + vec3( self.quarter,  self.quarter,  self.quarter), self.childActualSize),
-		newBound(self.center + vec3(-self.quarter, -self.quarter, -self.quarter), self.childActualSize),
-		newBound(self.center + vec3( self.quarter, -self.quarter, -self.quarter), self.childActualSize),
-		newBound(self.center + vec3(-self.quarter, -self.quarter,  self.quarter), self.childActualSize),
-		newBound(self.center + vec3( self.quarter, -self.quarter,  self.quarter), self.childActualSize)
+		new_bound(self.center + vec3(-self.quarter,  self.quarter, -self.quarter), self.childActualSize),
+		new_bound(self.center + vec3( self.quarter,  self.quarter, -self.quarter), self.childActualSize),
+		new_bound(self.center + vec3(-self.quarter,  self.quarter,  self.quarter), self.childActualSize),
+		new_bound(self.center + vec3( self.quarter,  self.quarter,  self.quarter), self.childActualSize),
+		new_bound(self.center + vec3(-self.quarter, -self.quarter, -self.quarter), self.childActualSize),
+		new_bound(self.center + vec3( self.quarter, -self.quarter, -self.quarter), self.childActualSize),
+		new_bound(self.center + vec3(-self.quarter, -self.quarter,  self.quarter), self.childActualSize),
+		new_bound(self.center + vec3( self.quarter, -self.quarter,  self.quarter), self.childActualSize)
 	}
 end
 
@@ -527,13 +535,13 @@ end
 --- Find which child node this object would be most likely to fit in.
 -- @param objBounds The object's bounds
 -- @return number One of the eight child octants
-function OctreeNode:bestFitChild(objBounds)
+function OctreeNode:best_fit_child(objBounds)
 	return (objBounds.center.x <= self.center.x and 0 or 1) + (objBounds.center.y >= self.center.y and 0 or 4) + (objBounds.center.z <= self.center.z and 0 or 2) + 1
 end
 
 --- Checks if there are few enough objects in this node and its children that the children should all be merged into this.
 -- @return boolean True there are less or the same abount of objects in this and its children than numObjectsAllowed
-function OctreeNode:shouldMerge()
+function OctreeNode:should_merge()
 	local totalObjects = #self.objects
 
 	for _, child in ipairs(self.children) do
@@ -551,11 +559,11 @@ end
 
 --- Checks if this node or anything below it has something in it.
 -- @return boolean True if this node or any of its children, grandchildren etc have something in the
-function OctreeNode:hasAnyObjects()
+function OctreeNode:has_any_objects()
 	if #self.objects > 0 then return true end
 
 	for _, child in ipairs(self.children) do
-		if child:hasAnyObjects() then return true end
+		if child:has_any_objects() then return true end
 	end
 
 	return false
@@ -564,7 +572,7 @@ end
 --- Draws node boundaries visually for debugging.
 -- @param cube Cube model to draw
 -- @param depth Used for recurcive calls to this method
-function OctreeNode:drawBounds(cube, depth)
+function OctreeNode:draw_bounds(cube, depth)
 	depth = depth or 0
 	local tint = depth / 7 -- Will eventually get values > 1. Color rounds to 1 automatically
 
@@ -579,7 +587,7 @@ function OctreeNode:drawBounds(cube, depth)
 
 	depth = depth + 1
 	for _, child in ipairs(self.children) do
-		child:drawBounds(cube, depth)
+		child:draw_bounds(cube, depth)
 	end
 
 	love.graphics.setColor(255, 255, 255)
@@ -587,7 +595,7 @@ end
 
 --- Draws the bounds of all objects in the tree visually for debugging.
 -- @param cube Cube model to draw
-function OctreeNode:drawObjects(cube)
+function OctreeNode:draw_objects(cube)
 	local tint = self.baseLength / 20
 	love.graphics.setColor(0, (1 - tint) * 255, tint * 255, 63)
 
@@ -600,16 +608,16 @@ function OctreeNode:drawObjects(cube)
 	end
 
 	for _, child in ipairs(self.children) do
-		child:drawObjects(cube)
+		child:draw_objects(cube)
 	end
 
 	love.graphics.setColor(255, 255, 255)
 end
 
 Node = setmetatable({
-	new = newNode
+	new = new_node
 }, {
-	__call = function(_, ...) return newNode(...) end
+	__call = function(_, ...) return new_node(...) end
 })
 
 return setmetatable({

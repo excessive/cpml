@@ -2,33 +2,32 @@
 -- @module intersect
 
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
-local vec3 = require(current_folder .. "vec3")
-local constants = require(current_folder .. "constants")
+local vec3           = require(current_folder .. "vec3")
+local constants      = require(current_folder .. "constants")
+local intersect      = {}
 
-local intersect = {}
-
--- *COMPLETELY* untested!
-function intersect.ray_aabb(ray, lb, rt)
-	local min = math.min
-	local max = math.max
+-- ray = { position, direction }
+-- min = vec3
+-- max = vec3
+function intersect.ray_aabb(ray, min, max)
+	local mmin = math.min
+	local mmax = math.max
 
 	-- ray.direction is unit direction vector of ray
 	local dir = ray.direction:normalize()
-	local dirfrac = vec3(1/dir.x,1/dir.y,1/dir.z)
+	local dirfrac = vec3(1 / dir.x, 1 / dir.y, 1 / dir.z)
 
-	-- lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
-	-- ray.point is origin of ray
-	local t1 = (lb.x - ray.point.x)*dirfrac.x
-	local t2 = (rt.x - ray.point.x)*dirfrac.x
-	local t3 = (lb.y - ray.point.y)*dirfrac.y
-	local t4 = (rt.y - ray.point.y)*dirfrac.y
-	local t5 = (lb.z - ray.point.z)*dirfrac.z
-	local t6 = (rt.z - ray.point.z)*dirfrac.z
+	local t1 = (min.x - ray.position.x) * dirfrac.x
+	local t2 = (max.x - ray.position.x) * dirfrac.x
+	local t3 = (min.y - ray.position.y) * dirfrac.y
+	local t4 = (max.y - ray.position.y) * dirfrac.y
+	local t5 = (min.z - ray.position.z) * dirfrac.z
+	local t6 = (max.z - ray.position.z) * dirfrac.z
 
-	local tmin = max(max(min(t1, t2), min(t3, t4)), min(t5, t6))
-	local tmax = min(min(max(t1, t2), max(t3, t4)), max(t5, t6))
+	local tmin = mmax(mmax(mmin(t1, t2), mmin(t3, t4)), mmin(t5, t6))
+	local tmax = mmin(mmin(mmax(t1, t2), mmax(t3, t4)), mmax(t5, t6))
 
-	-- if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+	-- if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behind us
 	if tmax < 0 then
 		return false
 	end
@@ -41,23 +40,23 @@ function intersect.ray_aabb(ray, lb, rt)
 	return true, tmin
 end
 
--- ray = { point, direction }
--- plane = { point, normal }
+-- ray = { position, direction }
+-- plane = { position, normal }
 -- https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
 function intersect.ray_plane(ray, plane)
 	-- t = distance of direction
-	-- d = distance from ray point to plane point
+	-- d = distance from ray position to plane position
 	-- p = point of intersection
 
-	local d = ray.point:dist(plane.point)
+	local d = ray.position:dist(plane.position)
 	local r = ray.direction:dot(plane.normal)
 
 	if r <= 0 then
 		return false
 	end
 
-	local t = -(ray.point:dot(plane.normal) + d) / r
-	local p = ray.point + t * ray.direction
+	local t = -(ray.position:dot(plane.normal) + d) / r
+	local p = ray.position + t * ray.direction
 
 	if p:dot(plane.normal) + d < constants.FLT_EPSILON then
 		return p
@@ -68,11 +67,11 @@ end
 
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 function intersect.ray_triangle(ray, triangle)
-	assert(ray.point ~= nil)
+	assert(ray.position ~= nil)
 	assert(ray.direction ~= nil)
 	assert(#triangle == 3)
 
-	local p, d = ray.point, ray.direction
+	local p, d = ray.position, ray.direction
 
 	local h, s, q = vec3(), vec3(), vec3()
 	local a, f, u, v
@@ -201,11 +200,11 @@ function intersect.encapsulate_aabb(outer, inner)
 end
 
 function intersect.circle_circle(c1, c2)
-	assert(type(c1.point)  == "table",  "c1 point must be a table")
-	assert(type(c1.radius) == "number", "c1 radius must be a number")
-	assert(type(c2.point)  == "table",  "c2 point must be a table")
-	assert(type(c2.radius) == "number", "c2 radius must be a number")
-	return c1.point:dist(c2.point) <= c1.radius + c2.radius
+	assert(type(c1.position)  == "table",  "c1 position must be a vector")
+	assert(type(c1.radius)    == "number", "c1 radius must be a number")
+	assert(type(c2.position)  == "table",  "c2 position must be a vector")
+	assert(type(c2.radius)    == "number", "c2 radius must be a number")
+	return c1.position:dist(c2.position) <= c1.radius + c2.radius
 end
 
 return intersect
