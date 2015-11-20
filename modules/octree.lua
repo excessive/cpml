@@ -116,8 +116,8 @@ function Octree:draw_bounds(cube)
 end
 
 --- Draws the bounds of all objects in the tree visually for debugging.
-function Octree:draw_objects(cube)
-	self.rootNode:draw_objects(cube)
+function Octree:draw_objects(cube, filter)
+	self.rootNode:draw_objects(cube, filter)
 end
 
 --- Grow the octree to fit in all objects.
@@ -353,8 +353,8 @@ end
 -- @param ray Ray with a position and a direction
 -- @param func Function to execute on any objects within child nodes
 -- @return boolean True if an intersect is detected
-function OctreeNode:cast_ray(ray, func, level)
-	level = level or 1
+function OctreeNode:cast_ray(ray, func, depth)
+	depth = depth or 1
 
 	if intersect.ray_aabb(ray, self.bounds.min, self.bounds.max) then
 		if #self.objects > 0 then
@@ -366,7 +366,7 @@ function OctreeNode:cast_ray(ray, func, level)
 		end
 
 		for _, child in ipairs(self.children) do
-			local hit = child:cast_ray(ray, func, level+1)
+			local hit = child:cast_ray(ray, func, depth + 1)
 
 			if hit then
 				return hit
@@ -585,9 +585,8 @@ function OctreeNode:draw_bounds(cube, depth)
 	love.graphics.draw(cube)
 	love.graphics.setWireframe(false)
 
-	depth = depth + 1
 	for _, child in ipairs(self.children) do
-		child:draw_bounds(cube, depth)
+		child:draw_bounds(cube, depth + 1)
 	end
 
 	love.graphics.setColor(255, 255, 255)
@@ -595,20 +594,22 @@ end
 
 --- Draws the bounds of all objects in the tree visually for debugging.
 -- @param cube Cube model to draw
-function OctreeNode:draw_objects(cube)
+function OctreeNode:draw_objects(cube, filter)
 	local tint = self.baseLength / 20
 	love.graphics.setColor(0, (1 - tint) * 255, tint * 255, 63)
 
 	for _, object in ipairs(self.objects) do
-		love.graphics.updateMatrix("transform", mat4()
-			:translate(object.bounds.center)
-			:scale(object.bounds.size)
-		)
-		love.graphics.draw(cube)
+		if filter and filter(object.data) or not filter then
+			love.graphics.updateMatrix("transform", mat4()
+				:translate(object.bounds.center)
+				:scale(object.bounds.size)
+			)
+			love.graphics.draw(cube)
+		end
 	end
 
 	for _, child in ipairs(self.children) do
-		child:draw_objects(cube)
+		child:draw_objects(cube, filter)
 	end
 
 	love.graphics.setColor(255, 255, 255)
