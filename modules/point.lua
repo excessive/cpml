@@ -57,7 +57,7 @@ end
 -- @param point Table with two numbers as {x, y}
 -- @return "[ x, y ]"
 function point.__tostring(point)
-	return string.format( "[ f, f ]", point[1], point[2] )
+	return string.format( "[ %d, %d ]", point[1], point[2] )
 end
 
 --- Add points.
