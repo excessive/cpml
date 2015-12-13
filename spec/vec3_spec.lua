@@ -4,7 +4,7 @@ describe("vec3:", function()
 	it("testing basic operators", function()
 		-- add
 		assert.is.equal(vec3(1, 1, 1) + vec3(2, 3, 4), vec3(3, 4, 5))
-		assert.is.equal(vec3(1, 1, 1) + 5, vec3(6, 6, 6)
+		assert.is.equal(vec3(1, 1, 1) + 5, vec3(6, 6, 6))
 
 		-- sub
 		assert.is.equal(vec3(1, 1, 1) - vec3(2, 3, 4), vec3(-1, -2, -3))
