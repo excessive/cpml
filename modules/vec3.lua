@@ -82,13 +82,25 @@ function vector.__unm(a)
 end
 
 function vector.__add(a,b)
-	assert(isvector(a) and isvector(b), "Add: wrong argument types (<vector> expected)")
-	return new(a.x+b.x, a.y+b.y, a.z+b.z)
+	if type(a) == "number" then
+		return new(a+b.x, a+b.y, a+b.z)
+	elseif type(b) == "number" then
+		return new(b+a.x, b+a.y, b+a.z)
+	else
+		assert(isvector(a) and isvector(b), "Add: wrong argument types (<vector> expected)")
+		return new(a.x+b.x, a.y+b.y, a.z+b.z)
+	end
 end
 
 function vector.__sub(a,b)
-	assert(isvector(a) and isvector(b), "Sub: wrong argument types (<vector> expected)")
-	return new(a.x-b.x, a.y-b.y, a.z-b.z)
+	if type(a) == "number" then
+		return new(a-b.x, a-b.y, a-b.z)
+	elseif type(b) == "number" then
+		return new(b-a.x, b-a.y, b-a.z)
+	else
+		assert(isvector(a) and isvector(b), "Sub: wrong argument types (<vector> expected)")
+		return new(a.x-b.x, a.y-b.y, a.z-b.z)
+	end
 end
 
 function vector.__mul(a,b)

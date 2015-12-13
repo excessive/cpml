@@ -119,7 +119,7 @@ function quaternion.__eq(a, b)
 end
 
 function quaternion:__tostring()
-	return string.format("(%0.3f,%0.3f,%0.3f,%0.3f)", self.x, self.y, self.z, self.x)
+	return string.format("(%0.3f,%0.3f,%0.3f,%0.3f)", self.x, self.y, self.z, self.w)
 end
 
 function quaternion:unpack()
@@ -149,7 +149,7 @@ function quaternion:to_axis_angle()
 		z = self.z / s
 	end
 
-	return angle, { x, y, z }
+	return angle, vec3(x, y, z)
 end
 
 -- Test if we are zero
@@ -279,6 +279,16 @@ local function rotate(angle, axis)
 	return new(axis.x * sin, axis.y * sin, axis.z * sin, cos)
 end
 
+--- Create a quaternion from a direction + up vector.
+-- @param normal
+-- @param up
+-- @return quat
+local function from_direction(normal, up)
+	local a = up:cross(normal)
+	local d = up:dot(normal)
+	return new(a.x, a.y, a.z, d + 1)
+end
+
 function quaternion:to_euler()
 	local sqx = self.x*self.x
 	local sqy = self.y*self.y
@@ -345,5 +355,5 @@ end
 
 -- return quaternion
 -- the module
-return setmetatable({ new = new, rotate = rotate },
+return setmetatable({ new = new, rotate = rotate, from_direction = from_direction },
 { __call = function(_, ...) return new(...) end })

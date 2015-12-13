@@ -32,29 +32,6 @@ local function matrix_mult_nxn(m1, m2)
 	return mtx
 end
 
-function mat4.from_direction(direction, up)
-	local forward = direction:normalize()
-	local side = forward:cross(up):normalize()
-	local new_up = side:cross(forward):normalize()
-
-	local view = mat4()
-	view[1]  = side.x
-	view[5]  = side.y
-	view[9]  = side.z
-
-	view[2]  = new_up.x
-	view[6]  = new_up.y
-	view[10] = new_up.z
-
-	view[3]  = forward.x
-	view[7]  = forward.y
-	view[11] = forward.z
-
-	view[16] = 1
-
-	return view
-end
-
 function mat4:to_quat()
 	local m = self:transpose():to_vec4s()
 	local w = math.sqrt(1 + m[1][1] + m[2][2] + m[3][3]) / 2
@@ -263,19 +240,15 @@ function mat4:scale(s)
 	return mat4(m) * mat4(self)
 end
 
-local function len(v)
-	return math.sqrt(v[1] * v[1] + v[2] * v[2] + v[3] * v[3])
-end
-
 function mat4:rotate(angle, axis)
 	if type(angle) == "table" then
 		angle, axis = angle:to_axis_angle()
 	end
-	local l = len(axis)
+	local l = axis:len()
 	if l == 0 then
 		return self
 	end
-	local x, y, z = axis[1] / l, axis[2] / l, axis[3] / l
+	local x, y, z = axis.x / l, axis.y / l, axis.z / l
 	local c = math.cos(angle)
 	local s = math.sin(angle)
 	local m = {
@@ -537,6 +510,54 @@ function mat4:to_vec4s()
 		{ self[9], self[10], self[11], self[12] },
 		{ self[13], self[14], self[15], self[16] }
 	}
+end
+
+
+function mat4.from_direction(direction, up)
+	local forward = direction:normalize()
+	local side = forward:cross(up):normalize()
+	local new_up = side:cross(forward):normalize()
+
+	local view = mat4()
+	view[1]  = side.x
+	view[5]  = side.y
+	view[9]  = side.z
+
+	view[2]  = new_up.x
+	view[6]  = new_up.y
+	view[10] = new_up.z
+
+	view[3]  = forward.x
+	view[7]  = forward.y
+	view[11] = forward.z
+
+	view[16] = 1
+
+	return view
+end
+
+function mat4.from_transform(t, rot, scale)
+		-- local m = {
+		-- 	scale.x, 0, 0, 0,
+		-- 	0, scale.y, 0, 0,
+		-- 	0, 0, scale.z, 0,
+		-- 	0, 0, 0, 1
+		-- }
+	local angle, axis = rot:to_axis_angle()
+	local l = axis:len()
+	if l == 0 then
+		return self
+	end
+	local x, y, z = axis.x / l, axis.y / l, axis.z / l
+	local c = math.cos(angle)
+	local s = math.sin(angle)
+	local m = {
+		x*x*(1-c)+c, y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
+		x*y*(1-c)-z*s, y*y*(1-c)+c, y*z*(1-c)+x*s, 0,
+		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c, 0,
+		t.x, t.y, t.z, 1,
+	}
+	return setmetatable(m, mat4)
 end
 
 return mat4

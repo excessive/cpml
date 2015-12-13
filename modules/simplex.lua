@@ -41,8 +41,8 @@ if not has_ffi then
 end
 
 -- Modules --
-local bit = require("bit")
-local math = require("math")
+-- local bit = require("bit")
+-- local math = require("math")
 
 -- Imports --
 local band = bit.band
