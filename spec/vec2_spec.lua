@@ -5,11 +5,11 @@ describe("vec2:", function()
 	it("testing basic operators", function()
 		-- add
 		assert.is.equal(vec2(1, 1) + vec2(2, 3), vec2(3, 4))
-		assert.has.errors(function() return vec2(1, 1) + 5 end)
+		assert.is.equal(vec2(1, 1) + 5, vec2(6, 6))
 
 		-- sub
 		assert.is.equal(vec2(1, 1) - vec2(2, 3), vec2(-1, -2))
-		assert.has.errors(function() return vec2(1, 1) - 5 end)
+		assert.is.equal(vec2(1, 1) + 5, vec2(-4, -4))
 
 		-- mul
 		assert.is.equal(vec2(2, 1) * vec2(2, 3), vec2(4, 3))
