@@ -60,28 +60,51 @@ function point.__tostring(point)
 	return string.format( "[ %d, %d ]", point[1], point[2] )
 end
 
+local function ispoint( p )
+	return p[1] and p[2]
+end
+
 --- Add points.
--- @param p1 Table with two numbers as {x, y}
--- @param p2 Table with two numbers as {x, y}
+-- @param a Table with two numbers as {x, y} or a number
+-- @param b Table with two numbers as {x, y} or a number
 -- @return Translated point
-function point.__add(p1, p2)
-	return p1:translate(p1, p2[1], p2[2])
+function point.__add(a, b)
+	if type(a) == "number" then
+		return point.translate(b, a, a)
+	elseif type(b) == "number" then
+		return point.translate(a, b, b)
+	else
+		assert(ispoint(a) and ispoint(b), "Add: wrong argument types (<point> expected)")
+		return point.translate(a, b[1], b[2])
+	end
 end
 
 --- Subtract points.
--- @param p1 Table with two numbers as {x, y}
--- @param p2 Table with two numbers as {x, y}
+-- @param a Table with two numbers as {x, y} or a number
+-- @param b Table with two numbers as {x, y} or a number
 -- @return Translated point
-function point.__sub(p1, p2)
-	return p1:translate(p1, -p2[1], -p2[2])
+function point.__sub(a, b)
+	if type(a) == "number" then
+		return point.translate(b, -a, -a)
+	elseif type(b) == "number" then
+		return point.translate(a, -b, -b)
+	else
+		assert(ispoint(a) and ispoint(b), "Subtract: wrong argument types (<point> expected)")
+		return point.translate(a, -b[1], -b[2])
+	end
 end
 
 --- Multiply points.
--- @param p1 Table with two numbers as {x, y}
--- @param scale Amount to scale
+-- @param a Table with two numbers as {x, y} or amount to scale
+-- @param b Table with two numbers as {x, y} or amount to scale
 -- @return Scaled point
-function point.__mul(p1, scale)
-	return p1:scale(scale)
+function point.__mul(a, b)
+	if type(a) == "number" then
+		return point.scale(b, a)
+	elseif type(b) == "number" then
+		return point.scale(a, b)
+	end
+	error( "Multiply: cannot multiply two points" )
 end
 
 --- Convert point from polar to cartesian.
