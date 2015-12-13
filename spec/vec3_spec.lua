@@ -8,7 +8,7 @@ describe("vec3:", function()
 
 		-- sub
 		assert.is.equal(vec3(1, 1, 1) - vec3(2, 3, 4), vec3(-1, -2, -3))
-		assert.is.equal(vec3(1, 1, 1) - 5, vec3(-4, -4, -4)
+		assert.is.equal(vec3(1, 1, 1) - 5, vec3(-4, -4, -4))
 
 		-- mul
 		assert.is.equal(vec3(2, 1, 2) * vec3(2, 3, 4), vec3(4, 3, 8))
