@@ -10,7 +10,6 @@ local intersect      = require(current_folder .. "intersect")
 local mat4           = require(current_folder .. "mat4")
 local utils          = require(current_folder .. "utils")
 local vec3           = require(current_folder .. "vec3")
-local lume           = require "lume"
 local Octree         = {}
 local OctreeNode     = {}
 local Node
@@ -238,7 +237,8 @@ function OctreeNode:add(obj, objBounds)
 			end
 
 			-- Now that we have the new children, see if this node's existing objects would fit there
-			for i, object in lume.ripairs(self.objects) do
+			for i = #self.objects, 1, -1 do
+				local object = self.objects[i]
 				-- Find which child the object is closest to based on where the
 				-- object's center is located in relation to the octree's center.
 				best_fit_child = self:best_fit_child(object.bounds)
