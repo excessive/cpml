@@ -546,6 +546,6 @@ function mat4:to_vec4s()
 end
 
 return setmetatable({}, {
-		__call = function(_, ...) return mat4.new(...) end,
-		__index = mat4
+	__call = function(_, ...) return mat4.new(...) end,
+	__index = mat4
 })

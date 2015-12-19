@@ -336,6 +336,6 @@ end
 -- return quaternion
 -- the module
 return setmetatable({}, {
-		__call = function(_, ...) return quaternion.new(...) end,
-		__index = quaternion
+	__call = function(_, ...) return quaternion.new(...) end,
+	__index = quaternion
 })
