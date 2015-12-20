@@ -48,7 +48,6 @@ local files = {
 	"mat4",
 	"mesh",
 	"octree",
-	"point",
 	"quadtree",
 	"quat",
 	"simplex",
