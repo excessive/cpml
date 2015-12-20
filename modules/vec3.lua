@@ -40,9 +40,9 @@ function vec3.div(out, a, b)
 end
 
 function vec3.cross(out, a, b)
-	out.x = a.y*b.z - a.z*b.y
-	out.y = a.z*b.x - a.x*b.z
-	out.z = a.x*b.y - a.y*b.x
+	out.x = a.y * b.z - a.z * b.y
+	out.y = a.z * b.x - a.x * b.z
+	out.z = a.x * b.y - a.y * b.x
 end
 
 function vec3.dot(a, b)
@@ -51,15 +51,17 @@ end
 
 function vec3.normalize(out, a)
 	local l = vec3.len(a)
-	out.x, out.y, out.z = a.x / l, a.y / l, a.z / l
-end
-
-function vec3.len2(a)
-	return a.x * a.x + a.y * a.y + a.z * a.z
+	out.x = a.x / l
+	out.y = a.y / l
+	out.z = a.z / l
 end
 
 function vec3.len(a)
 	return sqrt(a.x * a.x + a.y * a.y + a.z * a.z)
+end
+
+function vec3.len2(a)
+	return a.x * a.x + a.y * a.y + a.z * a.z
 end
 
 function vec3.dist(a, b)
@@ -73,19 +75,16 @@ function vec3.dist2(a, b)
 	local dx = a.x - b.x
 	local dy = a.y - b.y
 	local dz = a.z - b.z
-	return (dx * dx + dy * dy + dz * dz)
+	return dx * dx + dy * dy + dz * dz
 end
-
 
 function vec3.lerp(a, b, s)
 	return a + s * (b - a)
 end
 
-
 function vec3.unpack(a)
 	return a.x, a.y, a.z
 end
-
 
 function vec3.tostring(a)
 	return string.format("(%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z)
