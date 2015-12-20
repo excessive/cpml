@@ -33,7 +33,6 @@ function vec3.mul(out, a, b)
 	out.z = a.z * b
 end
 
-<<<<<<< HEAD
 function vec3.div(out, a, b)
 	out.x = a.x / b
 	out.y = a.y / b
@@ -44,54 +43,6 @@ function vec3.cross(out, a, b)
 	out.x = a.y*b.z - a.z*b.y
 	out.y = a.z*b.x - a.x*b.z
 	out.z = a.x*b.y - a.y*b.x
-=======
-function vector.__add(a,b)
-	if type(a) == "number" then
-		return new(a+b.x, a+b.y, a+b.z)
-	elseif type(b) == "number" then
-		return new(a.x+b, a.y+b, a.z+b)
-	else
-		assert(isvector(a) and isvector(b), "Add: wrong argument types (<vector> expected)")
-		return new(a.x+b.x, a.y+b.y, a.z+b.z)
-	end
-end
-
-function vector.__sub(a,b)
-	if type(a) == "number" then
-		return new(a-b.x, a-b.y, a-b.z)
-	elseif type(b) == "number" then
-		return new(a.x-b, a.y-b, a.z-b)
-	else
-		assert(isvector(a) and isvector(b), "Sub: wrong argument types (<vector> expected)")
-		return new(a.x-b.x, a.y-b.y, a.z-b.z)
-	end
-end
-
-function vector.__mul(a,b)
-	if type(a) == "number" then
-		return new(a*b.x, a*b.y, a*b.z)
-	elseif type(b) == "number" then
-		return new(b*a.x, b*a.y, b*a.z)
-	else
-		assert(isvector(a) and isvector(b), "Mul: wrong argument types (<vector> or <number> expected)")
-		return new(a.x*b.x, a.y*b.y, a.z*b.z)
-	end
-end
-
-function vector.__div(a,b)
-	if type(a) == "number" then
-		return new(a / b.x, a / b.y, a / b.z)
-	elseif type(b) == "number" then
-		return new(a.x / b, a.y / b, a.z / b)
-	else
-		assert(isvector(a) and isvector(b), "Div: wrong argument types (<vector> or <number> expected)")
-		return new(a.x/b.x, a.y/b.y, a.z/b.z)
-	end
-end
-
-function vector.__eq(a,b)
-	return a.x == b.x and a.y == b.y and a.z == b.z
->>>>>>> refs/remotes/excessive/master
 end
 
 function vec3.dot(a, b)
