@@ -12,7 +12,9 @@ local cpml_vec3 = ffi.typeof("cpml_vec3")
 vec3.new = cpml_vec3
 
 function vec3.clone(a)
-	ffi.copy(vec3.new(), a, ffi.sizeof(out))
+	local out = vec3.new()
+	ffi.copy(out, a, ffi.sizeof(cpml_vec3))
+	return out
 end
 
 function vec3.add(out, a, b)
