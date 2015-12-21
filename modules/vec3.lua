@@ -1,5 +1,5 @@
-local sqrt= math.sqrt
-local ffi = require "ffi"
+local sqrt = math.sqrt
+local ffi  = require "ffi"
 
 ffi.cdef[[
 typedef struct {
@@ -78,6 +78,26 @@ function vec3.dist2(a, b)
 	local dy = a.y - b.y
 	local dz = a.z - b.z
 	return dx * dx + dy * dy + dz * dz
+end
+
+function vec3.reflect(i, n)
+	local tmp = vec3.new()
+	vec3.mul(tmp, n, 2.0 * vec3.dot(n, i))
+	vec3.sub(tmp, i, tmp)
+	return tmp
+end
+
+function vec3.refract(i, n, ior)
+	local tmp = vec3.new()
+	local d = vec3.dot(n, i)
+	local k = 1.0 - ior * ior * (1.0 - d * d)
+	if k >= 0.0 then
+		local tmp2 = vec3.new() -- Can this be avoided?
+		vec3.mul(tmp, i, ior)
+		vec3.mul(tmp2, n, ior * d + sqrt(k))
+		vec3.sub(tmp, tmp, tmp2)
+	end
+	return tmp
 end
 
 function vec3.lerp(a, b, s)
