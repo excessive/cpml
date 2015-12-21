@@ -117,8 +117,8 @@ function intersect.ray_triangle(ray, triangle)
 	-- return position of intersection
 	if t > FLT_EPSILON then
 		local out = vec3()
-		cpml.mul(out, ray.direction, t)
-		cpml.add(out, ray.position, out)
+		vec3.mul(out, ray.direction, t)
+		vec3.add(out, ray.position, out)
 		return out
 	end
 
@@ -141,7 +141,7 @@ function intersect.line_line(a, b)
 	vec3.sub(p21, a[2], a[1])
 
 	-- if lengths are negative or too close to 0, lines do not intersect
-	if cpml.len2(p43) < FLT_EPSILON or cpml.len2(p21) < FLT_EPSILON then
+	if vec3.len2(p43) < FLT_EPSILON or vec3.len2(p21) < FLT_EPSILON then
 		return false
 	end
 
