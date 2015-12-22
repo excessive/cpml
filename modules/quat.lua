@@ -1,359 +1,338 @@
---- Quaternions
--- @module quat
--- @alias quaternion
-
--- quaternions
--- @author Andrew Stacey
--- Website: http://www.math.ntnu.no/~stacey/HowDidIDoThat/iPad/Codea.html
--- Licence: CC0 http://wiki.creativecommons.org/CC0
-
---[[
-This is a class for handling quaternion numbers.  It was originally
-designed as a way of encoding rotations of 3 dimensional space.
---]]
-
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
 local constants      = require(current_folder .. "constants")
 local vec3           = require(current_folder .. "vec3")
-local quaternion     = {}
-quaternion.__index   = quaternion
+local ffi            = require "ffi"
+local DOT_THRESHOLD  = constants.DOT_THRESHOLD
+local FLT_EPSILON    = constants.FLT_EPSILON
+local abs            = math.abs
+local acos           = math.acos
+local asin           = math.asin
+local atan2          = math.atan2
+local cos            = math.cos
+local sin            = math.sin
+local min            = math.min
+local max            = math.max
+local pi             = math.pi
+local sqrt           = math.sqrt
 
---[[
-A quaternion can either be specified by giving the four coordinates as
-real numbers or by giving the scalar part and the vector part.
---]]
+ffi.cdef[[
+typedef struct {
+	double x, y, z, w;
+} cpml_quat;
+]]
 
-local function new(...)
-	local x, y, z, w
-	-- copy
-	local arg = { select(1, ...) or 0, select(2, ...) or 0, select(3, ...) or 0, select(4, ...) or 0 }
-	local n = select('#', ...)
-	if n == 1 and type(arg[1]) == "table" then
-		x = arg[1].x or arg[1][1]
-		y = arg[1].y or arg[1][2]
-		z = arg[1].z or arg[1][3]
-		w = arg[1].w or arg[1][4]
-	-- four numbers
-	elseif n == 4 then
-		x = arg[1]
-		y = arg[2]
-		z = arg[3]
-		w = arg[4]
-	-- real number plus vector
-	elseif n == 2 then
-		x = arg[1].x or arg[1][1]
-		y = arg[1].y or arg[1][2]
-		z = arg[1].z or arg[1][3]
-		w = arg[2]
-	else
-		print(string.format("%s %s %s %s", select(1, ...), select(2, ...), select(3, ...), select(4, ...)))
-		error("Incorrect number of arguments to quaternion")
-	end
+local quat = {}
+local cpml_quat = ffi.typeof("cpml_quat")
+quat.new = cpml_quat
 
-	return setmetatable({ x = x or 0, y = y or 0, z = z or 0, w = w or 1 }, quaternion)
+function quat.identity(out)
+	out.x = 0
+	out.y = 0
+	out.z = 0
+	out.w = 1
 end
 
-function quaternion.__add(a, b)
-	if type(b) == "number" then
-		return new(a.x, a.y, a.z, a.w + b)
-	end
-
-	return new(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w)
+function quat.clone(a)
+	local out = quat.new()
+	ffi.copy(out, a, ffi.sizeof(cpml_quat))
+	return out
 end
 
-function quaternion.__sub(a, b)
-	return new(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w)
+function quat.add(out, a, b)
+	out.x = a.x + b.x
+	out.y = a.y + b.y
+	out.z = a.z + b.z
+	out.w = a.w + b.w
 end
 
-function quaternion:__unm()
-	return self:scale(-1)
+function quat.sub(out, a, b)
+	out.x = a.x - b.x
+	out.y = a.y - b.y
+	out.z = a.z - b.z
+	out.w = a.w - b.w
 end
 
-function quaternion.__mul(a, b)
-	-- quat * number
-	if type(b) == "number" then
-		return a:scale(b)
-	-- quat * quat
-	elseif type(b) == "table" and b.w then
-		local x, y, z, w
-
-		x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
-		y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z
-		z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
-		w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
-
-		return new(x, y, z, w)
-	else
+function quat.mul(out, a, b)
+	if type(b) == "table" and b.x and b.y and b.z and b.w then
+		out.x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
+		out.y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z
+		out.z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
+		out.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+	elseif type(b) == "table" and b.x and b.y and b.z then
 		local qv  = vec3(a.x, a.y, a.z)
-		local uv  = qv:cross(b)
-		local uuv = qv:cross(uv)
-
-		return b + ((uv * a.w) + uuv) * 2
+		local uv, uuv = vec3(), vec3()
+		vec3.cross(uv, qv, b)
+		vec3.cross(uuv, qv, uv)
+		vec3.mul(out, uv, a.w)
+		vec3.add(out, out, uuv)
+		vec3.mul(out, out, 2)
+		vec3.add(out, b, out)
 	end
 end
 
-function quaternion.__div(a, b)
+function quat.div(out, a, b)
 	if type(b) == "number" then
-		return a:scale(1 / b)
-	elseif type(b) == "table" then
-		return a * b:reciprocal()
+		quat.scale(out, a, 1 / b)
+	elseif type(b) == "table" and b.x and b.y and b.z and b.w then
+		quat.reciprocal(out, b)
+		quat.mul(out, a, out)
 	end
 end
 
-function quaternion:__pow(n)
+function quat.pow(out, a, n)
 	if n == 0 then
-		return self.unit()
+		quat.identity(out)
 	elseif n > 0 then
-		return self * self^(n-1)
+		out.x = a.x^(n-1)
+		out.y = a.y^(n-1)
+		out.z = a.z^(n-1)
+		out.w = a.w^(n-1)
+		quat.mul(out, a, out)
 	elseif n < 0 then
-		return self:reciprocal()^(-n)
+		quat.reciprocal(out, a)
+		out.x = out.x^(-n)
+		out.y = out.y^(-n)
+		out.z = out.z^(-n)
+		out.w = out.w^(-n)
 	end
 end
 
-function quaternion.__eq(a, b)
-	if a.x ~= b.x or a.y ~= b.y or a.z ~= b.z or a.w ~= b.w then
-		return false
-	end
-
-	return true
+function quat.cross(out, a, b)
+	out.x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y
+	out.y = a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z
+	out.z = a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x
+	out.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
 end
 
-function quaternion:__tostring()
-	return string.format("(%0.3f,%0.3f,%0.3f,%0.3f)", self.x, self.y, self.z, self.w)
-end
-
-function quaternion:unpack()
-	return self.x, self.y, self.z, self.w
-end
-
-function quaternion.unit()
-	return new(0, 0, 0, 1)
-end
-
-function quaternion:to_axis_angle()
-	if self.w > 1 or self.w < -1 then
-		self = self:normalize()
-	end
-
-	local angle = 2 * math.acos(self.w)
-	local s     = math.sqrt(1-self.w*self.w)
-	local x, y, z
-
-	if s < constants.FLT_EPSILON then
-		x = self.x
-		y = self.y
-		z = self.z
-	else
-		x = self.x / s -- normalize axis
-		y = self.y / s
-		z = self.z / s
-	end
-
-	return angle, vec3(x, y, z)
-end
-
--- Test if we are zero
-function quaternion:is_zero()
-	-- are we the zero vector
-	if self.x ~= 0 or self.y ~= 0 or self.z ~= 0 or self.w ~= 0 then
-		return false
-	end
-
-	return true
-end
-
--- Test if we are real
-function quaternion:is_real()
-	-- are we the zero vector
-	if self.x ~= 0 or self.y ~= 0 or self.z ~= 0 then
-		return false
-	end
-
-	return true
-end
-
--- Test if the real part is zero
-function quaternion:is_imaginary()
-	-- are we the zero vector
-	if self.w ~= 0 then
-		return false
-	end
-
-	return true
-end
-
--- The dot product of two quaternions
-function quaternion.dot(a, b)
+function quat.dot(a, b)
 	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
 end
 
-function quaternion.cross(a, b)
-	return new(
-		a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
-		a.w * b.y + a.y * b.w + a.z * b.x - a.x * b.z,
-		a.w * b.z + a.z * b.w + a.x * b.y - a.y * b.x,
-		a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
-	)
-end
-
--- Length of a quaternion
-function quaternion:len()
-	return math.sqrt(self:len2())
-end
-
--- Length squared of a quaternion
-function quaternion:len2()
-	return self:dot(self)
-end
-
--- Normalize a quaternion to have length 1
-function quaternion:normalize()
-	if self:is_zero() then
-		error("Unable to normalize a zero-length quaternion")
+function quat.normalize(out, a)
+	if quat.is_zero(a) then
+		error("Cannot normalize a zero-length quaternion.")
 		return false
 	end
 
-	local l = 1 / self:len()
-	return self:scale(l)
+	local l = 1 / quat.len(a)
+	quat.scale(out, a, l)
 end
 
--- Scale the quaternion
-function quaternion:scale(l)
-	return new(self.x * l, self.y * l, self.z * l, self.w * l)
+function quat.len(a)
+	return sqrt(a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w)
 end
 
--- Conjugation (corresponds to inverting a rotation)
-function quaternion:conjugate()
-	return new(-self.x, -self.y, -self.z, self.w)
+function quat.len2(a)
+	return a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w
 end
 
-function quaternion:inverse()
-	return self:conjugate():normalize()
+function quat.lerp(out, a, b, s)
+	quat.sub(out, b, a)
+	quat.mul(out, out, s)
+	quat.add(out, a, out)
+	quat.normalize(out, out)
 end
 
--- Reciprocal: 1/q
-function quaternion:reciprocal()
-	if self.is_zero() then
-		error("Cannot reciprocate a zero quaternion")
-		return false
+function quat.slerp(out, a, b, s)
+	local function clamp(n, low, high) return min(max(n, low), high) end
+	local dot = quat.dot(a, b)
+
+	if dot < 0 then
+		quat.scale(a, a, -1)
+		dot = -dot
 	end
 
-	local q = self:conjugate()
-	local l = self:len2()
-	q = q:scale(1 / l)
+	if dot > DOT_THRESHOLD then
+		quat.lerp(out, a, b, s)
+		return
+	end
 
-	return q
+	clamp(dot, -1, 1)
+	local temp  = quat.new()
+	local theta = acos(dot) * s
+
+	quat.scale(out, a, dot)
+	quat.sub(out, b, out)
+	quat.normalize(out, out)
+	quat.scale(out, out, sin(theta))
+	quat.scale(temp, a, cos(theta))
+	quat.add(out, temp, out)
 end
 
--- Returns the real part
-function quaternion:real()
-	return self.w
-end
+function quat.rotate(out, angle, axis)
+	local len = vec3.len(axis)
 
-function quaternion:clone()
-	return new(self.x, self.y, self.z, self.w)
-end
-
--- Returns the vector (imaginary) part as a Vec3 object
-function quaternion:to_vec3()
-	return vec3(self.x, self.y, self.z)
-end
-
---[[
-Converts a rotation to a quaternion. The first argument is the angle
-to rotate, the second must specify an axis as a Vec3 object.
---]]
-
-local function rotate(angle, axis)
-	local len = axis:len()
-
-	if math.abs(len - 1) > 0.001 then
+	if abs(len - 1) > FLT_EPSILON then
 		axis.x = axis.x / len
 		axis.y = axis.y / len
 		axis.z = axis.z / len
 	end
 
-	local sin = math.sin(angle * 0.5)
-	local cos = math.cos(angle * 0.5)
+	local s = sin(angle * 0.5)
+	local c = cos(angle * 0.5)
 
-	return new(axis.x * sin, axis.y * sin, axis.z * sin, cos)
+	out.x = axis.x * s
+	out.y = axis.y * s
+	out.z = axis.z * s
+	out.w = c
 end
 
---- Create a quaternion from a direction + up vector.
--- @param normal
--- @param up
--- @return quat
-local function from_direction(normal, up)
-	local a = up:cross(normal)
-	local d = up:dot(normal)
-	return new(a.x, a.y, a.z, d + 1)
+function quat.scale(out, a, s)
+	out.x = a.x * s
+	out.y = a.y * s
+	out.z = a.z * s
+	out.w = a.w * s
 end
 
-function quaternion:to_euler()
-	local sqx = self.x*self.x
-	local sqy = self.y*self.y
-	local sqz = self.z*self.z
-	local sqw = self.w*self.w
+function quat.conjugate(out, a)
+	out.x = -a.x
+	out.y = -a.y
+	out.z = -a.z
+	out.w = a.w
+end
 
-	 -- if normalised is one, otherwise is correction factor
+function quat.inverse(out, a)
+	quat.conjugate(out, a)
+	quat.normalize(out, out)
+end
+
+function quat.reciprocal(out, a)
+	if quat.is_zero(a) then
+		error("Cannot reciprocate a zero-length quaternion.")
+		return false
+	end
+
+	local l = quat.len2(a)
+	quat.conjugate(out, a)
+	quat.scale(out, out, 1 / l)
+end
+
+function quat.is_zero(a)
+	return a.x == 0 and a.y == 0 and a.z == 0 and a.w == 0 then
+end
+
+function quat.is_real(a)
+	return a.x == 0 and a.y == 0 and a.z == 0 then
+end
+
+function quat.is_imaginary(a)
+	return a.w == 0 then
+end
+
+function quat.real(a)
+	return a.w
+end
+
+function quat.imaginary(a)
+	return vec3(a.x, a.y, a.z)
+end
+
+function quat.from_direction(out, normal, up)
+	local d = vec3.dot(up, normal)
+	local a = vec3()
+	vec3.cross(a, up, normal)
+	out.x = a.x
+	out.y = a.y
+	out.z = a.z
+	out.w = d + 1
+end
+
+function quat.to_angle_axis(a)
+	if a.w > 1 or a.w < -1 then
+		quat.normalize(a, a)
+	end
+
+	local angle = 2 * acos(a.w)
+	local s     = sqrt(1 - a.w * a.w)
+	local x, y, z
+
+	if s < FLT_EPSILON then
+		x = a.x
+		y = a.y
+		z = a.z
+	else
+		x = a.x / s
+		y = a.y / s
+		z = a.z / s
+	end
+
+	return angle, vec3(x, y, z)
+end
+
+function quat.to_euler(a)
+	local sqx = a.x * a.x
+	local sqy = a.y * a.y
+	local sqz = a.z * a.z
+	local sqw = a.w * a.w
+
 	local unit = sqx + sqy + sqz + sqw
-	local test = self.x*self.y + self.z*self.w
-
+	local test = a.x * a.y + a.z * a.w
 	local pitch, yaw, roll
 
-	 -- singularity at north pole
-	if test > 0.499*unit then
-		yaw = 2 * math.atan2(self.x,self.w)
-		pitch = math.pi/2
-		roll = 0
-		return pitch, yaw, roll
+	if test > 0.499 * unit then
+		pitch = pi / 2
+		yaw   = 2 * atan2(a.x, a.w)
+		roll  = 0
+	elseif test < -0.499 * unit then
+		pitch = -pi / 2
+		yaw   = -2 * atan2(a.x, a.w)
+		roll  = 0
+	else
+		pitch = asin(2 * test / unit)
+		yaw   = atan2(2 * a.y * a.w - 2 * a.x * a.z,  sqx - sqy - sqz + sqw)
+		roll  = atan2(2 * a.x * a.w - 2 * a.y * a.z, -sqx + sqy - sqz + sqw)
 	end
 
-	 -- singularity at south pole
-	if test < -0.499*unit then
-		yaw = -2 * math.atan2(self.x,self.w)
-		pitch = -math.pi/2
-		roll = 0
-		return pitch, yaw, roll
-	end
-
-	yaw   = math.atan2(2*self.y*self.w-2*self.x*self.z , sqx - sqy - sqz + sqw)
-	pitch = math.asin(2*test/unit)
-	roll  = math.atan2(2*self.x*self.w-2*self.y*self.z , -sqx + sqy - sqz + sqw)
-
-	return pitch, roll, yaw
+	return pitch, yaw, roll
 end
 
--- http://keithmaggio.wordpress.com/2011/02/15/math-magician-lerp-slerp-and-nlerp/
--- non-normalized rotations do not work out for quats!
-function quaternion.lerp(a, b, s)
-	local v = a + (b - a) * s
-	return v:normalize()
+function quat.unpack(a)
+	return a.x, a.y, a.z, a.w
 end
 
--- http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
-function quaternion.slerp(a, b, s)
-	local function clamp(n, low, high) return math.min(math.max(n, low), high) end
-	local dot = a:dot(b)
-
-	-- http://www.gamedev.net/topic/312067-shortest-slerp-path/#entry2995591
-	if dot < 0 then
-		a = -a
-		dot = -dot
-	end
-
-	if dot > constants.DOT_THRESHOLD then
-		return quaternion.lerp(a, b, s)
-	end
-
-	clamp(dot, -1, 1)
-	local theta = math.acos(dot) * s
-	local c = (b - a * dot):normalize()
-
-	return a * math.cos(theta) + c * math.sin(theta)
+function quat.tostring(a)
+	return string.format("(%+0.3f,%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z, a.w)
 end
 
--- return quaternion
--- the module
-return setmetatable({ new = new, rotate = rotate, from_direction = from_direction },
-{ __call = function(_, ...) return new(...) end })
+local quat_mt = {}
+
+quat_mt.__index = quat
+quat_mt.__call = quat.new
+quat_mt.__tostring = quat.tostring
+
+function quat_mt.__unm(a)
+	local temp = quat.new()
+	quat.scale(temp, a, -1)
+	return temp
+end
+
+function quat_mt.__eq(a,b)
+	return a.x == b.x and a.y == b.y and a.z == b.z and a.w == b.w
+end
+
+function quat_mt.__add(a, b)
+	local temp = quat.new()
+	quat.add(temp, a, b)
+	return temp
+end
+
+function quat_mt.__mul(a, b)
+	local temp = quat.new()
+	quat.mul(temp, a, b)
+	return temp
+end
+
+function quat_mt.__div(a, b)
+	local temp = quat.new()
+	quat.div(temp, a, b)
+	return temp
+end
+
+function quat_mt.__pow(a, n)
+	local temp = quat.new()
+	quat.pow(temp, a, n)
+	return temp
+end
+
+ffi.metatype(cpml_quat, quat_mt)
+return setmetatable({}, quat_mt)
