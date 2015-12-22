@@ -62,7 +62,9 @@ end
 --- Clone a vector.
 -- @tparam @{vec3} vec vector to be cloned
 function vec3.clone(a)
-	ffi.copy(vec3.new(), a, ffi.sizeof(out))
+	local out = vec3.new()
+	ffi.copy(out, a, ffi.sizeof(cpml_vec3))
+	return out
 end
 
 --- Add two vectors.
@@ -115,16 +117,6 @@ function vec3.cross(out, a, b)
 	out.z = a.x * b.y - a.y * b.x
 end
 
-
---- Get the dot product of two vectors.
--- @tparam @{vec3} a Left hand operant
--- @tparam @{vec3} b Right hand operant
--- @treturn number 
-function vec3.dot(a, b)
-	return a.x * b.x + a.y * b.y + a.z * b.z
-end
-
-
 --- Get the normal of a vector.
 -- @tparam @{vec3} out vector to store the result
 -- @tparam @{vec3} a vector to normalize
@@ -133,6 +125,33 @@ function vec3.normalize(out, a)
 	out.x = a.x / l
 	out.y = a.y / l
 	out.z = a.z / l
+end
+
+
+function vec3.reflect(out, i, n)
+	vec3.mul(out, n, 2.0 * vec3.dot(n, i))
+	vec3.sub(out, i, out)
+	return out
+end
+
+local tmp = vec3.__new(0, 0, 0)
+function vec3.refract(out, i, n, ior)
+	local d = vec3.dot(n, i)
+	local k = 1.0 - ior * ior * (1.0 - d * d)
+	if k >= 0.0 then
+		vec3.mul(out, i, ior)
+		vec3.mul(tmp, n, ior * d + sqrt(k))
+		vec3.sub(out, out, tmp)
+	end
+	return out
+end
+
+--- Get the dot product of two vectors.
+-- @tparam @{vec3} a Left hand operant
+-- @tparam @{vec3} b Right hand operant
+-- @treturn number 
+function vec3.dot(a, b)
+	return a.x * b.x + a.y * b.y + a.z * b.z
 end
 
 --- Get the length of a vector.

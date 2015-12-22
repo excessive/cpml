@@ -12,7 +12,9 @@ local cpml_vec2 = ffi.typeof("cpml_vec2")
 vec2.new = cpml_vec2
 
 function vec2.clone(a)
-	ffi.copy(vec2.new(), a, ffi.sizeof(out))
+	local out = vec2.new()
+	ffi.copy(out, a, ffi.sizeof(cpml_vec2))
+	return out
 end
 
 function vec2.add(out, a, b)
