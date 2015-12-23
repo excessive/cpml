@@ -134,7 +134,7 @@ function vec3.reflect(out, i, n)
 	return out
 end
 
-local tmp = vec3.__new(0, 0, 0)
+local tmp = new(0, 0, 0)
 function vec3.refract(out, i, n, ior)
 	local d = vec3.dot(n, i)
 	local k = 1.0 - ior * ior * (1.0 - d * d)
