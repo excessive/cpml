@@ -1,29 +1,28 @@
 --- A 3 component vector.
 -- @module vec3
-
 local sqrt= math.sqrt
-local ffi = require "ffi"
 
 local vec3 = {}
+
+-- defaults
 vec3.x = 0
 vec3.y = 0
 vec3.z = 0
 
---- The private constructor, do not call this in general.
--- @tparam number x x component
--- @tparam number y y component
--- @tparam number z z component
-function vec3.__new(x, y, z)
-	return setmetatable({}, vec3_mt)
+-- Private constructor.
+local function new(x, y, z)
+	local v = {}
+	v.x, v.y, v.z = x, y, z
+	return setmetatable(v, vec3_mt)
 end
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
-local status
+local status, ffi
 if type(jit) == "table" and jit.status() then
-	status, _ = pcall(require, "ffi")
+	status, ffi = pcall(require, "ffi")
 	if status then
 		ffi.cdef "typedef struct { double x, y, z;} cpml_vec3;"
-		vec3.__new = ffi.typeof("cpml_vec3")
+		new = ffi.typeof("cpml_vec3")
 	end
 end
 
@@ -42,7 +41,7 @@ function vec3.new(x, y, z)
 		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
 		assert(type(z) == "number", "new: Wrong argument type for z (<number> expected)")
 
-		return vec3.__new(x, y, z)
+		return new(x, y, z)
 
 	-- {x=x, y=y, z=z} or {x, y, z}
 	elseif type(x) == "table" then
@@ -51,21 +50,22 @@ function vec3.new(x, y, z)
 		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
 		assert(type(z) == "number", "new: Wrong argument type for z (<number> expected)")
 
-		return vec3.__new(x, y, z)
+		return new(x, y, z)
 
 	-- {x, x, x} eh. {0, 0, 0}, {3, 3, 3}
 	elseif type(x) == "number" then
-		return vec3.__new(x, x, x)
+		return new(x, x, x)
 	end
 end
 
+
 --- Clone a vector.
 -- @tparam @{vec3} vec vector to be cloned
+-- @treturn @{vec3}
 function vec3.clone(a)
-	local out = vec3.new()
-	ffi.copy(out, a, ffi.sizeof(cpml_vec3))
-	return out
+	return new(a.x, a.y, a.z)
 end
+
 
 --- Add two vectors.
 -- @tparam @{vec3} out vector to store the result
