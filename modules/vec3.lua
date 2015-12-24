@@ -4,11 +4,6 @@ local sqrt= math.sqrt
 
 local vec3 = {}
 
--- defaults
-vec3.x = 0
-vec3.y = 0
-vec3.z = 0
-
 -- Private constructor.
 local function new(x, y, z)
 	local v = {}
@@ -25,6 +20,9 @@ if type(jit) == "table" and jit.status() then
 		new = ffi.typeof("cpml_vec3")
 	end
 end
+
+-- Statically allocate a temporary variable used in many of our functions.
+local tmp = new(0, 0, 0)
 
 --- The public constructor.
 -- @param x Can be of three types: </br>
@@ -55,6 +53,8 @@ function vec3.new(x, y, z)
 	-- {x, x, x} eh. {0, 0, 0}, {3, 3, 3}
 	elseif type(x) == "number" then
 		return new(x, x, x)
+	else
+		return new(0, 0, 0)
 	end
 end
 
@@ -75,6 +75,7 @@ function vec3.add(out, a, b)
 	out.x = a.x + b.x
 	out.y = a.y + b.y
 	out.z = a.z + b.z
+	return out
 end
 
 --- Subtract one vector from another.
@@ -85,6 +86,7 @@ function vec3.sub(out, a, b)
 	out.x = a.x - b.x
 	out.y = a.y - b.y
 	out.z = a.z - b.z
+	return out
 end
 
 --- Multiply two vectors.
@@ -95,6 +97,7 @@ function vec3.mul(out, a, b)
 	out.x = a.x * b
 	out.y = a.y * b
 	out.z = a.z * b
+	return out
 end
 
 --- Divide one vector by another.
@@ -105,6 +108,7 @@ function vec3.div(out, a, b)
 	out.x = a.x / b
 	out.y = a.y / b
 	out.z = a.z / b
+	return out
 end
 
 --- Get the cross product of two vectors.
@@ -115,6 +119,7 @@ function vec3.cross(out, a, b)
 	out.x = a.y * b.z - a.z * b.y
 	out.y = a.z * b.x - a.x * b.z
 	out.z = a.x * b.y - a.y * b.x
+	return out
 end
 
 --- Get the normal of a vector.
@@ -125,8 +130,19 @@ function vec3.normalize(out, a)
 	out.x = a.x / l
 	out.y = a.y / l
 	out.z = a.z / l
+	return out
 end
 
+--- Trim a vector to a given length
+-- @tparam @{vec3} out vector to store the result
+-- @tparam @{vec3} a vector to be trimmed
+-- @tparam number len the length to trim the vector to
+function vec3.trim(out, a, len)
+	len = math.min(vec3.len(a), len)
+	vec3.normalize(out, a)
+	vec3.mul(out, len)
+	return out
+end
 
 function vec3.reflect(out, i, n)
 	vec3.mul(out, n, 2.0 * vec3.dot(n, i))
@@ -134,7 +150,6 @@ function vec3.reflect(out, i, n)
 	return out
 end
 
-local tmp = new(0, 0, 0)
 function vec3.refract(out, i, n, ior)
 	local d = vec3.dot(n, i)
 	local k = 1.0 - ior * ior * (1.0 - d * d)
@@ -143,6 +158,21 @@ function vec3.refract(out, i, n, ior)
 		vec3.mul(tmp, n, ior * d + sqrt(k))
 		vec3.sub(out, out, tmp)
 	end
+
+	return out
+end
+
+
+--- Lerp between two vectors.
+-- @tparam @{vec3} out vector for result to be stored in
+-- @tparam @{vec3} a first vector
+-- @tparam @{vec3} b second vector
+-- @tparam number s step value
+-- @treturn @{vec3}
+function vec3.lerp(out, a, b, s)
+	vec3.sub(out, b, a)
+	vec3.mul(out, out, s)
+	vec3.add(out, out, a)
 	return out
 end
 
@@ -190,14 +220,6 @@ function vec3.dist2(a, b)
 	return dx * dx + dy * dy + dz * dz
 end
 
---- Lerp between two vectors.
--- @tparam @{vec3} a first vector
--- @tparam @{vec3} b second vector
--- @treturn @{vec3}
-function vec3.lerp(a, b, s)
-	return a + s * (b - a)
-end
-
 --- Unpack a vector into form x,y,z
 -- @tparam @{vec3} a first vector
 -- @treturn number x component
@@ -227,8 +249,11 @@ end
 local vec3_mt = {}
 
 vec3_mt.__index = vec3
-vec3_mt.__call = vec3.new
 vec3_mt.__tostring = vec3.tostring
+
+function vec3_mt.__call(self, x, y, z)
+	return vec3.new(x, y, z)
+end
 
 function vec3_mt.__unm(a)
 	return vec3.new(-a.x, -a.y, -a.z)
@@ -275,7 +300,7 @@ function vec3_mt.__div(a, b)
 end
 
 if status then
-	ffi.metatype(cpml_vec3, vec3_mt)
+	ffi.metatype(new, vec3_mt)
 end
 
 return setmetatable({}, vec3_mt)
