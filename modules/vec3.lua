@@ -299,6 +299,10 @@ function vec3_mt.__div(a, b)
 	return temp
 end
 
+vec3.unit_x = vec3.new(1, 0, 0)
+vec3.unit_y = vec3.new(0, 1, 0)
+vec3.unit_z = vec3.new(0, 0, 1)
+
 if status then
 	ffi.metatype(new, vec3_mt)
 end
