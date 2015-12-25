@@ -216,14 +216,14 @@ function vec2_mt.__call(self, x, y, z)
 end
 
 function vec2_mt.__unm(a)
-	return vec2.new(-a.x, -a.y, -a.z)
+	return vec2.new(-a.x, -a.y)
 end
 
 function vec2_mt.__eq(a,b)
 	assert(vec2.isvector(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(vec2.isvector(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 
-	return a.x == b.x and a.y == b.y and a.z == b.z
+	return a.x == b.x and a.y == b.y
 end
 
 function vec2_mt.__add(a, b)
