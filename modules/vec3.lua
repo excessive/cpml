@@ -21,15 +21,14 @@ if type(jit) == "table" and jit.status() then
 	end
 end
 
--- Statically allocate a temporary variable used in many of our functions.
+-- Statically allocate a temporary variable used in some of our functions.
 local tmp = new(0, 0, 0)
 
 --- The public constructor.
 -- @param x Can be of three types: </br>
---	<u1>
---	<li> number x component
---	<li> table {x, y, z} or {x = x, y = y, z = z}
--- 	<li> scalar to fill the vector eg. {x, x, x}
+-- number x component
+-- table {x, y, z} or {x = x, y = y, z = z}
+-- scalar to fill the vector eg. {x, x, x}
 -- @tparam number y y component
 -- @tparam number z z component
 function vec3.new(x, y, z)
@@ -60,17 +59,17 @@ end
 
 
 --- Clone a vector.
--- @tparam @{vec3} vec vector to be cloned
--- @treturn @{vec3}
+-- @tparam vec3 a vector to be cloned
+-- @treturn vec3
 function vec3.clone(a)
 	return new(a.x, a.y, a.z)
 end
 
 
 --- Add two vectors.
--- @tparam @{vec3} out vector to store the result
--- @tparam @{vec3} a Left hand operant
--- @tparam @{vec3} b Right hand operant
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a Left hand operant
+-- @tparam vec3 b Right hand operant
 function vec3.add(out, a, b)
 	out.x = a.x + b.x
 	out.y = a.y + b.y
@@ -79,9 +78,9 @@ function vec3.add(out, a, b)
 end
 
 --- Subtract one vector from another.
--- @tparam @{vec3} out vector to store the result
--- @tparam @{vec3} a Left hand operant
--- @tparam @{vec3} b Right hand operant
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a Left hand operant
+-- @tparam vec3 b Right hand operant
 function vec3.sub(out, a, b)
 	out.x = a.x - b.x
 	out.y = a.y - b.y
@@ -89,10 +88,10 @@ function vec3.sub(out, a, b)
 	return out
 end
 
---- Multiply two vectors.
--- @tparam @{vec3} out vector to store the result
--- @tparam @{vec3} a Left hand operant
--- @tparam @{vec3} b Right hand operant
+--- Multiply a vector by a scalar.
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a Left hand operant
+-- @tparam number b Right hand operant
 function vec3.mul(out, a, b)
 	out.x = a.x * b
 	out.y = a.y * b
@@ -100,10 +99,10 @@ function vec3.mul(out, a, b)
 	return out
 end
 
---- Divide one vector by another.
--- @tparam @{vec3} out vector to store the result
--- @tparam @{vec3} a Left hand operant
--- @tparam @{vec3} b Right hand operant
+--- Divide a vector by a scakar.
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a Left hand operant
+-- @tparam number b Right hand operant
 function vec3.div(out, a, b)
 	out.x = a.x / b
 	out.y = a.y / b
@@ -112,9 +111,9 @@ function vec3.div(out, a, b)
 end
 
 --- Get the cross product of two vectors.
--- @tparam @{vec3} out vector to store the result
--- @tparam @{vec3} a Left hand operant
--- @tparam @{vec3} b Right hand operant
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a Left hand operant
+-- @tparam vec3 b Right hand operant
 function vec3.cross(out, a, b)
 	out.x = a.y * b.z - a.z * b.y
 	out.y = a.z * b.x - a.x * b.z
@@ -123,8 +122,8 @@ function vec3.cross(out, a, b)
 end
 
 --- Get the normal of a vector.
--- @tparam @{vec3} out vector to store the result
--- @tparam @{vec3} a vector to normalize
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a vector to normalize
 function vec3.normalize(out, a)
 	local l = vec3.len(a)
 	out.x = a.x / l
@@ -134,8 +133,8 @@ function vec3.normalize(out, a)
 end
 
 --- Trim a vector to a given length
--- @tparam @{vec3} out vector to store the result
--- @tparam @{vec3} a vector to be trimmed
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a vector to be trimmed
 -- @tparam number len the length to trim the vector to
 function vec3.trim(out, a, len)
 	len = math.min(vec3.len(a), len)
@@ -164,11 +163,11 @@ end
 
 
 --- Lerp between two vectors.
--- @tparam @{vec3} out vector for result to be stored in
--- @tparam @{vec3} a first vector
--- @tparam @{vec3} b second vector
+-- @tparam vec3 out vector for result to be stored in
+-- @tparam vec3 a first vector
+-- @tparam vec3 b second vector
 -- @tparam number s step value
--- @treturn @{vec3}
+-- @treturn vec3
 function vec3.lerp(out, a, b, s)
 	vec3.sub(out, b, a)
 	vec3.mul(out, out, s)
@@ -177,30 +176,30 @@ function vec3.lerp(out, a, b, s)
 end
 
 --- Get the dot product of two vectors.
--- @tparam @{vec3} a Left hand operant
--- @tparam @{vec3} b Right hand operant
+-- @tparam vec3 a Left hand operant
+-- @tparam vec3 b Right hand operant
 -- @treturn number 
 function vec3.dot(a, b)
 	return a.x * b.x + a.y * b.y + a.z * b.z
 end
 
 --- Get the length of a vector.
--- @tparam @{vec3} a vector to get the length of
+-- @tparam vec3 a vector to get the length of
 -- @treturn number
 function vec3.len(a)
 	return sqrt(a.x * a.x + a.y * a.y + a.z * a.z)
 end
 
 --- Get the squared length of a vector.
--- @tparam @{vec3} a vector to get the squared length of
+-- @tparam vec3 a vector to get the squared length of
 -- @treturn number
 function vec3.len2(a)
 	return a.x * a.x + a.y * a.y + a.z * a.z
 end
 
 --- Get the distance between two vectors.
--- @tparam @{vec3} a first vector
--- @tparam @{vec3} b second vector
+-- @tparam vec3 a first vector
+-- @tparam vec3 b second vector
 -- @treturn number
 function vec3.dist(a, b)
 	local dx = a.x - b.x
@@ -210,8 +209,8 @@ function vec3.dist(a, b)
 end
 
 --- Get the squared distance between two vectors.
--- @tparam @{vec3} a first vector
--- @tparam @{vec3} b second vector
+-- @tparam vec3 a first vector
+-- @tparam vec3 b second vector
 -- @treturn number
 function vec3.dist2(a, b)
 	local dx = a.x - b.x
@@ -221,7 +220,7 @@ function vec3.dist2(a, b)
 end
 
 --- Unpack a vector into form x,y,z
--- @tparam @{vec3} a first vector
+-- @tparam vec3 a first vector
 -- @treturn number x component
 -- @treturn number y component
 -- @treturn number z component
@@ -230,13 +229,13 @@ function vec3.unpack(a)
 end
 
 --- Return a string formatted "{x, y, z}"
--- @tparam @{vec3} a the vector to be turned into a string
+-- @tparam vec3 a the vector to be turned into a string
 -- @treturn string
 function vec3.tostring(a)
 	return string.format("(%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z)
 end
 
---- Return a boolean showing if a table is or is not a vector
+--- Return a boolean showing if a table is or is not a vec3
 -- @param v the object to be tested
 -- @treturn boolean
 function vec3.isvector(v)
