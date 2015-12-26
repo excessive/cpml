@@ -262,5 +262,8 @@ function vec2_mt.__div(a, b)
 	return temp
 end
 
-ffi.metatype(cpml_vec2, vec2_mt)
+if status then
+	ffi.metatype(new, vec2_mt)
+end
+
 return setmetatable({}, vec2_mt)
