@@ -1,3 +1,6 @@
+--- A 2 component vector.
+-- @module vec2
+
 local sqrt= math.sqrt
 local ffi = require "ffi"
 
@@ -23,10 +26,10 @@ end
 --- The public constructor.
 -- @param x Can be of three types: </br>
 -- number x component
--- table {x, y, z} or {x = x, y = y}
+-- table {x, y} or {x = x, y = y}
 -- scalar to fill the vector eg. {x, x}
 -- @tparam number y y component
-function vec2.new(x, y, z)
+function vec2.new(x, y)
 	-- number, number, number
 	if x and y then
 		assert(type(x) == "number", "new: Wrong argument type for x (<number> expected)")
@@ -122,7 +125,7 @@ end
 --- Get the cross product of two vectors.
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @tparam number
+-- @treturn number magnitude of cross product in 3d
 function vec2.cross(a, b)
 	return a.x * b.y - a.y * b.x
 end
@@ -175,7 +178,7 @@ end
 -- @tparam vec3 b second vector
 -- @tparam number s step value
 -- @treturn vec3
-function vec3.lerp(out, a, b, s)
+function vec2.lerp(out, a, b, s)
 	vec2.sub(out, b, a)
 	vec2.mul(out, out, s)
 	vec2.add(out, out, a)
@@ -200,7 +203,7 @@ end
 --- Return a boolean showing if a table is or is not a vec2
 -- @param v the object to be tested
 -- @treturn boolean
-function vec3.isvector(v)
+function vec2.isvector(v)
 	return 	type(v) == "table" and
 			type(v.x) == "number" and
 			type(v.y) == "number"
