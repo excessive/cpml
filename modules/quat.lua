@@ -165,6 +165,16 @@ function quat.div(out, a, b)
 	return out
 end
 
+local uv, uuv = vec3.new(), vec3.new()
+function quat.mul_vec3(out, a, b)
+	vec3.cross(uv, a, b)
+	vec3.cross(uuv, a, uv)
+	vec3.mul(out, uv, a.w)
+	vec3.add(out, out, uuv)
+	vec3.mul(out, out, 2)
+	vec3.add(out, b, out)
+end
+
 --- Pow a quaternion by an exponent
 -- @tparam quat out
 -- @tparam quat a
