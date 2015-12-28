@@ -53,7 +53,6 @@ function vec2.new(x, y)
 	end
 end
 
-
 --- Clone a vector.
 -- @tparam vec2 a vector to be cloned
 -- @treturn vec2
@@ -133,7 +132,7 @@ end
 --- Get the dot product of two vectors.
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn number 
+-- @treturn number
 function vec2.dot(a, b)
 	return a.x * b.x + a.y * b.y
 end
@@ -203,10 +202,11 @@ end
 --- Return a boolean showing if a table is or is not a vec2
 -- @param v the object to be tested
 -- @treturn boolean
-function vec2.isvector(v)
-	return 	type(v) == "table" and
-			type(v.x) == "number" and
-			type(v.y) == "number"
+function vec2.isvec2(v)
+	return
+		type(v)   == "table"  and
+		type(v.x) == "number" and
+		type(v.y) == "number"
 end
 
 local vec2_mt = {}
@@ -223,15 +223,15 @@ function vec2_mt.__unm(a)
 end
 
 function vec2_mt.__eq(a,b)
-	assert(vec2.isvector(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.isvector(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+	assert(vec2.isvec2(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.isvec2(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 
 	return a.x == b.x and a.y == b.y
 end
 
 function vec2_mt.__add(a, b)
-	assert(vec2.isvector(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.isvector(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+	assert(vec2.isvec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.isvec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 
 	local temp = vec2.new()
 	vec2.add(temp, a, b)
@@ -239,10 +239,10 @@ function vec2_mt.__add(a, b)
 end
 
 function vec2_mt.__mul(a, b)
-	local isvecb = vec2.isvector(b)
+	local isvecb = vec2.isvec2(b)
 	a, b = isvecb and b or a, isvecb and a or b
 
-	assert(vec2.isvector(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.isvec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
 
 	local temp = vec2.new()
@@ -251,10 +251,10 @@ function vec2_mt.__mul(a, b)
 end
 
 function vec2_mt.__div(a, b)
-	local isvecb = isvector(b)
+	local isvecb = vec2.isvec2(b)
 	a, b = isvecb and b or a, isvecb and a or b
 
-	assert(vec2.isvector(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.isvec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
 
 	local temp = vec2.new()

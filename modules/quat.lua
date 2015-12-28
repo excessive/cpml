@@ -126,10 +126,42 @@ end
 -- @tparam quat b
 -- @treturn quat out
 function quat.mul(out, a, b)
-	out.x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
-	out.y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z
-	out.z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
-	out.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+	-- quat * quat
+	if type(b) == "table" and b.x and b.y and b.z and b.w then
+		out.x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
+		out.y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z
+		out.z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
+		out.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+	-- quat * vec3
+	elseif type(b) == "table" and b.x and b.y and b.z then
+		local qv  = vec3(a.x, a.y, a.z)
+		local uv, uuv = vec3(), vec3()
+		vec3.cross(uv, qv, b)
+		vec3.cross(uuv, qv, uv)
+		vec3.mul(out, uv, a.w)
+		vec3.add(out, out, uuv)
+		vec3.mul(out, out, 2)
+		vec3.add(out, b, out)
+	end
+
+	return out
+end
+
+--- Perform a quaternion division.
+-- @tparam quat out
+-- @tparam quat a
+-- @tparam quat b
+-- @treturn quat out
+function quat.div(out, a, b)
+	-- quat / quat
+	if type(b) == "table" and b.x and b.y and b.z and b.w then
+		quat.reciprocal(out, b)
+		quat.mul(out, a, out)
+	-- quat / number
+	elseif type(b) == "number" then
+		quat.scale(out, a, 1 / b)
+	end
+
 	return out
 end
 
@@ -324,11 +356,12 @@ end
 -- @param q object to be tested
 -- @treturn boolean
 function quat.isquat(q)
-	return 	type(v) == "table" and
-			type(v.x) == "number" and
-			type(v.y) == "number" and
-			type(v.z) == "number" and
-			type(v.w) == "number"
+	return
+		type(v)   == "table"  and
+		type(v.x) == "number" and
+		type(v.y) == "number" and
+		type(v.z) == "number" and
+		type(v.w) == "number"
 end
 
 local quat_mt = {}
@@ -353,26 +386,44 @@ function quat_mt.__eq(a,b)
 end
 
 function quat_mt.__add(a, b)
-	assert(quat.isquat(a), "__eq: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b), "__eq: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	assert(quat.isquat(a), "__add: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.isquat(b), "__add: Wrong argument type for right hand operant. (<cpml.quat> expected)")
 
 	local temp = quat.new()
 	quat.add(temp, a, b)
 	return temp
 end
 
+function quat_mt.__sub(a, b)
+	assert(quat.isquat(a), "__sub: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.isquat(b), "__sub: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+
+	local temp = quat.new()
+	quat.sub(temp, a, b)
+	return temp
+end
+
 function quat_mt.__mul(a, b)
-	assert(quat.isquat(a), "__eq: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b), "__eq: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	assert(quat.isquat(a), "__mul: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.isquat(b), "__mul: Wrong argument type for right hand operant. (<cpml.quat> expected)")
 
 	local temp = quat.new()
 	quat.mul(temp, a, b)
 	return temp
 end
 
+function quat_mt.__div(a, b)
+	assert(quat.isquat(a), "__div: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.isquat(b), "__div: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+
+	local temp = quat.new()
+	quat.div(temp, a, b)
+	return temp
+end
+
 function quat_mt.__pow(a, n)
-	assert(quat.isquat(a), "__eq: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(type(b) == "number", "__eq: Wrong argument type for right hand operant. (<number> expected)")
+	assert(quat.isquat(a), "__pow: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(type(b) == "number", "__pow: Wrong argument type for right hand operant. (<number> expected)")
 
 	local temp = quat.new()
 	quat.pow(temp, a, n)

@@ -161,7 +161,6 @@ function vec3.refract(out, i, n, ior)
 	return out
 end
 
-
 --- Lerp between two vectors.
 -- @tparam vec3 out vector for result to be stored in
 -- @tparam vec3 a first vector
@@ -178,7 +177,7 @@ end
 --- Get the dot product of two vectors.
 -- @tparam vec3 a Left hand operant
 -- @tparam vec3 b Right hand operant
--- @treturn number 
+-- @treturn number
 function vec3.dot(a, b)
 	return a.x * b.x + a.y * b.y + a.z * b.z
 end
@@ -238,11 +237,12 @@ end
 --- Return a boolean showing if a table is or is not a vec3
 -- @param v the object to be tested
 -- @treturn boolean
-function vec3.isvector(v)
-	return 	type(v) == "table" and
-			type(v.x) == "number" and
-			type(v.y) == "number" and
-			type(v.z) == "number"
+function vec3.isvec3(v)
+	return
+		type(v)   == "table"  and
+		type(v.x) == "number" and
+		type(v.y) == "number" and
+		type(v.z) == "number"
 end
 
 local vec3_mt = {}
@@ -259,26 +259,35 @@ function vec3_mt.__unm(a)
 end
 
 function vec3_mt.__eq(a,b)
-	assert(vec3.isvector(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.isvector(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+	assert(vec3.isvec3(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.isvec3(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 
 	return a.x == b.x and a.y == b.y and a.z == b.z
 end
 
 function vec3_mt.__add(a, b)
-	assert(vec3.isvector(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.isvector(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+	assert(vec3.isvec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.isvec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 
 	local temp = vec3.new()
 	vec3.add(temp, a, b)
 	return temp
 end
 
+function vec3_mt.__sub(a, b)
+	assert(vec3.isvec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.isvec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+
+	local temp = vec3.new()
+	vec3.sub(temp, a, b)
+	return temp
+end
+
 function vec3_mt.__mul(a, b)
-	local isvecb = isvector(b)
+	local isvecb = vec3.isvec3(b)
 	a, b = isvecb and b or a, isvecb and a or b
 
-	assert(vec3.isvector(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.isvec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
 
 	local temp = vec3.new()
@@ -287,10 +296,10 @@ function vec3_mt.__mul(a, b)
 end
 
 function vec3_mt.__div(a, b)
-	local isvecb = isvector(b)
+	local isvecb = vec3.isvec3(b)
 	a, b = isvecb and b or a, isvecb and a or b
 
-	assert(vec3.isvector(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.isvec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
 
 	local temp = vec3.new()
