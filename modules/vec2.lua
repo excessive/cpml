@@ -1,7 +1,8 @@
 --- A 2 component vector.
 -- @module vec2
 
-local sqrt= math.sqrt
+local atan2, sqrt, pi = math.atan2, math.sqrt, math.pi
+local cos, sin = math.cos, math.sin
 local ffi = require "ffi"
 
 local vec2 = {}
@@ -172,16 +173,38 @@ function vec2.dist2(a, b)
 end
 
 --- Lerp between two vectors.
--- @tparam vec3 out vector for result to be stored in
--- @tparam vec3 a first vector
--- @tparam vec3 b second vector
+-- @tparam vec2 out vector for result to be stored in
+-- @tparam vec2 a first vector
+-- @tparam vec2 b second vector
 -- @tparam number s step value
--- @treturn vec3
+-- @treturn vec2
 function vec2.lerp(out, a, b, s)
 	vec2.sub(out, b, a)
 	vec2.mul(out, out, s)
 	vec2.add(out, out, a)
 	return out
+end
+
+--- Convert point from polar to cartesian.
+-- @tparam vec2 out vector for result to be stored in
+-- @tparam number radius radius of the point
+-- @tparam number theta angle of the point (in radians)
+-- @treturn vec2
+function vec2.to_cartesian(out, radius, theta)
+	out.x = radius * cos(theta)
+	out.y = radius * sin(theta)
+	return out
+end
+
+--- Convert point from cartesian to polar.
+-- @tparam vec2 a vector to convert
+-- @treturn number radius
+-- @treturn number theta
+function vec2.to_polar(a)
+	local radius = sqrt(a.x^2 + a.y^2)
+	local theta  = atan2(a.y, a.x)
+	theta = theta > 0 and theta or theta + 2 * pi
+	return radius, theta
 end
 
 --- Unpack a vector into form x,y
