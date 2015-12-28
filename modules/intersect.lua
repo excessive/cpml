@@ -79,17 +79,17 @@ end
 -- triangle[3] is a vec3
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 function intersect.ray_triangle(ray, triangle)
-	local h, s, q = vec3(), vec3(), vec3()
+	local h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3()
 	local a, f, u, v
 
-	local e1 = triangle[2] - triangle[1]
-	local e2 = triangle[3] - triangle[1]
+	vec3.sub(e1, triangle[2], triangle[1])
+	vec3.sub(e2, triangle[3], triangle[1])
 
 	vec3.cross(h, ray.direction, e2)
 	a = vec3.dot(h, e1)
 
 	-- if a is too close to 0, ray does not intersect triangle
-	if a > -FLT_EPSILON and a < FLT_EPSILON then
+	if abs(a) <= FLT_EPSILON then
 		return false
 	end
 
@@ -115,7 +115,7 @@ function intersect.ray_triangle(ray, triangle)
 	local t = vec3.dot(q, e2) * f
 
 	-- return position of intersection
-	if t > FLT_EPSILON then
+	if t >= FLT_EPSILON then
 		local out = vec3()
 		vec3.mul(out, ray.direction, t)
 		vec3.add(out, ray.position, out)
@@ -123,6 +123,60 @@ function intersect.ray_triangle(ray, triangle)
 	end
 
 	-- ray does not intersect triangle
+	return false
+end
+
+-- ray.position is a vec3
+-- ray.direction is a vec3
+-- triangle[1] is a vec3
+-- triangle[2] is a vec3
+-- triangle[3] is a vec3
+-- http://graphicscodex.com/Sample2-RayTriangleIntersection.pdf
+function intersect.ray_triangle2(ray, triangle)
+	local q, r, s = vec3(), vec3(), vec3()
+	local n, u, v = vec3(), vec3(), vec3()
+	local b, a, t = {}
+
+	-- Edge vectors
+	vec3.sub(u, triangle[2], triangle[1])
+	vec3.sub(v, triangle[3], triangle[1])
+
+	-- Face normal
+	vec3.cross(n, u, v)
+
+	vec3.cross(q, ray.direction, v)
+	a = vec3.dot(q, u)
+
+	-- Backfacing or nearly parallel?
+	if vec3.dot(n, ray.direction) >= FLT_EPSILON or
+		abs(a) < FLT_EPSILON then
+		return false
+	end
+
+	vec3.sub(s, ray.position, triangle[1])
+	vec3.div(s, s, a)
+	vec3.cross(r, s, u)
+
+	table.insert(b, vec3.dot(s, q))
+	table.insert(b, vec3.dot(r, ray.direction))
+	table.insert(b, 1 - b[1] - b[2])
+
+	-- Intersected outside triangle?
+	if b[1] < FLT_EPSILON or
+		b[2] < FLT_EPSILON or
+		b[3] < FLT_EPSILON then
+		return false
+	end
+
+	t = vec3.dot(r, v)
+
+	if t >= FLT_EPSILON then
+		local out = vec3()
+		vec3.mul(out, ray.direction, t)
+		vec3.add(out, ray.position, out)
+		return out
+	end
+
 	return false
 end
 
