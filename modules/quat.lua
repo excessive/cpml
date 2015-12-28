@@ -126,46 +126,19 @@ end
 -- @tparam quat b
 -- @treturn quat out
 function quat.mul(out, a, b)
-	-- quat * quat
-	if type(b) == "table" and b.x and b.y and b.z and b.w then
-		out.x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
-		out.y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z
-		out.z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
-		out.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
-	-- quat * vec3
-	elseif type(b) == "table" and b.x and b.y and b.z then
-		local qv  = vec3(a.x, a.y, a.z)
-		local uv, uuv = vec3(), vec3()
-		vec3.cross(uv, qv, b)
-		vec3.cross(uuv, qv, uv)
-		vec3.mul(out, uv, a.w)
-		vec3.add(out, out, uuv)
-		vec3.mul(out, out, 2)
-		vec3.add(out, b, out)
-	end
-
+	out.x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
+	out.y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z
+	out.z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
+	out.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
 	return out
 end
 
---- Perform a quaternion division.
+--- Perform a quaternion and vec3 multiplication.
 -- @tparam quat out
 -- @tparam quat a
--- @tparam quat b
--- @treturn quat out
-function quat.div(out, a, b)
-	-- quat / quat
-	if type(b) == "table" and b.x and b.y and b.z and b.w then
-		quat.reciprocal(out, b)
-		quat.mul(out, a, out)
-	-- quat / number
-	elseif type(b) == "number" then
-		quat.scale(out, a, 1 / b)
-	end
-
-	return out
-end
-
-local uv, uuv = vec3.new(), vec3.new()
+-- @tparam vec3 b
+-- @treturn vec3 out
+local uv, uuv = vec3(), vec3()
 function quat.mul_vec3(out, a, b)
 	vec3.cross(uv, a, b)
 	vec3.cross(uuv, a, uv)
@@ -415,20 +388,17 @@ end
 
 function quat_mt.__mul(a, b)
 	assert(quat.isquat(a), "__mul: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b), "__mul: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	assert(quat.isquat(b) or vec3.isvec3(b), "__mul: Wrong argument type for right hand operant. (<cpml.quat> or <cpml.vec3> expected)")
 
-	local temp = quat.new()
-	quat.mul(temp, a, b)
-	return temp
-end
-
-function quat_mt.__div(a, b)
-	assert(quat.isquat(a), "__div: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b), "__div: Wrong argument type for right hand operant. (<cpml.quat> expected)")
-
-	local temp = quat.new()
-	quat.div(temp, a, b)
-	return temp
+	if quat.isquat(b) then
+		local temp = quat.new()
+		quat.mul(temp, a, b)
+		return temp
+	elseif vec3.isvec3(b) then
+		local temp = vec3()
+		quat.mul_vec3(temp, a, b)
+		return temp
+	end
 end
 
 function quat_mt.__pow(a, n)

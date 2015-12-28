@@ -80,22 +80,20 @@ end
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 local h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3()
 function intersect.ray_triangle(ray, triangle)
-	local a, f, u, v
-
 	vec3.sub(e1, triangle[2], triangle[1])
 	vec3.sub(e2, triangle[3], triangle[1])
 
 	vec3.cross(h, ray.direction, e2)
-	a = vec3.dot(h, e1)
+	local a = vec3.dot(h, e1)
 
 	-- if a is too close to 0, ray does not intersect triangle
 	if abs(a) <= FLT_EPSILON then
 		return false
 	end
 
-	f = 1 / a
+	local f = 1 / a
 	vec3.sub(s, ray.position, triangle[1])
-	u = vec3.dot(s, h) * f
+	local u = vec3.dot(s, h) * f
 
 	-- ray does not intersect triangle
 	if u < 0 or u > 1 then
@@ -103,7 +101,7 @@ function intersect.ray_triangle(ray, triangle)
 	end
 
 	vec3.cross(q, s, e1)
-	v = vec3.dot(ray.direction, q) * f
+	local v = vec3.dot(ray.direction, q) * f
 
 	-- ray does not intersect triangle
 	if v < 0 or u + v > 1 then
@@ -135,8 +133,6 @@ end
 local q, r, s = vec3(), vec3(), vec3()
 local n, u, v = vec3(), vec3(), vec3()
 function intersect.ray_triangle2(ray, triangle)
-	local b1, b2, b3, a, t
-
 	-- Edge vectors
 	vec3.sub(u, triangle[2], triangle[1])
 	vec3.sub(v, triangle[3], triangle[1])
@@ -145,7 +141,7 @@ function intersect.ray_triangle2(ray, triangle)
 	vec3.cross(n, u, v)
 
 	vec3.cross(q, ray.direction, v)
-	a = vec3.dot(q, u)
+	local a = vec3.dot(q, u)
 
 	-- Backfacing or nearly parallel?
 	if vec3.dot(n, ray.direction) >= FLT_EPSILON or
@@ -157,9 +153,9 @@ function intersect.ray_triangle2(ray, triangle)
 	vec3.div(s, s, a)
 	vec3.cross(r, s, u)
 
-	b1 = vec3.dot(s, q))
-	b2 = vec3.dot(r, ray.direction))
-	b3 = 1 - b[1] - b[2])
+	local b1 = vec3.dot(s, q))
+	local b2 = vec3.dot(r, ray.direction))
+	local b3 = 1 - b[1] - b[2])
 
 	-- Intersected outside triangle?
 	if b1 < FLT_EPSILON or
@@ -168,7 +164,7 @@ function intersect.ray_triangle2(ray, triangle)
 		return false
 	end
 
-	t = vec3.dot(r, v)
+	local t = vec3.dot(r, v)
 
 	if t >= FLT_EPSILON then
 		local out = vec3()
