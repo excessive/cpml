@@ -78,8 +78,8 @@ end
 -- triangle[2] is a vec3
 -- triangle[3] is a vec3
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
+local h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3()
 function intersect.ray_triangle(ray, triangle)
-	local h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3()
 	local a, f, u, v
 
 	vec3.sub(e1, triangle[2], triangle[1])
@@ -132,10 +132,10 @@ end
 -- triangle[2] is a vec3
 -- triangle[3] is a vec3
 -- http://graphicscodex.com/Sample2-RayTriangleIntersection.pdf
+local q, r, s = vec3(), vec3(), vec3()
+local n, u, v = vec3(), vec3(), vec3()
 function intersect.ray_triangle2(ray, triangle)
-	local q, r, s = vec3(), vec3(), vec3()
-	local n, u, v = vec3(), vec3(), vec3()
-	local b, a, t = {}
+	local b1, b2, b3, a, t
 
 	-- Edge vectors
 	vec3.sub(u, triangle[2], triangle[1])
@@ -157,14 +157,14 @@ function intersect.ray_triangle2(ray, triangle)
 	vec3.div(s, s, a)
 	vec3.cross(r, s, u)
 
-	table.insert(b, vec3.dot(s, q))
-	table.insert(b, vec3.dot(r, ray.direction))
-	table.insert(b, 1 - b[1] - b[2])
+	b1 = vec3.dot(s, q))
+	b2 = vec3.dot(r, ray.direction))
+	b3 = 1 - b[1] - b[2])
 
 	-- Intersected outside triangle?
-	if b[1] < FLT_EPSILON or
-		b[2] < FLT_EPSILON or
-		b[3] < FLT_EPSILON then
+	if b1 < FLT_EPSILON or
+		b2 < FLT_EPSILON or
+		b3 < FLT_EPSILON then
 		return false
 	end
 
