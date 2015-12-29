@@ -294,7 +294,7 @@ function mat4.translate(out, a, t)
 		0, 0, 1, 0,
 		t.x, t.y, t.z, 1
 	}
-	
+
 	return mat4.mul(out, a, m)
 end
 
@@ -330,7 +330,7 @@ function mat4:invert()
 	self[6]  * self[11] + self[13] * self[7]  * self[10]
 
 	out[2] = -self[2]  * self[11] * self[16] + self[2]  * self[12] * self[15]  +
-	self[10] * self[3]  * self[16] - self[10] * self[4]  * self[15] - self[14] * 
+	self[10] * self[3]  * self[16] - self[10] * self[4]  * self[15] - self[14] *
 	self[3]  * self[12] +self[14] * self[4]  * self[11]
 
 	out[6] =  self[1]  * self[11] * self[16] - self[1]  * self[12] * self[15] -

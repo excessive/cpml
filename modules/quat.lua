@@ -14,6 +14,8 @@ local abs, acos, asin, atan2 = math.abs, math.acos, math.asin, math.atan2
 local cos, sin, min, max, pi = math.cos, math.sin, math.min, math.max, math.pi
 local sqrt = math.sqrt
 
+local quat = {}
+
 -- Private constructor.
 local function new(x, y, z, w)
 	local q = {}

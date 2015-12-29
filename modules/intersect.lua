@@ -2,22 +2,26 @@
 -- @module intersect
 
 local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
-local vec3           = require(current_folder .. "vec3")
-local constants      = require(current_folder .. "constants")
-local intersect      = {}
+
+local constants = require(current_folder .. "constants")
+local vec3      = require(current_folder .. "vec3")
 
 local abs, min, max = math.abs, math.min, math.max
-local FLT_EPSILON = constants.FLT_EPSILON
+local FLT_EPSILON   = constants.FLT_EPSILON
+
+local intersect = {}
+
 
 -- ray.position is a vec3
 -- ray.direction is a vec3
 -- aabb.min is a vec3
 -- aabb.max is a vec3
+local dir, dirfrac = vec3(), vec3()
 function intersect.ray_aabb(ray, aabb)
-	-- ray.direction is unit direction vector of ray
-	local dir = vec3()
 	vec3.normalize(dir, ray.direction)
-	local dirfrac = vec3(1 / dir.x, 1 / dir.y, 1 / dir.z)
+	dirfrac.x = 1 / dir.x
+	dirfrac.y = 1 / dir.y
+	dirfrac.z = 1 / dir.z
 
 	local t1 = (aabb.min.x - ray.position.x) * dirfrac.x
 	local t2 = (aabb.max.x - ray.position.x) * dirfrac.x
@@ -124,58 +128,6 @@ function intersect.ray_triangle(ray, triangle)
 	return false
 end
 
--- ray.position is a vec3
--- ray.direction is a vec3
--- triangle[1] is a vec3
--- triangle[2] is a vec3
--- triangle[3] is a vec3
--- http://graphicscodex.com/Sample2-RayTriangleIntersection.pdf
-local q, r, s = vec3(), vec3(), vec3()
-local n, u, v = vec3(), vec3(), vec3()
-function intersect.ray_triangle2(ray, triangle)
-	-- Edge vectors
-	vec3.sub(u, triangle[2], triangle[1])
-	vec3.sub(v, triangle[3], triangle[1])
-
-	-- Face normal
-	vec3.cross(n, u, v)
-
-	vec3.cross(q, ray.direction, v)
-	local a = vec3.dot(q, u)
-
-	-- Backfacing or nearly parallel?
-	if vec3.dot(n, ray.direction) >= FLT_EPSILON or
-		abs(a) < FLT_EPSILON then
-		return false
-	end
-
-	vec3.sub(s, ray.position, triangle[1])
-	vec3.div(s, s, a)
-	vec3.cross(r, s, u)
-
-	local b1 = vec3.dot(s, q))
-	local b2 = vec3.dot(r, ray.direction))
-	local b3 = 1 - b[1] - b[2])
-
-	-- Intersected outside triangle?
-	if b1 < FLT_EPSILON or
-		b2 < FLT_EPSILON or
-		b3 < FLT_EPSILON then
-		return false
-	end
-
-	local t = vec3.dot(r, v)
-
-	if t >= FLT_EPSILON then
-		local out = vec3()
-		vec3.mul(out, ray.direction, t)
-		vec3.add(out, ray.position, out)
-		return out
-	end
-
-	return false
-end
-
 -- a[1] is a vec3
 -- a[2] is a vec3
 -- b[1] is a vec3
@@ -183,9 +135,9 @@ end
 -- Algorithm is ported from the C algorithm of
 -- Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
 -- Archive.org am hero \o/
+local p13, p43, p21, out1, out2 = vec3(), vec3(), vec3(), vec3(), vec3()
 function intersect.line_line(a, b)
 	-- new points
-	local p13, p43, p21 = vec3(), vec3(), vec3()
 	vec3.sub(p13, a[1], b[1])
 	vec3.sub(p43, b[2], b[1])
 	vec3.sub(p21, a[2], a[1])
@@ -213,11 +165,8 @@ function intersect.line_line(a, b)
 	local mub   = (d1343 + d4321 * (mua)) / d4343
 
 	-- return positions of intersection on each line
-	local out1 = vec3()
 	vec3.mul(out1, mua, p21)
 	vec3.add(out1, a[1], out)
-
-	local out2 = vec3()
 	vec3.mul(out2, mub, p43)
 	vec3.add(out2, b[1], out2)
 
