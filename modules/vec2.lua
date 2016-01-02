@@ -3,7 +3,6 @@
 
 local atan2, sqrt, pi = math.atan2, math.sqrt, math.pi
 local cos, sin = math.cos, math.sin
-local ffi = require "ffi"
 
 local vec2 = {}
 
