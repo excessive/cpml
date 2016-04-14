@@ -32,7 +32,7 @@
                 :@@@@@@@++;;;+#@@@@@@+`
                       .;'+++++;.
 --]]
-local current_folder = (...):gsub('%.init$', '') .. "."
+local current_folder = (...) and (...):gsub('%.init$', '') .. "." or ""
 
 local cpml = {
 	_LICENSE = "CPML is distributed under the terms of the MIT license. See LICENSE.md.",

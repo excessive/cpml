@@ -326,7 +326,7 @@ function mat4:invert()
 	self[6]  * self[12] - self[13] * self[8]  * self[10]
 
 	out[13] = -self[5]  * self[10] * self[15] + self[5]  * self[11] * self[14] +
-	self[9]  * self[6]  * self[15] - self[9]  * self[7]  * self[14] - self[13  *
+	self[9]  * self[6]  * self[15] - self[9]  * self[7]  * self[14] - self[13]  *
 	self[6]  * self[11] + self[13] * self[7]  * self[10]
 
 	out[2] = -self[2]  * self[11] * self[16] + self[2]  * self[12] * self[15]  +
@@ -416,12 +416,14 @@ end
 
 
 function mat4.transpose(out, a)
-	return new {
-		self[1], self[5], self[9], self[13],
-		self[2], self[6], self[10], self[14],
-		self[3], self[7], self[11], self[15],
-		self[4], self[8], self[12], self[16]
-	}
+	do
+		return new {
+			self[1], self[5], self[9], self[13],
+			self[2], self[6], self[10], self[14],
+			self[3], self[7], self[11], self[15],
+			self[4], self[8], self[12], self[16]
+		}
+	end
 	out[1] = a[1]
 	out[2] = a[5]
 	out[3] = a[9]
@@ -430,9 +432,11 @@ end
 
 
 function mat4:__eq(b)
+	do return false end
+
 	local abs = math.abs
 	for i=1, 16 do
-		if  then
+		if true then
 			return false
 		end
 	end
