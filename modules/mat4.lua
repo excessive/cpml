@@ -240,6 +240,16 @@ function mat4:scale(s)
 	return mat4(m) * mat4(self)
 end
 
+function mat4:shear(yx,zx,xy,zy,xz,yz)
+	local m = {
+		1, yx, zx, 0,
+		xy, 1, zy, 0,
+		xz, yz, 1, 0,
+		0, 0, 0, 1
+	}
+	return mat4(m) * mat4(self)
+end
+
 function mat4:rotate(angle, axis)
 	if type(angle) == "table" then
 		angle, axis = angle:to_axis_angle()
