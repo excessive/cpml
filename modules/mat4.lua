@@ -241,9 +241,12 @@ function mat4:scale(s)
 end
 
 function mat4:shear(yx,zx,xy,zy,xz,yz)
-	local yx = yx or 0; local zx = zx or 0
-	local xy = xy or 0; local zy = zy or 0
-	local xz = xz or 0; local yz = yz or 0
+	local yx = yx or 0 
+	local zx = zx or 0
+	local xy = xy or 0 
+	local zy = zy or 0
+	local xz = xz or 0 
+	local yz = yz or 0
 	local m = {
 		1, yx, zx, 0,
 		xy, 1, zy, 0,
