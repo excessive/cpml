@@ -51,7 +51,7 @@ local function new(x,y,z)
 end
 
 local function isvector(v)
-	return getmetatable(v) == vector or (type(type(v) == "table" and v.x and v.y and v.z) == "number")
+	return getmetatable(v) == vector or (type(v) == "table" and type(v.x) == "number" and type(v.y) == "number" and type(v.z) == "number")
 end
 
 local zero = new(0,0,0)
