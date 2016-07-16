@@ -130,28 +130,24 @@ describe("vec3:", function()
 	end)
 
 	it("Test cross product", function()
-		do
-			local a = vec3(3, 5, 7)
-			local b = vec3(7, 4, 1)
+		local a = vec3(3, 5, 7)
+		local b = vec3(7, 4, 1)
 
-			local c = vec3.cross(vec3(), a, b)
-			assert.is.equal(c.x, -23)
-			assert.is.equal(c.y,  46)
-			assert.is.equal(c.z, -23)
-		end
+		local c = vec3.cross(vec3(), a, b)
+		assert.is.equal(c.x, -23)
+		assert.is.equal(c.y,  46)
+		assert.is.equal(c.z, -23)
 	end)
 
 	it("Test dot product", function()
-		do
-			local a = vec3(3, 5, 7)
-			local b = vec3(7, 4, 1)
+		local a = vec3(3, 5, 7)
+		local b = vec3(7, 4, 1)
 
-			local c = vec3.dot(a, b)
-			assert.is.equal(c, 48)
+		local c = vec3.dot(a, b)
+		assert.is.equal(c, 48)
 
-			local d = a:dot(b)
-			assert.is.equal(c, d)
-		end
+		local d = a:dot(b)
+		assert.is.equal(c, d)
 	end)
 
 	it("Test lerp", function()
