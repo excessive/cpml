@@ -101,7 +101,7 @@ end
 function utils.is_pot(value)
 	-- found here: https://love2d.org/forums/viewtopic.php?p=182219#p182219
 	-- check if a number is a power-of-two
-  return (frexp(value)) == 0.5
+	return (frexp(value)) == 0.5
 end
 
 return utils

@@ -1,13 +1,11 @@
 --- A 2 component vector.
 -- @module vec2
 
-local atan2, sqrt, pi = math.atan2, math.sqrt, math.pi
-local cos, sin = math.cos, math.sin
-
+local atan2, sqrt,cos, sin, pi = math.atan2, math.sqrt, math.cos, math,sin, math.pi
 local vec2 = {}
 
 -- Private constructor.
-local function new(x, y, z)
+local function new(x, y)
 	local v = {}
 	v.x, v.y = x, y
 	return setmetatable(v, vec2_mt)
@@ -30,7 +28,7 @@ end
 -- scalar to fill the vector eg. {x, x}
 -- @tparam number y y component
 function vec2.new(x, y)
-	-- number, number, number
+	-- number, number
 	if x and y then
 		assert(type(x) == "number", "new: Wrong argument type for x (<number> expected)")
 		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
@@ -45,7 +43,7 @@ function vec2.new(x, y)
 
 		return new(x, y)
 
-	-- {x, x, x} eh. {0, 0, 0}, {3, 3, 3}
+	-- {x, x} eh. {0, 0}, {3, 3}
 	elseif type(x) == "number" then
 		return new(x, x)
 	else
@@ -57,7 +55,7 @@ end
 -- @tparam vec2 a vector to be cloned
 -- @treturn vec2
 function vec2.clone(a)
-	return new(a.x, a.y, a.z)
+	return new(a.x, a.y)
 end
 
 --- Add two vectors.
@@ -117,7 +115,7 @@ end
 function vec2.trim(out, a, len)
 	len = math.min(vec2.len(a), len)
 	vec2.normalize(out, a)
-	vec2.mul(out, len)
+	vec2.mul(out, out, len)
 	return out
 end
 
@@ -184,6 +182,34 @@ function vec2.lerp(out, a, b, s)
 	return out
 end
 
+--- Unpack a vector into form x,y
+-- @tparam vec2 a first vector
+-- @treturn number x component
+-- @treturn number y component
+function vec2.unpack(a)
+	return a.x, a.y
+end
+
+--- Return a string formatted "{x, y}"
+-- @tparam vec2 a the vector to be turned into a string
+-- @treturn string
+function vec2.tostring(a)
+	return string.format("(%+0.3f,%+0.3f)", a.x, a.y)
+end
+
+--- Return a boolean showing if a table is or is not a vec2
+-- @param v the object to be tested
+-- @treturn boolean
+function vec2.isvec2(v)
+	return
+		(
+			type(v) == "table" or
+			type(v) == "cdata"
+		)  and
+		type(v.x) == "number" and
+		type(v.y) == "number"
+end
+
 --- Convert point from polar to cartesian.
 -- @tparam vec2 out vector for result to be stored in
 -- @tparam number radius radius of the point
@@ -206,38 +232,13 @@ function vec2.to_polar(a)
 	return radius, theta
 end
 
---- Unpack a vector into form x,y
--- @tparam vec2 a first vector
--- @treturn number x component
--- @treturn number y component
-function vec2.unpack(a)
-	return a.x, a.y
-end
-
---- Return a string formatted "{x, y}"
--- @tparam vec2 a the vector to be turned into a string
--- @treturn string
-function vec2.tostring(a)
-	return string.format("(%+0.3f,%+0.3f)", a.x, a.y)
-end
-
---- Return a boolean showing if a table is or is not a vec2
--- @param v the object to be tested
--- @treturn boolean
-function vec2.isvec2(v)
-	return
-		type(v)   == "table"  and
-		type(v.x) == "number" and
-		type(v.y) == "number"
-end
-
 local vec2_mt = {}
 
 vec2_mt.__index = vec2
 vec2_mt.__tostring = vec2.tostring
 
-function vec2_mt.__call(self, x, y, z)
-	return vec2.new(x, y, z)
+function vec2_mt.__call(self, x, y)
+	return vec2.new(x, y)
 end
 
 function vec2_mt.__unm(a)
@@ -257,6 +258,15 @@ function vec2_mt.__add(a, b)
 
 	local temp = vec2.new()
 	vec2.add(temp, a, b)
+	return temp
+end
+
+function vec2_mt.__sub(a, b)
+	assert(vec2.isvec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.isvec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+
+	local temp = vec2.new()
+	vec2.sub(temp, a, b)
 	return temp
 end
 
@@ -283,6 +293,9 @@ function vec2_mt.__div(a, b)
 	vec2.div(temp, a, b)
 	return temp
 end
+
+vec2.unit_x = vec2.new(1, 0)
+vec2.unit_y = vec2.new(0, 1)
 
 if status then
 	ffi.metatype(new, vec2_mt)

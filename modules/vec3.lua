@@ -1,7 +1,7 @@
 --- A 3 component vector.
 -- @module vec3
-local sqrt= math.sqrt
 
+local sqrt = math.sqrt
 local vec3 = {}
 
 -- Private constructor.
@@ -57,14 +57,12 @@ function vec3.new(x, y, z)
 	end
 end
 
-
 --- Clone a vector.
 -- @tparam vec3 a vector to be cloned
 -- @treturn vec3
 function vec3.clone(a)
 	return new(a.x, a.y, a.z)
 end
-
 
 --- Add two vectors.
 -- @tparam vec3 out vector to store the result
@@ -110,17 +108,6 @@ function vec3.div(out, a, b)
 	return out
 end
 
---- Get the cross product of two vectors.
--- @tparam vec3 out vector to store the result
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
-function vec3.cross(out, a, b)
-	out.x = a.y * b.z - a.z * b.y
-	out.y = a.z * b.x - a.x * b.z
-	out.z = a.x * b.y - a.y * b.x
-	return out
-end
-
 --- Get the normal of a vector.
 -- @tparam vec3 out vector to store the result
 -- @tparam vec3 a vector to normalize
@@ -139,38 +126,18 @@ end
 function vec3.trim(out, a, len)
 	len = math.min(vec3.len(a), len)
 	vec3.normalize(out, a)
-	vec3.mul(out, len)
+	vec3.mul(out, out, len)
 	return out
 end
 
-function vec3.reflect(out, i, n)
-	vec3.mul(out, n, 2.0 * vec3.dot(n, i))
-	vec3.sub(out, i, out)
-	return out
-end
-
-function vec3.refract(out, i, n, ior)
-	local d = vec3.dot(n, i)
-	local k = 1.0 - ior * ior * (1.0 - d * d)
-	if k >= 0.0 then
-		vec3.mul(out, i, ior)
-		vec3.mul(tmp, n, ior * d + sqrt(k))
-		vec3.sub(out, out, tmp)
-	end
-
-	return out
-end
-
---- Lerp between two vectors.
--- @tparam vec3 out vector for result to be stored in
--- @tparam vec3 a first vector
--- @tparam vec3 b second vector
--- @tparam number s step value
--- @treturn vec3
-function vec3.lerp(out, a, b, s)
-	vec3.sub(out, b, a)
-	vec3.mul(out, out, s)
-	vec3.add(out, out, a)
+--- Get the cross product of two vectors.
+-- @tparam vec3 out vector to store the result
+-- @tparam vec3 a Left hand operant
+-- @tparam vec3 b Right hand operant
+function vec3.cross(out, a, b)
+	out.x = a.y * b.z - a.z * b.y
+	out.y = a.z * b.x - a.x * b.z
+	out.z = a.x * b.y - a.y * b.x
 	return out
 end
 
@@ -218,6 +185,19 @@ function vec3.dist2(a, b)
 	return dx * dx + dy * dy + dz * dz
 end
 
+--- Lerp between two vectors.
+-- @tparam vec3 out vector for result to be stored in
+-- @tparam vec3 a first vector
+-- @tparam vec3 b second vector
+-- @tparam number s step value
+-- @treturn vec3
+function vec3.lerp(out, a, b, s)
+	vec3.sub(out, b, a)
+	vec3.mul(out, out, s)
+	vec3.add(out, out, a)
+	return out
+end
+
 --- Unpack a vector into form x,y,z
 -- @tparam vec3 a first vector
 -- @treturn number x component
@@ -239,10 +219,32 @@ end
 -- @treturn boolean
 function vec3.isvec3(v)
 	return
-		type(v)   == "table"  and
+		(
+			type(v) == "table" or
+			type(v) == "cdata"
+
+		) and
 		type(v.x) == "number" and
 		type(v.y) == "number" and
 		type(v.z) == "number"
+end
+
+function vec3.reflect(out, i, n)
+	vec3.mul(out, n, 2.0 * vec3.dot(n, i))
+	vec3.sub(out, i, out)
+	return out
+end
+
+function vec3.refract(out, i, n, ior)
+	local d = vec3.dot(n, i)
+	local k = 1.0 - ior * ior * (1.0 - d * d)
+	if k >= 0.0 then
+		vec3.mul(out, i, ior)
+		vec3.mul(tmp, n, ior * d + sqrt(k))
+		vec3.sub(out, out, tmp)
+	end
+
+	return out
 end
 
 local vec3_mt = {}
