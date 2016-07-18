@@ -6,7 +6,7 @@ local vec3 = {}
 
 -- Private constructor.
 local function new(x, y, z)
-	local v = {}
+	local v       = {}
 	v.x, v.y, v.z = x, y, z
 	return setmetatable(v, vec3_mt)
 end
@@ -256,6 +256,10 @@ function vec3_mt.__call(self, x, y, z)
 	return vec3.new(x, y, z)
 end
 
+function vec3_mt.__tostring(a)
+	return vec3.tostring(a)
+end
+
 function vec3_mt.__unm(a)
 	return vec3.new(-a.x, -a.y, -a.z)
 end
@@ -271,18 +275,14 @@ function vec3_mt.__add(a, b)
 	assert(vec3.isvec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(vec3.isvec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 
-	local temp = vec3.new()
-	vec3.add(temp, a, b)
-	return temp
+	return vec3.add(new(), a, b)
 end
 
 function vec3_mt.__sub(a, b)
 	assert(vec3.isvec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(vec3.isvec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 
-	local temp = vec3.new()
-	vec3.sub(temp, a, b)
-	return temp
+	return vec3.sub(new(), a, b)
 end
 
 function vec3_mt.__mul(a, b)
@@ -292,9 +292,7 @@ function vec3_mt.__mul(a, b)
 	assert(vec3.isvec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
 
-	local temp = vec3.new()
-	vec3.mul(temp, a, b)
-	return temp
+	return vec3.mul(new(), a, b)
 end
 
 function vec3_mt.__div(a, b)
@@ -304,14 +302,12 @@ function vec3_mt.__div(a, b)
 	assert(vec3.isvec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
 
-	local temp = vec3.new()
-	vec3.div(temp, a, b)
-	return temp
+	return vec3.div(new(), a, b)
 end
 
-vec3.unit_x = vec3.new(1, 0, 0)
-vec3.unit_y = vec3.new(0, 1, 0)
-vec3.unit_z = vec3.new(0, 0, 1)
+vec3.unit_x = new(1, 0, 0)
+vec3.unit_y = new(0, 1, 0)
+vec3.unit_z = new(0, 0, 1)
 
 if status then
 	ffi.metatype(new, vec3_mt)

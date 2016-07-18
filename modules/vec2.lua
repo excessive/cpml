@@ -1,12 +1,16 @@
 --- A 2 component vector.
 -- @module vec2
 
-local atan2, sqrt,cos, sin, pi = math.atan2, math.sqrt, math.cos, math,sin, math.pi
-local vec2 = {}
+local atan2 = math.atan2
+local sqrt  = math.sqrt
+local cos   = math.cos
+local sin   = math.sin
+local pi    = math.pi
+local vec2  = {}
 
 -- Private constructor.
 local function new(x, y)
-	local v = {}
+	local v  = {}
 	v.x, v.y = x, y
 	return setmetatable(v, vec2_mt)
 end
@@ -241,6 +245,10 @@ function vec2_mt.__call(self, x, y)
 	return vec2.new(x, y)
 end
 
+function vec2_mt.__tostring(a)
+	return vec2.tostring(a)
+end
+
 function vec2_mt.__unm(a)
 	return vec2.new(-a.x, -a.y)
 end
@@ -256,18 +264,14 @@ function vec2_mt.__add(a, b)
 	assert(vec2.isvec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(vec2.isvec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 
-	local temp = vec2.new()
-	vec2.add(temp, a, b)
-	return temp
+	return vec2.add(new(), a, b)
 end
 
 function vec2_mt.__sub(a, b)
 	assert(vec2.isvec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(vec2.isvec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 
-	local temp = vec2.new()
-	vec2.sub(temp, a, b)
-	return temp
+	return vec2.sub(new(), a, b)
 end
 
 function vec2_mt.__mul(a, b)
@@ -277,9 +281,7 @@ function vec2_mt.__mul(a, b)
 	assert(vec2.isvec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
 
-	local temp = vec2.new()
-	vec2.mul(temp, a, b)
-	return temp
+	return vec2.mul(new(), a, b)
 end
 
 function vec2_mt.__div(a, b)
@@ -289,13 +291,11 @@ function vec2_mt.__div(a, b)
 	assert(vec2.isvec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
 
-	local temp = vec2.new()
-	vec2.div(temp, a, b)
-	return temp
+	return vec2.div(new(), a, b)
 end
 
-vec2.unit_x = vec2.new(1, 0)
-vec2.unit_y = vec2.new(0, 1)
+vec2.unit_x = new(1, 0)
+vec2.unit_y = new(0, 1)
 
 if status then
 	ffi.metatype(new, vec2_mt)

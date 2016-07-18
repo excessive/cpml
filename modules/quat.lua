@@ -342,7 +342,10 @@ end
 -- @treturn boolean
 function quat.isquat(q)
 	return
-		type(v)   == "table"  and
+		(
+			type(v) == "table"  or
+			type(v) == "cdata"
+		) and
 		type(v.x) == "number" and
 		type(v.y) == "number" and
 		type(v.z) == "number" and
