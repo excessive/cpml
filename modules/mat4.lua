@@ -101,7 +101,7 @@ end
 
 function mat4.from_direction(direction, up)
 	local forward = vec3.normalize(vec3(), direction)
-	local side    = vec3.normalize(vec3(), vec3.cross(vec3(), forward, up)
+	local side    = vec3.normalize(vec3(), vec3.cross(vec3(), forward, up))
 	local new_up  = vec3.normalize(vec3(), vec3.cross(vec3(), side, forward))
 
 	local out = new()
@@ -435,7 +435,7 @@ end
 
 function mat4.look_at(a, eye, center, up)
 	local forward = vec3.normalize(vec3(), center - eye)
-	local side    = vec3.normalize(vec3(), vec3.cross(vec3(), forward, up)
+	local side    = vec3.normalize(vec3(), vec3.cross(vec3(), forward, up))
 	local new_up  = vec3.normalize(vec3(), vec3.cross(vec3(), side, forward))
 
 	local view = new()
