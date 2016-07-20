@@ -612,7 +612,7 @@ function mat4_mt.__mul(a, b)
 		return mat4.mul(new(), a, b)
 	end
 
-	return mat4.mul_mat41({}, a, b)
+	return mat4.mul_mat4x1({}, a, b)
 end
 
 if status then
