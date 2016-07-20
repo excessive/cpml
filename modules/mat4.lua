@@ -331,7 +331,7 @@ function mat4.scale(out, a, s)
 	tmp[6]  = s.y
 	tmp[11] = s.z
 
-	return out:mul(a, tmp)
+	return out:mul(tmp, a)
 end
 
 function mat4.rotate(out, a, angle, axis)
@@ -369,7 +369,7 @@ function mat4.translate(out, a, t)
 	tmp[14] = t.y
 	tmp[15] = t.z
 
-	return out:mul(a, tmp)
+	return out:mul(tmp, a)
 end
 
 function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
@@ -381,7 +381,7 @@ function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	tmp[9]  = xz or 0
 	tmp[10] = yz or 0
 
-	return out:mul(a, tmp)
+	return out:mul(tmp, a)
 end
 
 function mat4.look_at(out, a, eye, center, up)
