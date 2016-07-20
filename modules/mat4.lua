@@ -529,6 +529,100 @@ function mat4.to_quat(a)
 	return q:normalize(q)
 end
 
+-- frustum = (proj * view):to_frustum(infinite)
+-- http://www.crownandcutlass.com/features/technicaldetails/frustum.html
+function mat4.to_frustum(a, infinite)
+	local t
+	local frustum = {}
+
+	-- Extract the TOP plane
+	frustum.top = {}
+	frustum.top.a = a[ 4] - a[ 2]
+	frustum.top.b = a[ 8] - a[ 6]
+	frustum.top.c = a[12] - a[10]
+	frustum.top.d = a[16] - a[14]
+
+	-- Normalize the result
+	t = sqrt(frustum.top.a * frustum.top.a + frustum.top.b * frustum.top.b + frustum.top.c * frustum.top.c)
+	frustum.top.a = frustum.top.a / t
+	frustum.top.b = frustum.top.b / t
+	frustum.top.c = frustum.top.c / t
+	frustum.top.d = frustum.top.d / t
+
+	-- Extract the BOTTOM plane
+	frustum.bottom = {}
+	frustum.bottom.a = a[ 4] + a[ 2]
+	frustum.bottom.b = a[ 8] + a[ 6]
+	frustum.bottom.c = a[12] + a[10]
+	frustum.bottom.d = a[16] + a[14]
+
+	-- Normalize the result
+	t = sqrt(frustum.bottom.a * frustum.bottom.a + frustum.bottom.b * frustum.bottom.b + frustum.bottom.c * frustum.bottom.c)
+	frustum.bottom.a = frustum.bottom.a / t
+	frustum.bottom.b = frustum.bottom.b / t
+	frustum.bottom.c = frustum.bottom.c / t
+	frustum.bottom.d = frustum.bottom.d / t
+
+	-- Extract the LEFT plane
+	frustum.left.a = a[ 4] + a[ 1]
+	frustum.left.b = a[ 8] + a[ 5]
+	frustum.left.c = a[12] + a[ 9]
+	frustum.left.d = a[16] + a[13]
+
+	-- Normalize the result
+	t = sqrt(frustum.left.a * frustum.left.a + frustum.left.b * frustum.left.b + frustum.left.c * frustum.left.c)
+	frustum.left.a = frustum.left.a / t
+	frustum.left.b = frustum.left.b / t
+	frustum.left.c = frustum.left.c / t
+	frustum.left.d = frustum.left.d / t
+
+	-- Extract the RIGHT plane
+	frustum.right = {}
+	frustum.right.a = a[ 4] - a[ 1]
+	frustum.right.b = a[ 8] - a[ 5]
+	frustum.right.c = a[12] - a[ 9]
+	frustum.right.d = a[16] - a[13]
+
+	-- Normalize the result
+	t = sqrt(frustum.right.a * frustum.right.a + frustum.right.b * frustum.right.b + frustum.right.c * frustum.right.c)
+	frustum.right.a = frustum.right.a / t
+	frustum.right.b = frustum.right.b / t
+	frustum.right.c = frustum.right.c / t
+	frustum.right.d = frustum.right.d / t
+
+	-- Extract the NEAR plane
+	frustum.near = {}
+	frustum.near.a = a[ 4] + a[ 3]
+	frustum.near.b = a[ 8] + a[ 7]
+	frustum.near.c = a[12] + a[11]
+	frustum.near.d = a[16] + a[15]
+
+	-- Normalize the result
+	t = sqrt(frustum.near.a * frustum.near.a + frustum.near.b * frustum.near.b + frustum.near.c * frustum.near.c)
+	frustum.near.a = frustum.near.a / t
+	frustum.near.b = frustum.near.b / t
+	frustum.near.c = frustum.near.c / t
+	frustum.near.d = frustum.near.d / t
+
+	if not infinite then
+		-- Extract the FAR plane
+		frustum.far = {}
+		frustum.far.a = a[ 4] - a[ 3]
+		frustum.far.b = a[ 8] - a[ 7]
+		frustum.far.c = a[12] - a[11]
+		frustum.far.d = a[16] - a[15]
+
+		-- Normalize the result
+		t = sqrt(frustum.far.a * frustum.far.a + frustum.far.b * frustum.far.b + frustum.far.c * frustum.far.c)
+		frustum.far.a = frustum.far.a / t
+		frustum.far.b = frustum.far.b / t
+		frustum.far.c = frustum.far.c / t
+		frustum.far.d = frustum.far.d / t
+	end
+
+	return frustum
+end
+
 local mat4_mt      = {}
 mat4_mt.__index    = mat4
 mat4_mt.__tostring = mat4.to_string
