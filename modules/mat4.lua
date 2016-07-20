@@ -276,7 +276,7 @@ function mat4.mul(out, a, b)
 	return out
 end
 
-function mat4.mul_mat41(out, a, b)
+function mat4.mul_mat4x1(out, a, b)
 	out[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
 	out[2] = b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14]
 	out[3] = b[1] * a[3] + b[2] * a[7] + b [3] * a[11] + b[4] * a[15]
@@ -490,8 +490,8 @@ end
 function mat4.project(obj, view, projection, viewport)
 	local position = { obj.x, obj.y, obj.z, 1 }
 
-	position = mat4.mul(position, mat4.transpose(mat4(), view))
-	position = mat4.mul(position, mat4.transpose(mat4(), projection))
+	mat4.mul_mat4x1(position, mat4.transpose(mat4(), view), position)
+	mat4.mul_mat4x1(position, mat4.transpose(mat4(), projection), position)
 
 	position[1] = position[1] / position[4] * 0.5 + 0.5
 	position[2] = position[2] / position[4] * 0.5 + 0.5
@@ -521,7 +521,7 @@ function mat4.unproject(win, view, projection, viewport)
 	position[3] = position[3] * 2 - 1
 	position[4] = position[4] * 2 - 1
 
-	mat4.mul(position, inverse, position)
+	mat4.mul_max4x1(position, inverse, position)
 
 	position[1] = position[1] / position[4]
 	position[2] = position[2] / position[4]
