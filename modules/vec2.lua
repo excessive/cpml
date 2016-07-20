@@ -120,7 +120,7 @@ end
 -- @tparam vec2 out vector to store the result
 -- @tparam vec2 a vector to normalize
 function vec2.normalize(out, a)
-	local l = vec2.len(a)
+	local l = a:len()
 	out.x = a.x / l
 	out.y = a.y / l
 	return out
@@ -131,10 +131,9 @@ end
 -- @tparam vec2 a vector to be trimmed
 -- @tparam number len the length to trim the vector to
 function vec2.trim(out, a, len)
-	len = math.min(vec2.len(a), len)
-	vec2.normalize(out, a)
-	vec2.mul(out, out, len)
 	return out
+		:normalize(a)
+		:mul(out, math.min(a:len(), len))
 end
 
 --- Get the cross product of two vectors.
@@ -188,9 +187,10 @@ function vec2.dist2(a, b)
 end
 
 function vec2.rotate(out, a, phi)
-	local c, s = cos(phi), sin(phi)
-	out.x      = c * a.x - s * a.y
-	out.y      = s * a.x + c * a.y
+	local c = cos(phi)
+	local s = sin(phi)
+	out.x   = c * a.x - s * a.y
+	out.y   = s * a.x + c * a.y
 	return out
 end
 
@@ -207,10 +207,10 @@ end
 -- @tparam number s step value
 -- @treturn vec2
 function vec2.lerp(out, a, b, s)
-	vec2.sub(out, b, a)
-	vec2.mul(out, out, s)
-	vec2.add(out, out, a)
 	return out
+		:sub(b, a)
+		:mul(out, s)
+		:add(out, a)
 end
 
 --- Unpack a vector into form x,y
@@ -224,14 +224,18 @@ end
 --- Return a boolean showing if a table is or is not a vec2
 -- @param v the object to be tested
 -- @treturn boolean
-function vec2.is_vec2(v)
+function vec2.is_vec2(a)
 	return
 		(
-			type(v) == "table" or
-			type(v) == "cdata"
+			type(a) == "table" or
+			type(a) == "cdata"
 		)  and
-		type(v.x) == "number" and
-		type(v.y) == "number"
+		type(a.x) == "number" and
+		type(a.y) == "number"
+end
+
+function vec2.is_zero(a)
+	return a.x == 0 and a.y == 0
 end
 
 --- Convert point from cartesian to polar.
@@ -261,7 +265,7 @@ function vec2_mt.__call(self, x, y)
 end
 
 function vec2_mt.__unm(a)
-	return vec2.new(-a.x, -a.y)
+	return new(-a.x, -a.y)
 end
 
 function vec2_mt.__eq(a,b)
@@ -273,25 +277,25 @@ end
 function vec2_mt.__add(a, b)
 	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
-	return vec2.add(new(), a, b)
+	return new():add(a, b)
 end
 
 function vec2_mt.__sub(a, b)
 	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
-	return vec2.sub(new(), a, b)
+	return new():sub(a, b)
 end
 
 function vec2_mt.__mul(a, b)
 	assert(vec2.is_vec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
-	return vec2.mul(new(), a, b)
+	return new():mul(a, b)
 end
 
 function vec2_mt.__div(a, b)
 	assert(vec2.is_vec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
-	return vec2.div(new(), a, b)
+	return new():div(a, b)
 end
 
 if status then

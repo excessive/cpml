@@ -129,10 +129,9 @@ end
 -- @tparam vec3 a vector to be trimmed
 -- @tparam number len the length to trim the vector to
 function vec3.trim(out, a, len)
-	len = math.min(vec3.len(a), len)
-	vec3.normalize(out, a)
-	vec3.mul(out, out, len)
 	return out
+		:normalize(a)
+		:mul(out, math.min(vec3.len(a), len))
 end
 
 --- Get the cross product of two vectors.
@@ -200,16 +199,17 @@ function vec3.rotate(out, a, phi, axis)
 	end
 
 	local u = vec3.normalize(vec3(), axis)
-	local c, s = cos(phi), sin(phi)
+	local c = cos(phi)
+	local s = sin(phi)
 
 	-- Calculate generalized rotation matrix
 	local m1 = new((c + u.x * u.x * (1 - c)),       (u.x * u.y * (1 - c) - u.z * s), (u.x * u.z * (1 - c) + u.y * s))
 	local m2 = new((u.y * u.x * (1 - c) + u.z * s), (c + u.y * u.y * (1 - c)),       (u.y * u.z * (1 - c) - u.x * s))
 	local m3 = new((u.z * u.x * (1 - c) - u.y * s), (u.z * u.y * (1 - c) + u.x * s), (c + u.z * u.z * (1 - c))      )
 
-	out.x = vec3.dot(a, m1)
-	out.y = vec3.dot(a, m2)
-	out.z = vec3.dot(a, m3)
+	out.x = a:dot(m1)
+	out.y = a:dot(m2)
+	out.z = a:dot(m3)
 	return out
 end
 
@@ -227,10 +227,10 @@ end
 -- @tparam number s step value
 -- @treturn vec3
 function vec3.lerp(out, a, b, s)
-	vec3.sub(out, b, a)
-	vec3.mul(out, out, s)
-	vec3.add(out, out, a)
 	return out
+		:sub(b, a)
+		:mul(out, s)
+		:add(out, a)
 end
 
 --- Unpack a vector into form x,y,z
@@ -256,6 +256,14 @@ function vec3.is_vec3(a)
 		type(a.y) == "number" and
 		type(a.z) == "number"
 end
+
+function vec3.is_zero(a)
+	return
+		a.x == 0 and
+		a.y == 0 and
+		a.z == 0
+end
+
 --- Return a string formatted "{x, y, z}"
 -- @tparam vec3 a the vector to be turned into a string
 -- @treturn string
@@ -272,7 +280,7 @@ function vec3_mt.__call(self, x, y, z)
 end
 
 function vec3_mt.__unm(a)
-	return vec3.new(-a.x, -a.y, -a.z)
+	return new(-a.x, -a.y, -a.z)
 end
 
 function vec3_mt.__eq(a,b)
@@ -284,25 +292,25 @@ end
 function vec3_mt.__add(a, b)
 	assert(vec3.is_vec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(vec3.is_vec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
-	return vec3.add(new(), a, b)
+	return new():add(a, b)
 end
 
 function vec3_mt.__sub(a, b)
 	assert(vec3.is_vec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(vec3.is_vec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
-	return vec3.sub(new(), a, b)
+	return new():sub(a, b)
 end
 
 function vec3_mt.__mul(a, b)
 	assert(vec3.is_vec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
-	return vec3.mul(new(), a, b)
+	return new():mul(a, b)
 end
 
 function vec3_mt.__div(a, b)
 	assert(vec3.is_vec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
-	return vec3.div(new(), a, b)
+	return new():div(a, b)
 end
 
 if status then

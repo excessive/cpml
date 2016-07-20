@@ -1,8 +1,8 @@
 # Licenses
 
-CPML is Copyright (c) 2014 Colby Klein <shakesoda@gmail.com>.
+CPML is Copyright (c) 2016 Colby Klein <shakesoda@gmail.com>.
 
-CPML is Copyright (c) 2014 Landon Manning <lmanning17@gmail.com>.
+CPML is Copyright (c) 2016 Landon Manning <lmanning17@gmail.com>.
 
 Code in vec3.lua is derived from hump.vector. (c) 2010-2013 Matthias Richter. MIT.
 

@@ -2,7 +2,7 @@
 -------------------------------------------------------------------------------
 -- @author Colby Klein
 -- @author Landon Manning
--- @copyright 2015
+-- @copyright 2016
 -- @license MIT/X11
 -------------------------------------------------------------------------------
                   .'@@@@@@@@@@@@@@#:
@@ -32,7 +32,7 @@
                 :@@@@@@@++;;;+#@@@@@@+`
                       .;'+++++;.
 --]]
-local current_folder = (...) and (...):gsub('%.init$', '') .. "." or ""
+local modules = (...) and (...):gsub('%.init$', '') .. ".modules." or ""
 
 local cpml = {
 	_LICENSE = "CPML is distributed under the terms of the MIT license. See LICENSE.md.",
@@ -56,8 +56,8 @@ local files = {
 	"vec3",
 }
 
-for _, v in ipairs(files) do
-	cpml[v] = require(current_folder .. "modules." .. v)
+for _, file in ipairs(files) do
+	cpml[file] = require(modules .. file)
 end
 
 return cpml

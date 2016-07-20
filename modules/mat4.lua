@@ -24,6 +24,14 @@ local function new(m)
 	return setmetatable(m, mat4_mt)
 end
 
+local function identity(m)
+	m[1],  m[2],  m[3],  m[4]  = 1, 0, 0, 0
+	m[5],  m[6],  m[7],  m[8]  = 0, 1, 0, 0
+	m[9],  m[10], m[11], m[12] = 0, 0, 1, 0
+	m[13], m[14], m[15], m[16] = 0, 0, 0, 1
+	return m
+end
+
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
 if type(jit) == "table" and jit.status() then
@@ -69,20 +77,15 @@ function mat4.new(a)
 end
 
 function mat4.identity()
-	return new {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	}
+	return identity(new())
 end
 
 function mat4.from_angle_axis(angle, axis)
 	if type(angle) == "table" then
-		angle, axis = vec3.to_angle_axis(angle)
+		angle, axis = angle:to_angle_axis()
 	end
 
-	local l = vec3.len(axis)
+	local l = axis:len()
 	if l == 0 then
 		return new()
 	end
@@ -100,9 +103,15 @@ function mat4.from_angle_axis(angle, axis)
 end
 
 function mat4.from_direction(direction, up)
-	local forward = vec3.normalize(vec3(), direction)
-	local side    = vec3.normalize(vec3(), vec3.cross(vec3(), forward, up))
-	local new_up  = vec3.normalize(vec3(), vec3.cross(vec3(), side, forward))
+	local forward = vec3():normalize(direction)
+
+	local side = vec3()
+		:cross(forward, up)
+		:normalize(side)
+
+	local new_up = vec3()
+		:cross(side, forward)
+		:normalize(new_up)
 
 	local out = new()
 	out[1]    = side.x
@@ -120,8 +129,8 @@ function mat4.from_direction(direction, up)
 end
 
 function mat4.from_transform(trans, rot, scale)
-	local angle, axis = vec3.to_angle_axis(rot)
-	local l = vec3.len(axis)
+	local angle, axis = rot:to_angle_axis()
+	local l = axis:len()
 
 	if l == 0 then
 		return new()
@@ -248,7 +257,7 @@ function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity
 	projection[15] = handednessScale
 	projection[16] = 0
 
-	return mat4.transpose(projection)
+	return projection:transpose(projection)
 end
 
 function mat4.clone(a)
@@ -286,85 +295,22 @@ function mat4.mul_mat4x1(out, a, b)
 end
 
 function mat4.invert(out, a)
-	out[1]   = a[6]  * a[11] * a[16] - a[6]  *
-		a[12] * a[15] - a[10] * a[7]  * a[16] +
-		a[10] * a[8]  * a[15] + a[14] * a[7]  *
-		a[12] - a[14] * a[8]  * a[11]
-
-	out[5]   = -a[5] * a[11] * a[16] + a[5]  *
-		a[12] * a[15] + a[9]  * a[7]  * a[16] -
-		a[9]  * a[8]  * a[15] - a[13] * a[7]  *
-		a[12] + a[13] * a[8]  * a[11]
-
-	out[9]   = a[5]  * a[10] * a[16] - a[5]  *
-		a[12] * a[14] - a[9]  * a[6]  * a[16] +
-		a[9]  * a[8]  * a[14] + a[13] * a[6]  *
-		a[12] - a[13] * a[8]  * a[10]
-
-	out[13]  = -a[5] * a[10] * a[15] + a[5]  *
-		a[11] * a[14] + a[9]  * a[6]  * a[15] -
-		a[9]  * a[7]  * a[14] - a[13] * a[6]  *
-		a[11] + a[13] * a[7]  * a[10]
-
-	out[2]   = -a[2] * a[11] * a[16] + a[2]  *
-		a[12] * a[15] + a[10] * a[3]  * a[16] -
-		a[10] * a[4]  * a[15] - a[14] * a[3]  *
-		a[12] + a[14] * a[4]  * a[11]
-
-	out[6]   =  a[1] * a[11] * a[16] - a[1]  *
-		a[12] * a[15] - a[9]  * a[3]  * a[16] +
-		a[9]  * a[4]  * a[15] + a[13] * a[3]  *
-		a[12] - a[13] * a[4]  * a[11]
-
-	out[10]  = -a[1] * a[10] * a[16] + a[1]  *
-		a[12] * a[14] + a[9]  * a[2]  * a[16] -
-		a[9]  * a[4]  * a[14] - a[13] * a[2]  *
-		a[12] + a[13] * a[4]  * a[10]
-
-	out[14]  = a[1]  * a[10] * a[15] - a[1]  *
-		a[11] * a[14] - a[9]  * a[2]  * a[15] +
-		a[9]  * a[3]  * a[14] + a[13] * a[2]  *
-		a[11] - a[13] * a[3]  * a[10]
-
-	out[3]   = a[2]  * a[7]  * a[16] - a[2]  *
-		a[8]  * a[15] - a[6]  * a[3]  * a[16] +
-		a[6]  * a[4]  * a[15] + a[14] * a[3]  *
-		a[8]  - a[14] * a[4]  * a[7]
-
-	out[7]   = -a[1] * a[7]  * a[16] + a[1]  *
-		a[8]  * a[15] + a[5]  * a[3]  * a[16] -
-		a[5]  * a[4]  * a[15] - a[13] * a[3]  *
-		a[8]  + a[13] * a[4]  * a[7]
-
-	out[11]  = a[1]  * a[6]  * a[16] - a[1]  *
-		a[8]  * a[14] - a[5]  * a[2]  * a[16] +
-		a[5]  * a[4]  * a[14] + a[13] * a[2]  *
-		a[8]  - a[13] * a[4]  * a[6]
-
-	out[15]  = -a[1] * a[6]  * a[15] + a[1]  *
-		a[7]  * a[14] + a[5]  * a[2]  * a[15] -
-		a[5]  * a[3]  * a[14] - a[13] * a[2]  *
-		a[7]  + a[13] * a[3]  * a[6]
-
-	out[4]   = -a[2] * a[7]  * a[12] + a[2]  *
-		a[8]  * a[11] + a[6]  * a[3]  * a[12] -
-		a[6]  * a[4]  * a[11] - a[10] * a[3]  *
-		a[8]  + a[10] * a[4]  * a[7]
-
-	out[8]   = a[1]  * a[7]  * a[12] - a[1]  *
-		a[8]  * a[11] - a[5]  * a[3]  * a[12] +
-		a[5]  * a[4]  * a[11] + a[9]  * a[3]  *
-		a[8]  - a[9]  * a[4]  * a[7]
-
-	out[12]  = -a[1] * a[6]  * a[12] + a[1]  *
-		a[8]  * a[10] + a[5]  * a[2]  * a[12] -
-		a[5]  * a[4]  * a[10] - a[9]  * a[2]  *
-		a[8]  + a[9]  * a[4]  * a[6]
-
-	out[16]  = a[1]  * a[6]  * a[11] - a[1]  *
-		a[7]  * a[10] - a[5]  * a[2]  * a[11] +
-		a[5]  * a[3]  * a[10] + a[9]  * a[2]  *
-		a[7]  - a[9]  * a[3]  * a[6]
+	out[1]  =  a[6] * a[11] * a[16] - a[6] * a[12] * a[15] - a[10] * a[7] * a[16] + a[10] * a[8] * a[15] + a[14] * a[7] * a[12] - a[14] * a[8] * a[11]
+	out[2]  = -a[2] * a[11] * a[16] + a[2] * a[12] * a[15] + a[10] * a[3] * a[16] - a[10] * a[4] * a[15] - a[14] * a[3] * a[12] + a[14] * a[4] * a[11]
+	out[3]  =  a[2] * a[7]  * a[16] - a[2] * a[8]  * a[15] - a[6]  * a[3] * a[16] + a[6]  * a[4] * a[15] + a[14] * a[3] * a[8]  - a[14] * a[4] * a[7]
+	out[4]  = -a[2] * a[7]  * a[12] + a[2] * a[8]  * a[11] + a[6]  * a[3] * a[12] - a[6]  * a[4] * a[11] - a[10] * a[3] * a[8]  + a[10] * a[4] * a[7]
+	out[5]  = -a[5] * a[11] * a[16] + a[5] * a[12] * a[15] + a[9]  * a[7] * a[16] - a[9]  * a[8] * a[15] - a[13] * a[7] * a[12] + a[13] * a[8] * a[11]
+	out[6]  =  a[1] * a[11] * a[16] - a[1] * a[12] * a[15] - a[9]  * a[3] * a[16] + a[9]  * a[4] * a[15] + a[13] * a[3] * a[12] - a[13] * a[4] * a[11]
+	out[7]  = -a[1] * a[7]  * a[16] + a[1] * a[8]  * a[15] + a[5]  * a[3] * a[16] - a[5]  * a[4] * a[15] - a[13] * a[3] * a[8]  + a[13] * a[4] * a[7]
+	out[8]  =  a[1] * a[7]  * a[12] - a[1] * a[8]  * a[11] - a[5]  * a[3] * a[12] + a[5]  * a[4] * a[11] + a[9]  * a[3] * a[8]  - a[9]  * a[4] * a[7]
+	out[9]  =  a[5] * a[10] * a[16] - a[5] * a[12] * a[14] - a[9]  * a[6] * a[16] + a[9]  * a[8] * a[14] + a[13] * a[6] * a[12] - a[13] * a[8] * a[10]
+	out[10] = -a[1] * a[10] * a[16] + a[1] * a[12] * a[14] + a[9]  * a[2] * a[16] - a[9]  * a[4] * a[14] - a[13] * a[2] * a[12] + a[13] * a[4] * a[10]
+	out[11] =  a[1] * a[6]  * a[16] - a[1] * a[8]  * a[14] - a[5]  * a[2] * a[16] + a[5]  * a[4] * a[14] + a[13] * a[2] * a[8]  - a[13] * a[4] * a[6]
+	out[12] = -a[1] * a[6]  * a[12] + a[1] * a[8]  * a[10] + a[5]  * a[2] * a[12] - a[5]  * a[4] * a[10] - a[9]  * a[2] * a[8]  + a[9]  * a[4] * a[6]
+	out[13] = -a[5] * a[10] * a[15] + a[5] * a[11] * a[14] + a[9]  * a[6] * a[15] - a[9]  * a[7] * a[14] - a[13] * a[6] * a[11] + a[13] * a[7] * a[10]
+	out[14] =  a[1] * a[10] * a[15] - a[1] * a[11] * a[14] - a[9]  * a[2] * a[15] + a[9]  * a[3] * a[14] + a[13] * a[2] * a[11] - a[13] * a[3] * a[10]
+	out[15] = -a[1] * a[6]  * a[15] + a[1] * a[7]  * a[14] + a[5]  * a[2] * a[15] - a[5]  * a[3] * a[14] - a[13] * a[2] * a[7]  + a[13] * a[3] * a[6]
+	out[16] =  a[1] * a[6]  * a[11] - a[1] * a[7]  * a[10] - a[5]  * a[2] * a[11] + a[5]  * a[3] * a[10] + a[9]  * a[2] * a[7]  - a[9]  * a[3] * a[6]
 
 	local det = a[1] * out[1] + a[2] * out[5] + a[3] * out[9] + a[4] * out[13]
 
@@ -380,22 +326,20 @@ function mat4.invert(out, a)
 end
 
 function mat4.scale(out, a, s)
-	local m = new {
-		s.x, 0, 0, 0,
-		0, s.y, 0, 0,
-		0, 0, s.z, 0,
-		0, 0, 0, 1
-	}
+	identity(tmp)
+	tmp[1]  = s.x
+	tmp[6]  = s.y
+	tmp[11] = s.z
 
-	return mat4.mul(out, a, m)
+	return out:mul(a, tmp)
 end
 
 function mat4.rotate(out, a, angle, axis)
 	if type(angle) == "table" then
-		angle, axis = vec3.to_angle_axis(angle)
+		angle, axis = angle:to_angle_axis()
 	end
 
-	local l = vec3.len(axis)
+	local l = axis:len()
 
 	if l == 0 then
 		return a
@@ -404,64 +348,70 @@ function mat4.rotate(out, a, angle, axis)
 	local x, y, z = axis.x / l, axis.y / l, axis.z / l
 	local c = cos(angle)
 	local s = sin(angle)
-	local m = new {
-		x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
-		x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0,
-		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0,
-		0, 0, 0, 1,
-	}
 
-	return mat4.mul(out, a, m)
+	identity(tmp)
+	tmp[1]  = x * x * (1 - c) + c
+	tmp[2]  = y * x * (1 - c) + z * s
+	tmp[3]  = x * z * (1 - c) - y * s
+	tmp[5]  = x * y * (1 - c) - z * s
+	tmp[6]  = y * y * (1 - c) + c
+ 	tmp[7]  = y * z * (1 - c) + x * s
+	tmp[9]  = x * z * (1 - c) + y * s
+	tmp[10] = y * z * (1 - c) - x * s
+	tmp[11] = z * z * (1 - c) + c
+
+	return out:mul(a, tmp)
 end
 
 function mat4.translate(out, a, t)
-	local m = new {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		t.x, t.y, t.z, 1
-	}
+	identity(tmp)
+	tmp[13] = t.x
+	tmp[14] = t.y
+	tmp[15] = t.z
 
-	return mat4.mul(out, a, m)
+	return out:mul(a, tmp)
 end
 
 function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
-	local yx = yx or 0
-	local zx = zx or 0
-	local xy = xy or 0
-	local zy = zy or 0
-	local xz = xz or 0
-	local yz = yz or 0
-	local m  = new {
-		1, yx, zx, 0,
-		xy, 1, zy, 0,
-		xz, yz, 1, 0,
-		0, 0, 0, 1
-	}
+	identity(tmp)
+	tmp[2]  = yx or 0
+	tmp[3]  = zx or 0
+	tmp[5]  = xy or 0
+	tmp[7]  = zy or 0
+	tmp[9]  = xz or 0
+	tmp[10] = yz or 0
 
-	return mat4.mul(out, a, m)
+	return out:mul(a, tmp)
 end
 
-function mat4.look_at(a, eye, center, up)
-	local forward = vec3.normalize(vec3(), center - eye)
-	local side    = vec3.normalize(vec3(), vec3.cross(vec3(), forward, up))
-	local new_up  = vec3.normalize(vec3(), vec3.cross(vec3(), side, forward))
+function mat4.look_at(out, a, eye, center, up)
+	local forward = vec3():normalize(center - eye)
 
-	local view = new()
-	view[1]    = side.x
-	view[5]    = side.y
-	view[9]    = side.z
-	view[2]    = new_up.x
-	view[6]    = new_up.y
-	view[10]   = new_up.z
-	view[3]    = -forward.x
-	view[7]    = -forward.y
-	view[11]   = -forward.z
-	view[16]   = 1
+	local side = vec3()
+		:cross(forward, up)
+		:normalize(side)
 
-	local out = mat4.mul(new(), mat4.translate(new(), -eye - forward),  view)
+	local new_up = vec3()
+		:cross(side, forward)
+		:normalize(new_up)
 
-	return mat4.mul(out, out, a)
+	identity(tmp)
+	local view = tmp
+
+	view[1]  =  side.x
+	view[5]  =  side.y
+	view[9]  =  side.z
+	view[2]  =  new_up.x
+	view[6]  =  new_up.y
+	view[10] =  new_up.z
+	view[3]  = -forward.x
+	view[7]  = -forward.y
+	view[11] = -forward.z
+
+	return out
+		:translate(-eye - forward)
+		:mul(out, view)
+		:mul(out, a)
 end
 
 function mat4.transpose(out, a)
@@ -490,8 +440,9 @@ end
 function mat4.project(obj, view, projection, viewport)
 	local position = { obj.x, obj.y, obj.z, 1 }
 
-	mat4.mul_mat4x1(position, mat4.transpose(mat4(), view), position)
-	mat4.mul_mat4x1(position, mat4.transpose(mat4(), projection), position)
+	identity(tmp)
+	mat4.mul_mat4x1(position, tmp:transpose(view),       position)
+	mat4.mul_mat4x1(position, tmp:transpose(projection), position)
 
 	position[1] = position[1] / position[4] * 0.5 + 0.5
 	position[2] = position[2] / position[4] * 0.5 + 0.5
@@ -507,10 +458,6 @@ end
 -- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L338
 -- Note: GLM calls the view matrix "model"
 function mat4.unproject(win, view, projection, viewport)
-	local inverse = mat4()
-	mat4.mul(inverse, view, projection)
-	mat4.invert(inverse, inverse)
-
 	local position = { win.x, win.y, win.z, 1 }
 
 	position[1] = (position[1] - viewport[1]) / viewport[3]
@@ -521,7 +468,9 @@ function mat4.unproject(win, view, projection, viewport)
 	position[3] = position[3] * 2 - 1
 	position[4] = position[4] * 2 - 1
 
-	mat4.mul_mat4x1(position, inverse, position)
+	identity(tmp)
+	tmp:mul(view, projection):invert(tmp)
+	mat4.mul_mat4x1(position, tmp, position)
 
 	position[1] = position[1] / position[4]
 	position[2] = position[2] / position[4]
@@ -566,17 +515,18 @@ function mat4.to_vec4s(a)
 end
 
 function mat4.to_quat(a)
-	local m = mat4.to_vec4s(mat4.transpose(out, a))
-	local w = sqrt(1 + m[1][1] + m[2][2] + m[3][3]) / 2
-	local scale = w * 4
+	identity(tmp):transpose(a)
 
-	local q = quat.new(
-		m[3][2] - m[2][3] / scale,
-		m[1][3] - m[3][1] / scale,
-		m[2][1] - m[1][2] / scale,
+	local w     = sqrt(1 + m[1] + m[6] + m[11]) / 2
+	local scale = w * 4
+	local q     = quat.new(
+		m[10] - m[7] / scale,
+		m[3]  - m[9] / scale,
+		m[5]  - m[2] / scale,
 		w
 	)
-	return quat.normalize(q, q)
+
+	return q:normalize(q)
 end
 
 local mat4_mt      = {}
@@ -588,7 +538,7 @@ function mat4_mt.__call(self, a)
 end
 
 function mat4_mt.__unm(a)
-	return mat4.invert(new(), a)
+	return new():invert(a)
 end
 
 function mat4_mt.__eq(a, b)
@@ -609,7 +559,7 @@ function mat4_mt.__mul(a, b)
 	assert(mat4.is_mat4(b) or #b == 4, "__mul: Wrong argument type for right hand operant. (<cpml.mat4> or table #4 expected)")
 
 	if mat4.is_mat4(b) then
-		return mat4.mul(new(), a, b)
+		return new():mul(a, b)
 	end
 
 	return mat4.mul_mat4x1({}, a, b)
