@@ -521,7 +521,7 @@ function mat4.unproject(win, view, projection, viewport)
 	position[3] = position[3] * 2 - 1
 	position[4] = position[4] * 2 - 1
 
-	mat4.mul_max4x1(position, inverse, position)
+	mat4.mul_mat4x1(position, inverse, position)
 
 	position[1] = position[1] / position[4]
 	position[2] = position[2] / position[4]
