@@ -8,7 +8,7 @@ describe("vec2:", function()
 		local a = vec2()
 		assert.is.equal(a.x, 0)
 		assert.is.equal(a.y, 0)
-		assert.is_true(vec2.isvec2(a))
+		assert.is_true(vec2.is_vec2(a))
 
 		-- new vector from table
 		local b = vec2 { 0, 0 }

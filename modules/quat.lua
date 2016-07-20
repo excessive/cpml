@@ -1,20 +1,22 @@
 --- A quaternion and associated utilities.
 -- @module quat
 
-local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
-
-local constants      = require(current_folder .. "constants")
-local vec3           = require(current_folder .. "vec3")
-
-local ffi            = require "ffi"
-local DOT_THRESHOLD  = constants.DOT_THRESHOLD
-local FLT_EPSILON    = constants.FLT_EPSILON
-
-local abs, acos, asin, atan2 = math.abs, math.acos, math.asin, math.atan2
-local cos, sin, min, max, pi = math.cos, math.sin, math.min, math.max, math.pi
-local sqrt = math.sqrt
-
-local quat = {}
+local modules       = (...):gsub('%.[^%.]+$', '') .. "."
+local constants     = require(modules .. "constants")
+local vec3          = require(modules .. "vec3")
+local DOT_THRESHOLD = constants.DOT_THRESHOLD
+local DBL_EPSILON   = constants.DBL_EPSILON
+local abs           = math.abs
+local acos          = math.acos
+local asin          = math.asin
+local atan2         = math.atan2
+local cos           = math.cos
+local sin           = math.sin
+local min           = math.min
+local max           = math.max
+local sqrt          = math.sqrt
+local pi            = math.pi
+local quat          = {}
 
 -- Private constructor.
 local function new(x, y, z, w)
@@ -22,6 +24,9 @@ local function new(x, y, z, w)
 	q.x, q.y, q.z, q.w = x, y, z, w
 	return setmetatable(q, quat_mt)
 end
+
+quat.unit = new(0, 0, 0, 1)
+quat.zero = new(0, 0, 0, 0)
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
@@ -48,7 +53,7 @@ function quat.new(x, y, z, w)
 		assert(type(z) == "number", "new: Wrong argument type for z (<number> expected)")
 		assert(type(w) == "number", "new: Wrong argument type for w (<number> expected)")
 
-		return new(x, y. z, w)
+		return new(x, y, z, w)
 
 	-- {x=x, y=y, z=z, w=w} or {x, y, z, w}
 	elseif type(x) == "table" then
@@ -66,16 +71,14 @@ function quat.new(x, y, z, w)
 end
 
 --- Create a quaternion from an axis, angle pair.
--- @tparam vec3 axis
 -- @tparam number angle
+-- @tparam vec3 axis
 -- @treturn quat
-function quat.from_axis_angle(axis, angle)
+function quat.from_angle_axis(angle, axis)
 	local len = vec3.len(axis)
-
-	local s = sin(angle * 0.5)
-	local c = cos(angle * 0.5)
-
-	return quat.new(axis.x*s, axis.y*s, axis.z*s, c)
+	local s   = sin(angle * 0.5)
+	local c   = cos(angle * 0.5)
+	return new(axis.x * s, axis.y * s, axis.z * s, c)
 end
 
 --- Create a quaternion from a normalized, up vector pair.
@@ -83,17 +86,16 @@ end
 -- @tparam vec3 up
 -- @treturn quat
 function quat.from_direction(normal, up)
+	local a = vec3.cross(vec3(), up, normal)
 	local d = vec3.dot(up, normal)
-	local a = vec3()
-	vec3.cross(a, up, normal)
-	return quat.new(a.x, a.y, a.z, d+1)
+	return new(a.x, a.y, a.z, d + 1)
 end
 
 --- Clone a quaternion.
 -- @tparam quat a
 -- @treturn quat clone
 function quat.clone(a)
-	new(a.x, a.y, a.z, a.w)
+	return new(a.x, a.y, a.z, a.w)
 end
 
 --- Component-wise add a quaternion.
@@ -148,6 +150,7 @@ function quat.mul_vec3(out, a, b)
 	vec3.add(out, out, uuv)
 	vec3.mul(out, out, 2)
 	vec3.add(out, b, out)
+	return out
 end
 
 --- Pow a quaternion by an exponent
@@ -178,6 +181,38 @@ function quat.pow(out, a, n)
 	return out
 end
 
+--- Normalize a quaternion.
+-- @tparam quat out
+-- @tparam quat a
+-- @treturn quat out
+function quat.normalize(out, a)
+	local l = 1 / quat.len(a)
+	quat.scale(out, a, l)
+	return out
+end
+
+--- Return the inner angle between two quaternions.
+-- @tparam quat a
+-- @tparam quat b
+-- @treturn number angle
+function quat.dot(a, b)
+	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
+end
+
+--- Return the length of a quaternion.
+-- @tparam quat a
+-- @treturn number len
+function quat.len(a)
+	return sqrt(a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w)
+end
+
+--- Return the squared length of a quaternion.
+-- @tparam quat a
+-- @treturn number len
+function quat.len2(a)
+	return a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w
+end
+
 --- Component-wise scale a quaternion by a scalar.
 -- @tparam quat out
 -- @tparam quat a
@@ -199,7 +234,7 @@ function quat.conjugate(out, a)
 	out.x = -a.x
 	out.y = -a.y
 	out.z = -a.z
-	out.w = a.w
+	out.w =  a.w
 	return out
 end
 
@@ -218,6 +253,7 @@ end
 -- @tparam quat a
 -- @treturn quat out
 function quat.reciprocal(out, a)
+	assert(not quat.is_zer(a), "Cannot reciprocate a zero quaternion")
 	local l = quat.len2(a)
 	quat.conjugate(out, a)
 	quat.scale(out, out, 1 / l)
@@ -270,20 +306,10 @@ function quat.slerp(out, a, b, s)
 	return out
 end
 
---- Normalize a quaternion.
--- @tparam quat out
--- @tparam quat a
--- @treturn quat out
-function quat.normalize(out, a)
-	local l = 1 / quat.len(a)
-	quat.scale(out, a, l)
-	return out
-end
-
 --- Return the imaginary part of the quaternion as a vec3.
 -- @tparam vec3 out
 -- @tparam quat a
--- @treturn quat out
+-- @treturn vec3 out
 function quat.imaginary(out, a)
 	out.x = a.x
 	out.y = a.y
@@ -298,28 +324,6 @@ function quat.real(a)
 	return a.w
 end
 
---- Return the inner angle between two quaternions.
--- @tparam quat a
--- @tparam quat b
--- @treturn number angle
-function quat.dot(a, b)
-	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
-end
-
---- Return the length of a quaternion.
--- @tparam quat a
--- @treturn number len
-function quat.len(a)
-	return sqrt(a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w)
-end
-
---- Return the squared length of a quaternion.
--- @tparam quat a
--- @treturn number len
-function quat.len2(a)
-	return a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w
-end
-
 --- Unpack a quaternion into form x,y,z,w.
 -- @tparam quat a
 -- @treturn number x
@@ -330,17 +334,46 @@ function quat.unpack(a)
 	return a.x, a.y, a.z, a.w
 end
 
+function quat.to_angle_axis(a)
+	if a.w > 1 or a.w < -1 then
+		a = quat.normalize(a, a)
+	end
+
+	local angle = 2 * acos(a.w)
+	local s     = sqrt(1 - a.w * a.w)
+	local x, y, z
+
+	if s < constants.DBL_EPSILON then
+		x = a.x
+		y = a.y
+		z = a.z
+	else
+		x = a.x / s -- normalize axis
+		y = a.y / s
+		z = a.z / s
+	end
+
+	return angle, vec3(x, y, z)
+end
+
+function quat.to_vec3(out, a)
+	out.x = a.x
+	out.y = a.y
+	out.z = a.z
+	return out
+end
+
 --- Return a string formatted "{x, y, z, w}"
 -- @tparam quat a
 -- @treturn string
-function quat.tostring(a)
+function quat.to_string(a)
 	return string.format("(%+0.3f,%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z, a.w)
 end
 
 --- Return a boolean showing if a table is or is not a quat
 -- @param q object to be tested
 -- @treturn boolean
-function quat.isquat(q)
+function quat.is_quat(q)
 	return
 		(
 			type(v) == "table"  or
@@ -352,67 +385,74 @@ function quat.isquat(q)
 		type(v.w) == "number"
 end
 
-local quat_mt = {}
+function quat.is_zero(a)
+	return
+		a.x == 0 and
+		a.y == 0 and
+		a.z == 0 and
+		a.w == 0
+end
 
-quat_mt.__index = quat
-quat_mt.__tostring = quat.tostring
+function quat.is_real(a)
+	return
+		a.x == 0 and
+		a.y == 0 and
+		a.z == 0
+end
 
-function quat_mt.__call(self, x, y, z)
-	return quat.new(x, y, z, w)
+function quat.is_imaginary(a)
+	return a.w == 0
+end
+
+local quat_mt      = {}
+quat_mt.__index    = quat
+quat_mt.__tostring = quat.to_string
+
+function quat_mt.__call(self, x, y, z, w)
+	return new(x, y, z, w)
 end
 
 function quat_mt.__unm(a)
-	local temp = quat.new()
-	quat.scale(temp, a, -1)
-	return temp
+	return quat.scale(new(), a, -1)
 end
 
 function quat_mt.__eq(a,b)
-	assert(quat.isquat(a), "__eq: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b), "__eq: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(a), "__eq: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(b), "__eq: Wrong argument type for right hand operant. (<cpml.quat> expected)")
 	return a.x == b.x and a.y == b.y and a.z == b.z and a.w == b.w
 end
 
 function quat_mt.__add(a, b)
-	assert(quat.isquat(a), "__add: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b), "__add: Wrong argument type for right hand operant. (<cpml.quat> expected)")
-
-	local temp = quat.new()
-	quat.add(temp, a, b)
-	return temp
+	assert(quat.is_quat(a), "__add: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(b), "__add: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	return quat.add(new(), a, b)
 end
 
 function quat_mt.__sub(a, b)
-	assert(quat.isquat(a), "__sub: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b), "__sub: Wrong argument type for right hand operant. (<cpml.quat> expected)")
-
-	local temp = quat.new()
-	quat.sub(temp, a, b)
-	return temp
+	assert(quat.is_quat(a), "__sub: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(b), "__sub: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	return quat.sub(new(), a, b)
 end
 
 function quat_mt.__mul(a, b)
-	assert(quat.isquat(a), "__mul: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.isquat(b) or vec3.isvec3(b), "__mul: Wrong argument type for right hand operant. (<cpml.quat> or <cpml.vec3> expected)")
+	assert(quat.is_quat(a), "__mul: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(b) or vec3.is_vec3(b) or type(b) = "number", "__mul: Wrong argument type for right hand operant. (<cpml.quat> or <cpml.vec3> expected)")
 
-	if quat.isquat(b) then
-		local temp = quat.new()
-		quat.mul(temp, a, b)
-		return temp
-	elseif vec3.isvec3(b) then
-		local temp = vec3()
-		quat.mul_vec3(temp, a, b)
-		return temp
+	if quat.is_quat(b) then
+		return quat.mul(new(), a, b)
 	end
+
+	if type(b) == "number" then
+		return quat.scale(new(), a, b)
+	end
+
+	return quat.mul_vec3(vec3(), a, b)
 end
 
 function quat_mt.__pow(a, n)
-	assert(quat.isquat(a), "__pow: Wrong argument type for left hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(a), "__pow: Wrong argument type for left hand operant. (<cpml.quat> expected)")
 	assert(type(b) == "number", "__pow: Wrong argument type for right hand operant. (<number> expected)")
-
-	local temp = quat.new()
-	quat.pow(temp, a, n)
-	return temp
+	return quat.pow(new(), a, n)
 end
 
 if status then

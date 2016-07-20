@@ -9,7 +9,7 @@ describe("vec3:", function()
 		assert.is.equal(a.x, 0)
 		assert.is.equal(a.y, 0)
 		assert.is.equal(a.z, 0)
-		assert.is_true(vec3.isvec3(a))
+		assert.is_true(vec3.is_vec3(a))
 
 		-- new vector from table
 		local b = vec3 { 0, 0, 0 }

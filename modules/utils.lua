@@ -1,15 +1,25 @@
 --- Various utility functions
 -- @module utils
 
-local utils = {}
+local modules = (...): gsub('%.[^%.]+$', '') .. "."
+local vec2    = require(modules .. "vec2")
+local vec3    = require(modules .. "vec3")
+local atan2   = math.atan2
+local acos    = math.acos
+local sqrt    = math.sqrt
+local abs     = math.abs
+local ceil    = math.ceil
+local floor   = math.floor
+local log     = math.log
+local utils   = {}
 
 -- reimplementation of math.frexp, due to its removal from Lua 5.3 :(
 -- courtesy of airstruck
-local log2 = math.log(2)
+local log2 = log(2)
 
 local frexp = math.frexp or function(x)
 	if x == 0 then return 0, 0 end
-	local e = math.floor(math.log(math.abs(x)) / log2 + 1)
+	local e = floor(log(abs(x)) / log2 + 1)
 	return x / 2 ^ e, e
 end
 
@@ -27,7 +37,7 @@ end
 -- @param size
 -- @return number
 function utils.deadzone(value, size)
-	return math.abs(value) >= size and value or 0
+	return abs(value) >= size and value or 0
 end
 
 --- Check if value is equal or greater than threshold.
@@ -36,7 +46,7 @@ end
 -- @return boolean
 function utils.threshold(value, threshold)
 	-- I know, it barely saves any typing at all.
-	return math.abs(value) >= threshold
+	return abs(value) >= threshold
 end
 
 --- Scales a value from one range to another.
@@ -79,7 +89,7 @@ end
 -- @return number
 function utils.round(value, precision)
 	if precision then return utils.round(value / precision) * precision end
-	return value >= 0 and math.floor(value+0.5) or math.ceil(value-0.5)
+	return value >= 0 and floor(value+0.5) or ceil(value-0.5)
 end
 
 --- Wrap `value` around if it exceeds `limit`.
@@ -102,6 +112,89 @@ function utils.is_pot(value)
 	-- found here: https://love2d.org/forums/viewtopic.php?p=182219#p182219
 	-- check if a number is a power-of-two
 	return (frexp(value)) == 0.5
+end
+
+-- Originally from vec3
+function utils.project_on(out, a, b)
+	local isvec3 = vec3.is_vec3(out)
+	local s =
+		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0) /
+		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0)
+
+	out.x   = b.x * s
+	out.y   = b.y * s
+	out.z   = isvec3 and b.z * s or nil
+
+	return out
+end
+
+-- Originally from vec3
+function utils.project_from(out, a, b)
+	local isvec3 = vec3.is_vec3(out)
+	local s =
+		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0) /
+		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0)
+
+	out.x   = b.x * s
+	out.y   = b.y * s
+	out.z   = isvec3 and b.z * s or nil
+
+	return out
+end
+
+-- Originally from vec3
+function utils.mirror_on(out, a, b)
+	local isvec3 = vec3.is_vec3(out)
+	local s =
+		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0) /
+		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0) * 2
+	out.x   = b.x * s - a.x
+	out.y   = b.y * s - a.y
+	out.z   = isvec3 and b.z * s - a.z or nil
+	return out
+end
+
+-- Originally from vec3
+function utils.reflect(out, i, n)
+	vec3.mul(out, n, vec3.dot(n, i) * 2)
+	vec3.sub(out, i, out)
+	return out
+end
+
+-- Originally from vec3
+function utils.refract(out, i, n, ior)
+	local d = vec3.dot(n, i)
+	local k = 1 - ior * ior * (1 - d * d)
+
+	if k >= 0 then
+		vec3.mul(out, i, ior)
+		vec3.mul(tmp, n, ior * d + sqrt(k))
+		vec3.sub(out, out, tmp)
+	end
+
+	return out
+end
+
+-- Originally from vec3
+function utils.angle_to(a, b)
+	if b then
+		return atan2(a.y - b.y, a.x - b.x)
+	end
+
+	return atan2(a.y, a.x)
+end
+
+-- Originally from vec3
+function utils.angle_between(a, b)
+	if b then
+		if vec2.is_vec2(a) then
+			return acos(vec2.dot(a, b) / (vec2.len(a) * vec2.len(b)))
+		end
+
+		return acos(vec3.dot(a, b) / (vec3.len(a) * vec3.len(b)))
+	end
+
+	return 0
 end
 
 return utils

@@ -5,7 +5,6 @@ local atan2 = math.atan2
 local sqrt  = math.sqrt
 local cos   = math.cos
 local sin   = math.sin
-local pi    = math.pi
 local vec2  = {}
 
 -- Private constructor.
@@ -14,6 +13,10 @@ local function new(x, y)
 	v.x, v.y = x, y
 	return setmetatable(v, vec2_mt)
 end
+
+vec2.unit_x = new(1, 0)
+vec2.unit_y = new(0, 1)
+vec2.zero   = new(0, 0)
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
@@ -53,6 +56,17 @@ function vec2.new(x, y)
 	else
 		return new(0, 0)
 	end
+end
+
+--- Convert point from polar to cartesian.
+-- @tparam vec2 out vector for result to be stored in
+-- @tparam number radius radius of the point
+-- @tparam number theta angle of the point (in radians)
+-- @treturn vec2
+function vec2.from_cartesian(out, radius, theta)
+	out.x = radius * cos(theta)
+	out.y = radius * sin(theta)
+	return out
 end
 
 --- Clone a vector.
@@ -173,6 +187,19 @@ function vec2.dist2(a, b)
 	return dx * dx + dy * dy
 end
 
+function vec2.rotate(out, a, phi)
+	local c, s = cos(phi), sin(phi)
+	out.x      = c * a.x - s * a.y
+	out.y      = s * a.x + c * a.y
+	return out
+end
+
+function vec2.perpendicular(out, a)
+	out.x = -a.y
+	out.y =  a.x
+	return out
+end
+
 --- Lerp between two vectors.
 -- @tparam vec2 out vector for result to be stored in
 -- @tparam vec2 a first vector
@@ -194,17 +221,10 @@ function vec2.unpack(a)
 	return a.x, a.y
 end
 
---- Return a string formatted "{x, y}"
--- @tparam vec2 a the vector to be turned into a string
--- @treturn string
-function vec2.tostring(a)
-	return string.format("(%+0.3f,%+0.3f)", a.x, a.y)
-end
-
 --- Return a boolean showing if a table is or is not a vec2
 -- @param v the object to be tested
 -- @treturn boolean
-function vec2.isvec2(v)
+function vec2.is_vec2(v)
 	return
 		(
 			type(v) == "table" or
@@ -214,17 +234,6 @@ function vec2.isvec2(v)
 		type(v.y) == "number"
 end
 
---- Convert point from polar to cartesian.
--- @tparam vec2 out vector for result to be stored in
--- @tparam number radius radius of the point
--- @tparam number theta angle of the point (in radians)
--- @treturn vec2
-function vec2.to_cartesian(out, radius, theta)
-	out.x = radius * cos(theta)
-	out.y = radius * sin(theta)
-	return out
-end
-
 --- Convert point from cartesian to polar.
 -- @tparam vec2 a vector to convert
 -- @treturn number radius
@@ -232,21 +241,23 @@ end
 function vec2.to_polar(a)
 	local radius = sqrt(a.x^2 + a.y^2)
 	local theta  = atan2(a.y, a.x)
-	theta = theta > 0 and theta or theta + 2 * pi
+	theta = theta > 0 and theta or theta + 2 * math.pi
 	return radius, theta
 end
 
-local vec2_mt = {}
+--- Return a string formatted "{x, y}"
+-- @tparam vec2 a the vector to be turned into a string
+-- @treturn string
+function vec2.to_string(a)
+	return string.format("(%+0.3f,%+0.3f)", a.x, a.y)
+end
 
-vec2_mt.__index = vec2
-vec2_mt.__tostring = vec2.tostring
+local vec2_mt      = {}
+vec2_mt.__index    = vec2
+vec2_mt.__tostring = vec2.to_string
 
 function vec2_mt.__call(self, x, y)
 	return vec2.new(x, y)
-end
-
-function vec2_mt.__tostring(a)
-	return vec2.tostring(a)
 end
 
 function vec2_mt.__unm(a)
@@ -254,48 +265,34 @@ function vec2_mt.__unm(a)
 end
 
 function vec2_mt.__eq(a,b)
-	assert(vec2.isvec2(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.isvec2(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
-
+	assert(vec2.is_vec2(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 	return a.x == b.x and a.y == b.y
 end
 
 function vec2_mt.__add(a, b)
-	assert(vec2.isvec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.isvec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
-
+	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 	return vec2.add(new(), a, b)
 end
 
 function vec2_mt.__sub(a, b)
-	assert(vec2.isvec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.isvec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
-
+	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 	return vec2.sub(new(), a, b)
 end
 
 function vec2_mt.__mul(a, b)
-	local isvecb = vec2.isvec2(b)
-	a, b = isvecb and b or a, isvecb and a or b
-
-	assert(vec2.isvec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
-
 	return vec2.mul(new(), a, b)
 end
 
 function vec2_mt.__div(a, b)
-	local isvecb = vec2.isvec2(b)
-	a, b = isvecb and b or a, isvecb and a or b
-
-	assert(vec2.isvec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
-
 	return vec2.div(new(), a, b)
 end
-
-vec2.unit_x = new(1, 0)
-vec2.unit_y = new(0, 1)
 
 if status then
 	ffi.metatype(new, vec2_mt)

@@ -77,7 +77,7 @@ function mat4.identity()
 	}
 end
 
-function mat4.from_axis_angle(angle, axis)
+function mat4.from_angle_axis(angle, axis)
 	if type(angle) == "table" then
 		angle, axis = vec3.to_angle_axis(angle)
 	end
@@ -119,6 +119,39 @@ function mat4.from_direction(direction, up)
 	return out
 end
 
+function mat4.from_transform(trans, rot, scale)
+	local angle, axis = vec3.to_angle_axis(rot)
+	local l = vec3.len(axis)
+
+	if l == 0 then
+		return new()
+	end
+
+	local x, y, z = axis.x / l, axis.y / l, axis.z / l
+	local c = cos(angle)
+	local s = sin(angle)
+
+	return new {
+		x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
+		x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0,
+		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0,
+		trans.x, trans.y, trans.z, 1
+	}
+end
+
+function mat4.from_ortho(left, right, top, bottom, near, far)
+	local out = new()
+	out[1]    =  2 / (right - left)
+	out[6]    =  2 / (top - bottom)
+	out[11]   = -2 / (far - near)
+	out[13]   = -((right + left) / (right - left))
+	out[14]   = -((top + bottom) / (top - bottom))
+	out[15]   = -((far + near) / (far - near))
+	out[16]   =  1
+
+	return out
+end
+
 function mat4.from_perspective(fovy, aspect, near, far)
 	assert(aspect ~= 0)
 	assert(near   ~= far)
@@ -130,19 +163,6 @@ function mat4.from_perspective(fovy, aspect, near, far)
 	out[11]   = -(far + near) / (far - near)
 	out[12]   = -1
 	out[15]   = -(2 * far * near) / (far - near)
-	out[16]   =  1
-
-	return out
-end
-
-function mat4.from_ortho(left, right, top, bottom, near, far)
-	local out = new()
-	out[1]    =  2 / (right - left)
-	out[6]    =  2 / (top - bottom)
-	out[11]   = -2 / (far - near)
-	out[13]   = -((right + left) / (right - left))
-	out[14]   = -((top + bottom) / (top - bottom))
-	out[15]   = -((far + near) / (far - near))
 	out[16]   =  1
 
 	return out
@@ -236,14 +256,14 @@ function mat4.clone(a)
 end
 
 function mat4.mul(out, a, b)
-	out[1]  = a[1]  * b[1] + a[2]  * b[5] + a [3] * b[9]  + a[4]  * b[13]
-	out[2]  = a[1]  * b[2] + a[2]  * b[6] + a [3] * b[10] + a[4]  * b[14]
-	out[3]  = a[1]  * b[3] + a[2]  * b[7] + a [3] * b[11] + a[4]  * b[15]
-	out[4]  = a[1]  * b[4] + a[2]  * b[8] + a [3] * b[12] + a[4]  * b[16]
-	out[5]  = a[5]  * b[1] + a[6]  * b[5] + a [7] * b[9]  + a[8]  * b[13]
-	out[6]  = a[5]  * b[2] + a[6]  * b[6] + a [7] * b[10] + a[8]  * b[14]
-	out[7]  = a[5]  * b[3] + a[6]  * b[7] + a [7] * b[11] + a[8]  * b[15]
-	out[8]  = a[5]  * b[4] + a[6]  * b[8] + a [7] * b[12] + a[8]  * b[16]
+	out[1]  = a[1]  * b[1] + a[2]  * b[5] + a[3]  * b[9]  + a[4]  * b[13]
+	out[2]  = a[1]  * b[2] + a[2]  * b[6] + a[3]  * b[10] + a[4]  * b[14]
+	out[3]  = a[1]  * b[3] + a[2]  * b[7] + a[3]  * b[11] + a[4]  * b[15]
+	out[4]  = a[1]  * b[4] + a[2]  * b[8] + a[3]  * b[12] + a[4]  * b[16]
+	out[5]  = a[5]  * b[1] + a[6]  * b[5] + a[7]  * b[9]  + a[8]  * b[13]
+	out[6]  = a[5]  * b[2] + a[6]  * b[6] + a[7]  * b[10] + a[8]  * b[14]
+	out[7]  = a[5]  * b[3] + a[6]  * b[7] + a[7]  * b[11] + a[8]  * b[15]
+	out[8]  = a[5]  * b[4] + a[6]  * b[8] + a[7]  * b[12] + a[8]  * b[16]
 	out[9]  = a[9]  * b[1] + a[10] * b[5] + a[11] * b[9]  + a[12] * b[13]
 	out[10] = a[9]  * b[2] + a[10] * b[6] + a[11] * b[10] + a[12] * b[14]
 	out[11] = a[9]  * b[3] + a[10] * b[7] + a[11] * b[11] + a[12] * b[15]
@@ -252,6 +272,15 @@ function mat4.mul(out, a, b)
 	out[14] = a[13] * b[2] + a[14] * b[6] + a[15] * b[10] + a[16] * b[14]
 	out[15] = a[13] * b[3] + a[14] * b[7] + a[15] * b[11] + a[16] * b[15]
 	out[16] = a[13] * b[4] + a[14] * b[8] + a[15] * b[12] + a[16] * b[16]
+
+	return out
+end
+
+function mat4.mul_mat41(out, a, b)
+	out[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
+	out[2] = b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14]
+	out[3] = b[1] * a[3] + b[2] * a[7] + b [3] * a[11] + b[4] * a[15]
+	out[4] = b[1] * a[4] + b[2] * a[8] + b [3] * a[12] + b[4] * a[16]
 
 	return out
 end
@@ -350,26 +379,6 @@ function mat4.invert(out, a)
 	return out
 end
 
-function mat4.compose_world_matrix(t, rot, scale)
-	local angle, axis = vec3.to_angle_axis(rot)
-	local l = vec3.len(axis)
-
-	if l == 0 then
-		return new()
-	end
-
-	local x, y, z = axis.x / l, axis.y / l, axis.z / l
-	local c = cos(angle)
-	local s = sin(angle)
-
-	return new {
-		x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
-		x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0,
-		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0,
-		t.x, t.y, t.z, 1
-	}
-end
-
 function mat4.scale(out, a, s)
 	local m = new {
 		s.x, 0, 0, 0,
@@ -395,7 +404,7 @@ function mat4.rotate(out, a, angle, axis)
 	local x, y, z = axis.x / l, axis.y / l, axis.z / l
 	local c = cos(angle)
 	local s = sin(angle)
-	local m = {
+	local m = new {
 		x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
 		x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0,
 		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0,
@@ -423,7 +432,7 @@ function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	local zy = zy or 0
 	local xz = xz or 0
 	local yz = yz or 0
-	local m  = {
+	local m  = new {
 		1, yx, zx, 0,
 		xy, 1, zy, 0,
 		xz, yz, 1, 0,
@@ -476,10 +485,69 @@ function mat4.transpose(out, a)
 	return out
 end
 
-function mat4.tostring()
+-- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L317
+-- Note: GLM calls the view matrix "model"
+function mat4.project(obj, view, projection, viewport)
+	local position = { obj.x, obj.y, obj.z, 1 }
+
+	position = mat4.mul(position, mat4.transpose(mat4(), view))
+	position = mat4.mul(position, mat4.transpose(mat4(), projection))
+
+	position[1] = position[1] / position[4] * 0.5 + 0.5
+	position[2] = position[2] / position[4] * 0.5 + 0.5
+	position[3] = position[3] / position[4] * 0.5 + 0.5
+	position[4] = position[4] / position[4] * 0.5 + 0.5
+
+	position[1] = position[1] * viewport[3] + viewport[1]
+	position[2] = position[2] * viewport[4] + viewport[2]
+
+	return vec3(position[1], position[2], position[3])
+end
+
+-- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L338
+-- Note: GLM calls the view matrix "model"
+function mat4.unproject(win, view, projection, viewport)
+	local inverse = mat4()
+	mat4.mul(inverse, view, projection)
+	mat4.invert(inverse, inverse)
+
+	local position = { win.x, win.y, win.z, 1 }
+
+	position[1] = (position[1] - viewport[1]) / viewport[3]
+	position[2] = (position[2] - viewport[2]) / viewport[4]
+
+	position[1] = position[1] * 2 - 1
+	position[2] = position[2] * 2 - 1
+	position[3] = position[3] * 2 - 1
+	position[4] = position[4] * 2 - 1
+
+	mat4.mul(position, inverse, position)
+
+	position[1] = position[1] / position[4]
+	position[2] = position[2] / position[4]
+	position[3] = position[3] / position[4]
+
+	return vec3(position[1], position[2], position[3])
+end
+
+function mat4.is_mat4(a)
+	if not type(a) == "table" and not type(a) == "cdata" then
+		return false
+	end
+
+	for i = 1, 16 do
+		if type(a[i]) ~= "number" then
+			return false
+		end
+	end
+
+	return true
+end
+
+function mat4.to_string()
 	local str = "[ "
 	for i, v in ipairs(a) do
-		str = str .. string.format("%2.5f", v)
+		str = str .. string.format("%+0.3f", v)
 		if i < #a then
 			str = str .. ", "
 		end
@@ -488,30 +556,35 @@ function mat4.tostring()
 	return str
 end
 
+function mat4.to_vec4s(a)
+	return {
+		{ a[1],  a[2],  a[3],  a[4]  },
+		{ a[5],  a[6],  a[7],  a[8]  },
+		{ a[9],  a[10], a[11], a[12] },
+		{ a[13], a[14], a[15], a[16] }
+	}
+end
+
 function mat4.to_quat(a)
 	local m = mat4.to_vec4s(mat4.transpose(out, a))
-
 	local w = sqrt(1 + m[1][1] + m[2][2] + m[3][3]) / 2
 	local scale = w * 4
 
-	return quat.normalize(quat(), quat.new(
+	local q = quat.new(
 		m[3][2] - m[2][3] / scale,
 		m[1][3] - m[3][1] / scale,
 		m[2][1] - m[1][2] / scale,
 		w
-	))
+	)
+	return quat.normalize(q, q)
 end
 
 local mat4_mt      = {}
 mat4_mt.__index    = mat4
-mat4_mt.__tostring = mat4.tostring
+mat4_mt.__tostring = mat4.to_string
 
-function mat4_mt.__call(a)
+function mat4_mt.__call(self, a)
 	return mat4.new(a)
-end
-
-function mat4_mt.__tostring(a)
-	return mat4.tostring(a)
 end
 
 function mat4_mt.__unm(a)
@@ -519,8 +592,8 @@ function mat4_mt.__unm(a)
 end
 
 function mat4_mt.__eq(a, b)
-	assert(mat4.ismat4(a), "__eq: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
-	assert(mat4.ismat4(b), "__eq: Wrong argument type for right hand operant. (<cpml.mat4> expected)")
+	assert(mat4.is_mat4(a), "__eq: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
+	assert(mat4.is_mat4(b), "__eq: Wrong argument type for right hand operant. (<cpml.mat4> expected)")
 
 	for i = 1, 16 do
 		if a[i] ~= b[i] then
@@ -532,10 +605,14 @@ function mat4_mt.__eq(a, b)
 end
 
 function mat4_mt.__mul(a, b)
-	assert(mat4.ismat4(a), "__mul: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
-	assert(mat4.ismat4(b), "__mul: Wrong argument type for right hand operant. (<cpml.mat4> expected)")
+	assert(mat4.is_mat4(a), "__mul: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
+	assert(mat4.is_mat4(b) or #b == 4, "__mul: Wrong argument type for right hand operant. (<cpml.mat4> or table #4 expected)")
 
-	return mat4.mul(new(), a, b)
+	if mat4.is_mat4(b) then
+		return mat4.mul(new(), a, b)
+	end
+
+	return mat4.mul_mat41({}, a, b)
 end
 
 if status then

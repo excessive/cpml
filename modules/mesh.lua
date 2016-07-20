@@ -1,21 +1,25 @@
 --- Mesh utilities
 -- @module mesh
 
-local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
-local vec3 = require(current_folder .. "vec3")
-
-local mesh = {}
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local vec3    = require(modules .. "vec3")
+local mesh    = {}
 
 function mesh.compute_normal(a, b, c)
-	return (c - a):cross(b - a):normalize()
+	local out = vec3()
+	local ca  = vec3.sub(vec3(), c, a)
+	local ba  = vec3.sub(vec3(), b, a)
+	vec3.cross(out, ca, ba)
+	vec3.normalize(out, out)
+	return out
 end
 
 function mesh.average(vertices)
-	local avg = vec3(0,0,0)
+	local out = vec3(0, 0, 0)
 	for _, v in ipairs(vertices) do
-		avg = avg + v
+		vec3.add(out, out, v)
 	end
-	return avg / #vertices
+	return vec3.div(out, out, #vertices)
 end
 
 return mesh

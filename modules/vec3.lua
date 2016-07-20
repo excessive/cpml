@@ -11,6 +11,11 @@ local function new(x, y, z)
 	return setmetatable(v, vec3_mt)
 end
 
+vec3.unit_x = new(1, 0, 0)
+vec3.unit_y = new(0, 1, 0)
+vec3.unit_z = new(0, 0, 1)
+vec3.zero   = new(0, 0, 0)
+
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
 if type(jit) == "table" and jit.status() then
@@ -185,6 +190,36 @@ function vec3.dist2(a, b)
 	return dx * dx + dy * dy + dz * dz
 end
 
+--- Rotate vector about an axis.
+-- @param phi Amount to rotate, in radians
+-- @param axis Axis to rotate by
+-- @return vec3
+function vec3.rotate(out, a, phi, axis)
+	if not vec3.is_vec3(axis) then
+		return a
+	end
+
+	local u = vec3.normalize(vec3(), axis)
+	local c, s = cos(phi), sin(phi)
+
+	-- Calculate generalized rotation matrix
+	local m1 = new((c + u.x * u.x * (1 - c)),       (u.x * u.y * (1 - c) - u.z * s), (u.x * u.z * (1 - c) + u.y * s))
+	local m2 = new((u.y * u.x * (1 - c) + u.z * s), (c + u.y * u.y * (1 - c)),       (u.y * u.z * (1 - c) - u.x * s))
+	local m3 = new((u.z * u.x * (1 - c) - u.y * s), (u.z * u.y * (1 - c) + u.x * s), (c + u.z * u.z * (1 - c))      )
+
+	out.x = vec3.dot(a, m1)
+	out.y = vec3.dot(a, m2)
+	out.z = vec3.dot(a, m3)
+	return out
+end
+
+function vec3.perpendicular(out, a)
+	out.x = -a.y
+	out.y =  a.x
+	out.z =  0
+	return out
+end
+
 --- Lerp between two vectors.
 -- @tparam vec3 out vector for result to be stored in
 -- @tparam vec3 a first vector
@@ -207,57 +242,33 @@ function vec3.unpack(a)
 	return a.x, a.y, a.z
 end
 
---- Return a string formatted "{x, y, z}"
--- @tparam vec3 a the vector to be turned into a string
--- @treturn string
-function vec3.tostring(a)
-	return string.format("(%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z)
-end
-
 --- Return a boolean showing if a table is or is not a vec3
 -- @param v the object to be tested
 -- @treturn boolean
-function vec3.isvec3(v)
+function vec3.is_vec3(a)
 	return
 		(
-			type(v) == "table" or
-			type(v) == "cdata"
+			type(a) == "table" or
+			type(a) == "cdata"
 
 		) and
-		type(v.x) == "number" and
-		type(v.y) == "number" and
-		type(v.z) == "number"
+		type(a.x) == "number" and
+		type(a.y) == "number" and
+		type(a.z) == "number"
+end
+--- Return a string formatted "{x, y, z}"
+-- @tparam vec3 a the vector to be turned into a string
+-- @treturn string
+function vec3.to_string(a)
+	return string.format("(%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z)
 end
 
-function vec3.reflect(out, i, n)
-	vec3.mul(out, n, 2.0 * vec3.dot(n, i))
-	vec3.sub(out, i, out)
-	return out
-end
-
-function vec3.refract(out, i, n, ior)
-	local d = vec3.dot(n, i)
-	local k = 1.0 - ior * ior * (1.0 - d * d)
-	if k >= 0.0 then
-		vec3.mul(out, i, ior)
-		vec3.mul(tmp, n, ior * d + sqrt(k))
-		vec3.sub(out, out, tmp)
-	end
-
-	return out
-end
-
-local vec3_mt = {}
-
-vec3_mt.__index = vec3
-vec3_mt.__tostring = vec3.tostring
+local vec3_mt      = {}
+vec3_mt.__index    = vec3
+vec3_mt.__tostring = vec3.to_string
 
 function vec3_mt.__call(self, x, y, z)
 	return vec3.new(x, y, z)
-end
-
-function vec3_mt.__tostring(a)
-	return vec3.tostring(a)
 end
 
 function vec3_mt.__unm(a)
@@ -265,49 +276,34 @@ function vec3_mt.__unm(a)
 end
 
 function vec3_mt.__eq(a,b)
-	assert(vec3.isvec3(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.isvec3(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
-
+	assert(vec3.is_vec3(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 	return a.x == b.x and a.y == b.y and a.z == b.z
 end
 
 function vec3_mt.__add(a, b)
-	assert(vec3.isvec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.isvec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
-
+	assert(vec3.is_vec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 	return vec3.add(new(), a, b)
 end
 
 function vec3_mt.__sub(a, b)
-	assert(vec3.isvec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.isvec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
-
+	assert(vec3.is_vec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 	return vec3.sub(new(), a, b)
 end
 
 function vec3_mt.__mul(a, b)
-	local isvecb = vec3.isvec3(b)
-	a, b = isvecb and b or a, isvecb and a or b
-
-	assert(vec3.isvec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
-
 	return vec3.mul(new(), a, b)
 end
 
 function vec3_mt.__div(a, b)
-	local isvecb = vec3.isvec3(b)
-	a, b = isvecb and b or a, isvecb and a or b
-
-	assert(vec3.isvec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
-
 	return vec3.div(new(), a, b)
 end
-
-vec3.unit_x = new(1, 0, 0)
-vec3.unit_y = new(0, 1, 0)
-vec3.unit_z = new(0, 0, 1)
 
 if status then
 	ffi.metatype(new, vec3_mt)
