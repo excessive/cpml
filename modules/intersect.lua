@@ -115,7 +115,7 @@ end
 
 -- Algorithm is ported from the C algorithm of
 -- Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
--- Archive.org am hero \o/
+-- Archive.org am hero \o/ (https://web.archive.org/web/20120414063459/http://local.wasp.uwa.edu.au/~pbourke//geometry/lineline3d/)
 function intersect.line_line(p1, p2, p3, p4)
 	local epsilon = constants.FLT_EPSILON
 	local resultSegmentPoint1 = vec3(0,0,0)
