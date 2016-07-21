@@ -1,10 +1,11 @@
 --- A 3 component vector.
 -- @module vec3
 
-local sqrt = math.sqrt
-local cos  = math.cos
-local sin  = math.sin
-local vec3 = {}
+local sqrt    = math.sqrt
+local cos     = math.cos
+local sin     = math.sin
+local vec3    = {}
+local vec3_mt = {}
 
 -- Private constructor.
 local function new(x, y, z)
@@ -12,11 +13,6 @@ local function new(x, y, z)
 	v.x, v.y, v.z = x, y, z
 	return setmetatable(v, vec3_mt)
 end
-
-vec3.unit_x = new(1, 0, 0)
-vec3.unit_y = new(0, 1, 0)
-vec3.unit_z = new(0, 0, 1)
-vec3.zero   = new(0, 0, 0)
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
@@ -27,6 +23,11 @@ if type(jit) == "table" and jit.status() then
 		new = ffi.typeof("cpml_vec3")
 	end
 end
+
+vec3.unit_x = new(1, 0, 0)
+vec3.unit_y = new(0, 1, 0)
+vec3.unit_z = new(0, 0, 1)
+vec3.zero   = new(0, 0, 0)
 
 -- Statically allocate a temporary variable used in some of our functions.
 local tmp = new(0, 0, 0)
@@ -248,12 +249,12 @@ end
 -- @param v the object to be tested
 -- @treturn boolean
 function vec3.is_vec3(a)
-	return
-		(
-			type(a) == "table" or
-			type(a) == "cdata"
+	if type(a) == "cdata" then
+		return ffi.istype("cpml_vec3", a)
+	end
 
-		) and
+	return
+		type(a)   == "table"  and
 		type(a.x) == "number" and
 		type(a.y) == "number" and
 		type(a.z) == "number"
@@ -273,7 +274,6 @@ function vec3.to_string(a)
 	return string.format("(%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z)
 end
 
-local vec3_mt      = {}
 vec3_mt.__index    = vec3
 vec3_mt.__tostring = vec3.to_string
 

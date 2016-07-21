@@ -1,9 +1,10 @@
 --- Color utilities
 -- @module color
 
-local modules = (...):gsub('%.[^%.]+$', '') .. "."
-local utils   = require(modules .. "utils")
-local color   = {}
+local modules  = (...):gsub('%.[^%.]+$', '') .. "."
+local utils    = require(modules .. "utils")
+local color    = {}
+local color_mt = {}
 
 local function new(r, g, b, a)
 	return setmetatable({ r, g, b, a }, color)
@@ -258,7 +259,6 @@ function color.to_string(a)
 	return string.format("[ %3.0f, %3.0f, %3.0f, %3.0f ]", a[1], a[2], a[3], a[4])
 end
 
-local color_mt      = {}
 color_mt.__index    = color
 color_mt.__tostring = color.to_string
 

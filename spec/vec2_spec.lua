@@ -3,7 +3,7 @@ local DBL_EPSILON = require("modules.constants").DBL_EPSILON
 local abs, sqrt   = math.abs, math.sqrt
 
 describe("vec2:", function()
-	it("Test creating vectors", function()
+	it("tests creating vectors", function()
 		-- new empty vector
 		local a = vec2()
 		assert.is.equal(a.x, 0)
@@ -30,7 +30,7 @@ describe("vec2:", function()
 		assert.is.equal(d, e)
 	end)
 
-	it("Test basic operators", function()
+	it("tests basic operators", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
 		local s = 2
@@ -83,7 +83,7 @@ describe("vec2:", function()
 		end
 	end)
 
-	it("Test normal, trim, length", function()
+	it("tests normal, trim, length", function()
 		local a = vec2(3, 5)
 		local b = vec2():normalize(a)
 		local c = vec2():trim(a, 0.5)
@@ -94,7 +94,7 @@ describe("vec2:", function()
 		assert.is_true(abs(c:len()  - 0.5) < DBL_EPSILON)
 	end)
 
-	it("Test distance", function()
+	it("tests distance", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
 
@@ -111,7 +111,7 @@ describe("vec2:", function()
 		end
 	end)
 
-	it("Test cross product", function()
+	it("tests cross product", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
 		local c = a:cross(b)
@@ -119,7 +119,7 @@ describe("vec2:", function()
 		assert.is.equal(c, -23)
 	end)
 
-	it("Test dot product", function()
+	it("tests dot product", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
 		local c = a:dot(b)
@@ -127,7 +127,7 @@ describe("vec2:", function()
 		assert.is.equal(c, 41)
 	end)
 
-	it("Test lerp", function()
+	it("tests lerp", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
 		local s = 0.1
@@ -137,7 +137,7 @@ describe("vec2:", function()
 		assert.is.equal(c.y, 4.9)
 	end)
 
-	it("Test unpack", function()
+	it("tests unpack", function()
 		local a    = vec2(3, 5)
 		local x, y = a:unpack()
 

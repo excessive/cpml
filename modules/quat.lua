@@ -17,6 +17,7 @@ local max           = math.max
 local sqrt          = math.sqrt
 local pi            = math.pi
 local quat          = {}
+local quat_mt       = {}
 
 -- Private constructor.
 local function new(x, y, z, w)
@@ -24,9 +25,6 @@ local function new(x, y, z, w)
 	q.x, q.y, q.z, q.w = x, y, z, w
 	return setmetatable(q, quat_mt)
 end
-
-quat.unit = new(0, 0, 0, 1)
-quat.zero = new(0, 0, 0, 0)
 
 -- Statically allocate a temporary variable used in some of our functions.
 local tmp = new(0, 0, 0, 0)
@@ -269,7 +267,7 @@ end
 function quat.lerp(out, a, b, s)
 	return out
 		:sub(b, a)
-		:mul(out, s)
+		:scale(out, s)
 		:add(a, out)
 		:normalize(out)
 end
@@ -305,24 +303,6 @@ function quat.slerp(out, a, b, s)
 		:add(tmp, out)
 end
 
---- Return the imaginary part of the quaternion as a vec3.
--- @tparam vec3 out
--- @tparam quat a
--- @treturn vec3 out
-function quat.imaginary(out, a)
-	out.x = a.x
-	out.y = a.y
-	out.z = a.z
-	return out
-end
-
---- Return the real part of a quaternion.
--- @tparam quat a
--- @treturn number real
-function quat.real(a)
-	return a.w
-end
-
 --- Unpack a quaternion into form x,y,z,w.
 -- @tparam quat a
 -- @treturn number x
@@ -355,7 +335,8 @@ function quat.to_angle_axis(a)
 	return angle, vec3(x, y, z)
 end
 
-function quat.to_vec3(out, a)
+function quat.to_vec3(a)
+	local out = vec3()
 	out.x = a.x
 	out.y = a.y
 	out.z = a.z
@@ -373,11 +354,12 @@ end
 -- @param q object to be tested
 -- @treturn boolean
 function quat.is_quat(a)
+	if type(a) == "cdata" then
+		return ffi.istype("cpml_quat", a)
+	end
+
 	return
-		(
-			type(a) == "table"  or
-			type(a) == "cdata"
-		) and
+		type(a)   == "table"  and
 		type(a.x) == "number" and
 		type(a.y) == "number" and
 		type(a.z) == "number" and
@@ -403,12 +385,11 @@ function quat.is_imaginary(a)
 	return a.w == 0
 end
 
-local quat_mt      = {}
 quat_mt.__index    = quat
 quat_mt.__tostring = quat.to_string
 
 function quat_mt.__call(_, x, y, z, w)
-	return new(x, y, z, w)
+	return quat.new(x, y, z, w)
 end
 
 function quat_mt.__unm(a)
@@ -435,7 +416,7 @@ end
 
 function quat_mt.__mul(a, b)
 	assert(quat.is_quat(a), "__mul: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.is_quat(b) or vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.quat> or <cpml.vec3> expected)")
+	assert(quat.is_quat(b) or vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.quat> or <cpml.vec3> or <number> expected)")
 
 	if quat.is_quat(b) then
 		return new():mul(a, b)
@@ -450,12 +431,15 @@ end
 
 function quat_mt.__pow(a, n)
 	assert(quat.is_quat(a), "__pow: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(type(b) == "number", "__pow: Wrong argument type for right hand operant. (<number> expected)")
+	assert(type(n) == "number", "__pow: Wrong argument type for right hand operant. (<number> expected)")
 	return new():pow(a, n)
 end
 
 if status then
 	ffi.metatype(new, quat_mt)
 end
+
+quat.unit = new(0, 0, 0, 1)
+quat.zero = new(0, 0, 0, 0)
 
 return setmetatable({}, quat_mt)

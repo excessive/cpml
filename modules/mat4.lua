@@ -11,6 +11,7 @@ local sin       = math.sin
 local tan       = math.tan
 local rad       = math.rad
 local mat4      = {}
+local mat4_mt   = {}
 
 -- Private constructor.
 local function new(m)
@@ -480,7 +481,11 @@ function mat4.unproject(win, view, projection, viewport)
 end
 
 function mat4.is_mat4(a)
-	if not type(a) == "table" and not type(a) == "cdata" then
+	if type(a) == "cdata" then
+		return ffi.istype("cpml_mat4", a)
+	end
+
+	if type(a) ~= "table" then
 		return false
 	end
 
@@ -623,7 +628,6 @@ function mat4.to_frustum(a, infinite)
 	return frustum
 end
 
-local mat4_mt      = {}
 mat4_mt.__index    = mat4
 mat4_mt.__tostring = mat4.to_string
 

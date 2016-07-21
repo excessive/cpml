@@ -1,11 +1,12 @@
 --- A 2 component vector.
 -- @module vec2
 
-local atan2 = math.atan2
-local sqrt  = math.sqrt
-local cos   = math.cos
-local sin   = math.sin
-local vec2  = {}
+local atan2   = math.atan2
+local sqrt    = math.sqrt
+local cos     = math.cos
+local sin     = math.sin
+local vec2    = {}
+local vec2_mt = {}
 
 -- Private constructor.
 local function new(x, y)
@@ -13,10 +14,6 @@ local function new(x, y)
 	v.x, v.y = x, y
 	return setmetatable(v, vec2_mt)
 end
-
-vec2.unit_x = new(1, 0)
-vec2.unit_y = new(0, 1)
-vec2.zero   = new(0, 0)
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
@@ -27,6 +24,10 @@ if type(jit) == "table" and jit.status() then
 		new = ffi.typeof("cpml_vec2")
 	end
 end
+
+vec2.unit_x = new(1, 0)
+vec2.unit_y = new(0, 1)
+vec2.zero   = new(0, 0)
 
 --- The public constructor.
 -- @param x Can be of three types: </br>
@@ -222,11 +223,12 @@ end
 -- @param v the object to be tested
 -- @treturn boolean
 function vec2.is_vec2(a)
+	if type(a) == "cdata" then
+		return ffi.istype("cpml_vec2", a)
+	end
+
 	return
-		(
-			type(a) == "table" or
-			type(a) == "cdata"
-		)  and
+		type(a)   == "table"  and
 		type(a.x) == "number" and
 		type(a.y) == "number"
 end
@@ -253,7 +255,6 @@ function vec2.to_string(a)
 	return string.format("(%+0.3f,%+0.3f)", a.x, a.y)
 end
 
-local vec2_mt      = {}
 vec2_mt.__index    = vec2
 vec2_mt.__tostring = vec2.to_string
 
