@@ -1,102 +1,15 @@
 --- Color utilities
 -- @module color
 
-local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
-local utils = require(current_folder .. "utils")
-local color = {}
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local utils   = require(modules .. "utils")
+local color   = {}
+
 local function new(r, g, b, a)
-	return setmetatable({
-		r, g, b, a
-		-- utils.clamp(r or 0, 0, 255),
-		-- utils.clamp(g or 0, 0, 255),
-		-- utils.clamp(b or 0, 0, 255),
-		-- utils.clamp(a or 255, 0, 255)
-	}, color)
-end
-color.__index = color
-color.__call = function(_, ...) return new(...) end
-
-function color.invert(c)
-	return new(255 - c[1], 255 - c[2], 255 - c[3], c[4])
-end
-
-function color.lighten(c, v)
-	return new(
-		utils.clamp(c[1] + v * 255, 0, 255),
-		utils.clamp(c[2] + v * 255, 0, 255),
-		utils.clamp(c[3] + v * 255, 0, 255),
-		c[4]
-	)
-end
-
-function color.__tostring(a)
-	return string.format("[ %3.0f, %3.0f, %3.0f, %3.0f ]", a[1], a[2], a[3], a[4])
-end
-
-function color.__add(a, b)
-	return new(a[1] + b[1], a[2] + b[2], a[3] + b[3], a[4] + b[4])
-end
-
-function color.__sub(a, b)
-	return new(a[1] - b[1], a[2] - b[2], a[3] - b[3], a[4] - b[4])
-end
-
-function color.__mul(a, b)
-	if type(a) == "number" then
-		return new(a * b[1], a * b[2], a * b[3], a * b[4])
-	elseif type(b) == "number" then
-		return new(b * a[1], b * a[2], b * a[3], b * a[4])
-	else
-		return new(a[1] * b[1], a[2] * b[2], a[3] * b[3], a[4] * b[4])
-	end
-end
-
-function color.lerp(a, b, s)
-	return a + s * (b - a)
-end
-
-function color.darken(c, v)
-	return new(
-		utils.clamp(c[1] - v * 255, 0, 255),
-		utils.clamp(c[2] - v * 255, 0, 255),
-		utils.clamp(c[3] - v * 255, 0, 255),
-		c[4]
-	)
-end
-
-function color.mul(c, v)
-	local t = {}
-	for i=1,3 do
-		t[i] = c[i] * v
-	end
-	t[4] = c[4]
-	setmetatable(t, color)
-	return t
-end
-
--- directly set alpha channel
-function color.alpha(c, v)
-	local t = {}
-	for i=1,3 do
-		t[i] = c[i]
-	end
-	t[4] = v * 255
-	setmetatable(t, color)
-	return t
-end
-
-function color.opacity(c, v)
-	local t = {}
-	for i=1,3 do
-		t[i] = c[i]
-	end
-	t[4] = c[4] * v
-	setmetatable(t, color)
-	return t
+	return setmetatable({ r, g, b, a }, color)
 end
 
 -- HSV utilities (adapted from http://www.cs.rit.edu/~ncs/color/t_convert.html)
-
 -- hsv_to_color(hsv)
 -- Converts a set of HSV values to a color. hsv is a table.
 -- See also: hsv(h, s, v)
@@ -121,21 +34,13 @@ local function hsv_to_color(hsv)
 	q = v * (1-s*f)
 	t = v * (1-s*(1-f))
 
-	if i == 0 then     return new(v, t, p, a)
+	if     i == 0 then return new(v, t, p, a)
 	elseif i == 1 then return new(q, v, p, a)
 	elseif i == 2 then return new(p, v, t, a)
 	elseif i == 3 then return new(p, q, v, a)
 	elseif i == 4 then return new(t, p, v, a)
 	else               return new(v, p, q, a)
 	end
-end
-
-function color.from_hsv(h, s, v)
-	return hsv_to_color { h, s, v, 255 }
-end
-
-function color.from_hsva(h, s, v, a)
-	return hsv_to_color { h, s, v, a }
 end
 
 -- color_to_hsv(c)
@@ -187,9 +92,99 @@ local function color_to_hsv(c)
 	return { h, s, v, a }
 end
 
-function color.hue(color, newHue)
+function color.new(r, g, b, a)
+	-- number, number, number, number
+	if r and g and b and a then
+		assert(type(r) == "number", "new: Wrong argument type for r (<number> expected)")
+		assert(type(g) == "number", "new: Wrong argument type for g (<number> expected)")
+		assert(type(b) == "number", "new: Wrong argument type for b (<number> expected)")
+		assert(type(a) == "number", "new: Wrong argument type for a (<number> expected)")
+
+		return new(r, g, b, a)
+	end
+
+	-- {x, y, z, w}
+	elseif type(x) == "table" then
+		local r, g, b, a = r[1], r[2], r[3], r[4]
+		assert(type(r) == "number", "new: Wrong argument type for r (<number> expected)")
+		assert(type(g) == "number", "new: Wrong argument type for g (<number> expected)")
+		assert(type(b) == "number", "new: Wrong argument type for b (<number> expected)")
+		assert(type(a) == "number", "new: Wrong argument type for a (<number> expected)")
+
+		return new(r, g, b, a)
+	end
+
+	new(0, 0, 0, 0)
+end
+
+function color.from_hsv(h, s, v)
+	return hsv_to_color { h, s, v, 255 }
+end
+
+function color.from_hsva(h, s, v, a)
+	return hsv_to_color { h, s, v, a }
+end
+
+function color.invert(c)
+	return new(255 - c[1], 255 - c[2], 255 - c[3], c[4])
+end
+
+function color.lighten(c, v)
+	return new(
+		utils.clamp(c[1] + v * 255, 0, 255),
+		utils.clamp(c[2] + v * 255, 0, 255),
+		utils.clamp(c[3] + v * 255, 0, 255),
+		c[4]
+	)
+end
+
+function color.lerp(a, b, s)
+	return a + s * (b - a)
+end
+
+function color.darken(c, v)
+	return new(
+		utils.clamp(c[1] - v * 255, 0, 255),
+		utils.clamp(c[2] - v * 255, 0, 255),
+		utils.clamp(c[3] - v * 255, 0, 255),
+		c[4]
+	)
+end
+
+function color.multiply(c, v)
+	local t = color.new()
+	for i = 1, 3 do
+		t[i] = c[i] * v
+	end
+
+	t[4] = c[4]
+	return t
+end
+
+-- directly set alpha channel
+function color.alpha(c, v)
+	local t = color.new()
+	for i = 1, 3 do
+		t[i] = c[i]
+	end
+
+	t[4] = v * 255
+	return t
+end
+
+function color.opacity(c, v)
+	local t = color.new()
+	for i = 1, 3 do
+		t[i] = c[i]
+	end
+
+	t[4] = c[4] * v
+	return t
+end
+
+function color.hue(color, hue)
 	local c = color_to_hsv(color)
-	c[1] = (newHue + 360) % 360
+	c[1] = (hue + 360) % 360
 	return hsv_to_color(c)
 end
 
@@ -218,11 +213,13 @@ function color.gamma_to_linear(r, g, b, a)
 			return math.pow((c + 0.055) / 1.055, 2.4)
 		end
 	end
+
 	if type(r) == "table" then
 		local c = {}
-		for i=1,3 do
+		for i = 1, 3 do
 			c[i] = convert(r[i] / 255) * 255
 		end
+
 		c[4] = convert(r[4] / 255) * 255
 		return c
 	else
@@ -243,11 +240,13 @@ function color.linear_to_gamma(r, g, b, a)
 			return 1.055 * math.pow(c, 0.41666) - 0.055
 		end
 	end
+
 	if type(r) == "table" then
 		local c = {}
-		for i=1,3 do
+		for i = 1, 3 do
 			c[i] = convert(r[i] / 255) * 255
 		end
+
 		c[4] = convert(r[4] / 255) * 255
 		return c
 	else
@@ -255,4 +254,34 @@ function color.linear_to_gamma(r, g, b, a)
 	end
 end
 
-return setmetatable({new = new}, color)
+function color.to_string(a)
+	return string.format("[ %3.0f, %3.0f, %3.0f, %3.0f ]", a[1], a[2], a[3], a[4])
+end
+
+local color_mt      = {}
+color_mt.__index    = color
+color_mt.__tostring = color.to_string
+
+function color_mt.__call(_, r, g, b, a)
+	return color.new(r, g, b, a)
+end
+
+function color_mt.__add(a, b)
+	return new(a[1] + b[1], a[2] + b[2], a[3] + b[3], a[4] + b[4])
+end
+
+function color_mt.__sub(a, b)
+	return new(a[1] - b[1], a[2] - b[2], a[3] - b[3], a[4] - b[4])
+end
+
+function color_mt.__mul(a, b)
+	if type(a) == "number" then
+		return new(a * b[1], a * b[2], a * b[3], a * b[4])
+	elseif type(b) == "number" then
+		return new(b * a[1], b * a[2], b * a[3], b * a[4])
+	else
+		return new(a[1] * b[1], a[2] * b[2], a[3] * b[3], a[4] * b[4])
+	end
+end
+
+return setmetatable({}, color_mt)

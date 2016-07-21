@@ -260,7 +260,7 @@ local vec2_mt      = {}
 vec2_mt.__index    = vec2
 vec2_mt.__tostring = vec2.to_string
 
-function vec2_mt.__call(self, x, y)
+function vec2_mt.__call(_, x, y)
 	return vec2.new(x, y)
 end
 

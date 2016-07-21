@@ -627,7 +627,7 @@ local mat4_mt      = {}
 mat4_mt.__index    = mat4
 mat4_mt.__tostring = mat4.to_string
 
-function mat4_mt.__call(self, a)
+function mat4_mt.__call(_, a)
 	return mat4.new(a)
 end
 

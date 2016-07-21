@@ -275,7 +275,7 @@ local vec3_mt      = {}
 vec3_mt.__index    = vec3
 vec3_mt.__tostring = vec3.to_string
 
-function vec3_mt.__call(self, x, y, z)
+function vec3_mt.__call(_, x, y, z)
 	return vec3.new(x, y, z)
 end
 
@@ -283,7 +283,7 @@ function vec3_mt.__unm(a)
 	return new(-a.x, -a.y, -a.z)
 end
 
-function vec3_mt.__eq(a,b)
+function vec3_mt.__eq(a, b)
 	assert(vec3.is_vec3(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(vec3.is_vec3(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 	return a.x == b.x and a.y == b.y and a.z == b.z

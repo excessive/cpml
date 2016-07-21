@@ -121,9 +121,9 @@ function utils.project_on(out, a, b)
 		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0) /
 		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0)
 
-	out.x   = b.x * s
-	out.y   = b.y * s
-	out.z   = isvec3 and b.z * s or nil
+	out.x = b.x * s
+	out.y = b.y * s
+	out.z = isvec3 and b.z * s or nil
 
 	return out
 end
@@ -135,9 +135,9 @@ function utils.project_from(out, a, b)
 		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0) /
 		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0)
 
-	out.x   = b.x * s
-	out.y   = b.y * s
-	out.z   = isvec3 and b.z * s or nil
+	out.x = b.x * s
+	out.y = b.y * s
+	out.z = isvec3 and b.z * s or nil
 
 	return out
 end
@@ -148,28 +148,31 @@ function utils.mirror_on(out, a, b)
 	local s =
 		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0) /
 		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0) * 2
-	out.x   = b.x * s - a.x
-	out.y   = b.y * s - a.y
-	out.z   = isvec3 and b.z * s - a.z or nil
+
+	out.x = b.x * s - a.x
+	out.y = b.y * s - a.y
+	out.z = isvec3 and b.z * s - a.z or nil
+
 	return out
 end
 
 -- Originally from vec3
 function utils.reflect(out, i, n)
-	vec3.mul(out, n, vec3.dot(n, i) * 2)
-	vec3.sub(out, i, out)
 	return out
+		:mul(n, n:dot(i) * 2)
+		:sub(i, out)
 end
 
 -- Originally from vec3
+local tmp = vec3()
 function utils.refract(out, i, n, ior)
-	local d = vec3.dot(n, i)
+	local d = n:dot(i)
 	local k = 1 - ior * ior * (1 - d * d)
 
 	if k >= 0 then
-		vec3.mul(out, i, ior)
-		vec3.mul(tmp, n, ior * d + sqrt(k))
-		vec3.sub(out, out, tmp)
+		tmp:mul(n, ior * d + sqrt(k))
+		out:mul(i, ior)
+		out:sub(out, tmp)
 	end
 
 	return out

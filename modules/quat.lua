@@ -67,10 +67,9 @@ function quat.new(x, y, z, w)
 		assert(type(w) == "number", "new: Wrong argument type for w (<number> expected)")
 
 		return new(x, y, z, w)
-
-	else
-		return new(0, 0, 0, 1)
 	end
+
+	return new(0, 0, 0, 1)
 end
 
 --- Create a quaternion from an axis, angle pair.
@@ -408,7 +407,7 @@ local quat_mt      = {}
 quat_mt.__index    = quat
 quat_mt.__tostring = quat.to_string
 
-function quat_mt.__call(self, x, y, z, w)
+function quat_mt.__call(_, x, y, z, w)
 	return new(x, y, z, w)
 end
 
