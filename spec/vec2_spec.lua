@@ -8,7 +8,8 @@ describe("vec2:", function()
 		local a = vec2()
 		assert.is.equal(a.x, 0)
 		assert.is.equal(a.y, 0)
-		assert.is_true(vec2.is_vec2(a))
+		assert.is_true(a:is_vec2())
+		assert.is_true(a:is_zero())
 
 		-- new vector from table
 		local b = vec2 { 0, 0 }
@@ -21,15 +22,12 @@ describe("vec2:", function()
 
 		-- new vector from numbers
 		local d = vec2(3.14159, -2.808)
-		assert.is.equal(d.x, 3.14159)
+		assert.is.equal(d.x,  3.14159)
 		assert.is.equal(d.y, -2.808)
 
 		-- new vector from other vector
-		local e = vec2.clone(d)
+		local e = d:clone()
 		assert.is.equal(d, e)
-
-		local f = d:clone()
-		assert.is.equal(d, f)
 	end)
 
 	it("Test basic operators", function()
@@ -39,41 +37,41 @@ describe("vec2:", function()
 
 		-- Add
 		do
-			local c = vec2.add(vec2(), a, b)
+			local c = vec2():add(a, b)
+			local d = a + b
+
 			assert.is.equal(c.x, 10)
 			assert.is.equal(c.y, 9)
-
-			local d = a + b
 			assert.is.equal(c, d)
 		end
 
 		-- Subtract
 		do
-			local c = vec2.sub(vec2(), a, b)
-			assert.is.equal(c.x, -4)
-			assert.is.equal(c.y, 1)
-
+			local c = vec2():sub(a, b)
 			local d = a - b
+
+			assert.is.equal(c.x, -4)
+			assert.is.equal(c.y,  1)
 			assert.is.equal(c, d)
 		end
 
 		-- Multiply
 		do
-			local c = vec2.mul(vec2(), a, s)
+			local c = vec2():mul(a, s)
+			local d = a * s
+
 			assert.is.equal(c.x, 6)
 			assert.is.equal(c.y, 10)
-
-			local d = a * s
 			assert.is.equal(c, d)
 		end
 
 		-- Divide
 		do
-			local c = vec2.div(vec2(), a, s)
+			local c = vec2():div(a, s)
+			local d = a / s
+
 			assert.is.equal(c.x, 1.5)
 			assert.is.equal(c.y, 2.5)
-
-			local d = a / s
 			assert.is.equal(c, d)
 		end
 
@@ -87,14 +85,13 @@ describe("vec2:", function()
 
 	it("Test normal, trim, length", function()
 		local a = vec2(3, 5)
+		local b = vec2():normalize(a)
+		local c = vec2():trim(a, 0.5)
 
-		local b = vec2.normalize(vec2(), a)
-		assert.is_true(abs(b:len()  - 1) < DBL_EPSILON)
-		assert.is_true(abs(b:len()  - 1) < DBL_EPSILON)
-		assert.is_true(abs(b:len2() - 1) < DBL_EPSILON * 2)
-
-		local c = vec2.trim(vec2(), a, 0.5)
-		assert.is_true(abs(c:len() - 0.5) < DBL_EPSILON)
+		assert.is_true(abs(b:len()  - 1)   < DBL_EPSILON)
+		assert.is_true(abs(b:len()  - 1)   < DBL_EPSILON)
+		assert.is_true(abs(b:len2() - 1)   < DBL_EPSILON * 2)
+		assert.is_true(abs(c:len()  - 0.5) < DBL_EPSILON)
 	end)
 
 	it("Test distance", function()
@@ -103,82 +100,74 @@ describe("vec2:", function()
 
 		-- Distance
 		do
-			local c = vec2.dist(a, b)
+			local c = a:dist(b)
 			assert.is.equal(c, sqrt(17))
-
-			local d = a:dist(b)
-			assert.is.equal(c, d)
 		end
 
 		-- Distance Squared
 		do
-			local c = vec2.dist2(a, b)
+			local c = a:dist2(b)
 			assert.is.equal(c, 17)
-
-			local d = a:dist2(b)
-			assert.is.equal(c, d)
 		end
 	end)
 
 	it("Test cross product", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
+		local c = a:cross(b)
 
-		local c = vec2.cross(a, b)
 		assert.is.equal(c, -23)
-
-		local d = a:cross(b)
-		assert.is.equal(c, d)
 	end)
 
 	it("Test dot product", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
+		local c = a:dot(b)
 
-		local c = vec2.dot(a, b)
 		assert.is.equal(c, 41)
-
-		local d = a:dot(b)
-		assert.is.equal(c, d)
 	end)
 
 	it("Test lerp", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
 		local s = 0.1
+		local c = vec2():lerp(a, b, s)
 
-		local c = vec2.lerp(vec2(), a, b, s)
 		assert.is.equal(c.x, 3.4)
 		assert.is.equal(c.y, 4.9)
 	end)
 
 	it("Test unpack", function()
+		local a    = vec2(3, 5)
+		local x, y = a:unpack()
+
+		assert.is.equal(x, 3)
+		assert.is.equal(y, 5)
+	end)
+
+	it("tests rotate", function()
 		local a = vec2(3, 5)
+		local b = vec2():rotate(a,  math.pi)
+		local c = vec2():rotate(b, -math.pi)
 
-		do
-			local x, y = vec2.unpack(a)
-			assert.is.equal(x, 3)
-			assert.is.equal(y, 5)
-		end
+		assert.is.equal(c.x, 3)
+		assert.is.equal(c.y, 5)
+	end)
 
-		do
-			local x, y = a:unpack()
-			assert.is.equal(x, 3)
-			assert.is.equal(y, 5)
-		end
+	it("tests converting coordinates", function()
+		local a    = vec2(3, 5)
+		local r, t = a:to_polar()
+		local b    = vec2.from_cartesian(r, t)
+
+		assert.is.equal(b.x, a.x)
+		assert.is.equal(b.y, a.y)
+	end)
+
+	it("tests perpendicular", function()
+		local a = vec2(3, 5)
+		local b = vec2():perpendicular(a)
+
+		assert.is.equal(b.x, -5)
+		assert.is.equal(b.y,  3)
 	end)
 end)
-
---[[
-
--- TODO: To Cartesian
-do
-	local a = vec2(3, 5)
-end
-
--- TODO: To Polar
-do
-	local a = vec2(3, 5)
-end
-
---]]

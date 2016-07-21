@@ -2,6 +2,8 @@
 -- @module vec3
 
 local sqrt = math.sqrt
+local cos  = math.cos
+local sin  = math.sin
 local vec3 = {}
 
 -- Private constructor.
@@ -198,7 +200,7 @@ function vec3.rotate(out, a, phi, axis)
 		return a
 	end
 
-	local u = vec3.normalize(vec3(), axis)
+	local u = new():normalize(axis)
 	local c = cos(phi)
 	local s = sin(phi)
 

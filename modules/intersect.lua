@@ -211,9 +211,7 @@ function intersect.ray_plane(ray, plane)
 	return false
 end
 
--- Algorithm is ported from the C algorithm of
--- Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
--- Archive.org am hero \o/ (https://web.archive.org/web/20120414063459/http://local.wasp.uwa.edu.au/~pbourke//geometry/lineline3d/)
+-- https://web.archive.org/web/20120414063459/http://local.wasp.uwa.edu.au/~pbourke//geometry/lineline3d/
 -- a[1] is a vec3
 -- a[2] is a vec3
 -- b[1] is a vec3

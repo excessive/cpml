@@ -59,14 +59,11 @@ function vec2.new(x, y)
 end
 
 --- Convert point from polar to cartesian.
--- @tparam vec2 out vector for result to be stored in
 -- @tparam number radius radius of the point
 -- @tparam number theta angle of the point (in radians)
 -- @treturn vec2
-function vec2.from_cartesian(out, radius, theta)
-	out.x = radius * cos(theta)
-	out.y = radius * sin(theta)
-	return out
+function vec2.from_cartesian(radius, theta)
+	return new(radius * cos(theta), radius * sin(theta))
 end
 
 --- Clone a vector.
