@@ -5,13 +5,13 @@
 
 --- Octree
 -- @module octree
-local current_folder = (...):gsub('%.[^%.]+$', '') .. "."
-local intersect      = require(current_folder .. "intersect")
-local mat4           = require(current_folder .. "mat4")
-local utils          = require(current_folder .. "utils")
-local vec3           = require(current_folder .. "vec3")
-local Octree         = {}
-local OctreeNode     = {}
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local intersect  = require(modules .. "intersect")
+local mat4       = require(modules .. "mat4")
+local utils      = require(modules .. "utils")
+local vec3       = require(modules .. "vec3")
+local Octree     = {}
+local OctreeNode = {}
 local Node
 
 Octree.__index     = Octree
@@ -104,7 +104,7 @@ end
 -- @param ray Ray with a position and a direction
 -- @param func Function to execute on any objects within child nodes
 -- @param out Table to store results of func in
--- @return boolean True is is an intersect detected
+-- @return boolean True if an intersect detected
 function Octree:cast_ray(ray, func, out)
 	assert(func)
 	return self.rootNode:cast_ray(ray, func, out)
@@ -219,8 +219,8 @@ function OctreeNode:add(obj, objBounds)
 	if #self.objects < self.numObjectsAllowed
 	or self.baseLength / 2 < self.minSize then
 		table.insert(self.objects, {
-			data=obj,
-			bounds=objBounds
+			data   = obj,
+			bounds = objBounds
 		})
 	else
 		-- Fits at this level, but we can go deeper. Would it fit there?
@@ -258,8 +258,8 @@ function OctreeNode:add(obj, objBounds)
 			self.children[best_fit_child]:add(obj, objBounds)
 		else
 			table.insert(self.objects, {
-				data=obj,
-				bounds=objBounds
+				data   = obj,
+				bounds = objBounds
 			})
 		end
 	end
@@ -358,7 +358,7 @@ end
 function OctreeNode:cast_ray(ray, func, out, depth)
 	depth = depth or 1
 
-	if intersect.ray_aabb(ray, self.bounds.min, self.bounds.max) then
+	if intersect.ray_aabb(ray, self.bounds) then
 		if #self.objects > 0 then
 			local hit = func(ray, self.objects, out)
 
@@ -579,10 +579,11 @@ function OctreeNode:draw_bounds(cube, depth)
 	local tint = depth / 7 -- Will eventually get values > 1. Color rounds to 1 automatically
 
 	love.graphics.setColor(tint * 255, 0, (1 - tint) * 255)
-	love.graphics.updateMatrix("transform", mat4()
-		:translate(self.center)
-		:scale(vec3(self.adjLength, self.adjLength, self.adjLength))
-	)
+	local m = mat4()
+		:translate(m, self.center)
+		:scale(m, vec3(self.adjLength, self.adjLength, self.adjLength))
+
+	love.graphics.updateMatrix("transform", m)
 	love.graphics.setWireframe(true)
 	love.graphics.draw(cube)
 	love.graphics.setWireframe(false)
@@ -602,10 +603,11 @@ function OctreeNode:draw_objects(cube, filter)
 
 	for _, object in ipairs(self.objects) do
 		if filter and filter(object.data) or not filter then
-			love.graphics.updateMatrix("transform", mat4()
-				:translate(object.bounds.center)
-				:scale(object.bounds.size)
-			)
+			local m = mat4()
+				:translate(m, object.bounds.center)
+				:scale(m, object.bounds.size)
+
+			love.graphics.updateMatrix("transform", m
 			love.graphics.draw(cube)
 		end
 	end
