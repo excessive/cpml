@@ -450,7 +450,7 @@ function intersect.aabb_frustum(aabb, frustum)
 		-- indices of the positive vertex
 		local px = p.a > 0.0 and 2 or 1
 		local py = p.b > 0.0 and 2 or 1
-		local pz = (.c > 0.0 and 2 or 1
+		local pz = p.c > 0.0 and 2 or 1
 
 		-- project p-vertex on plane normal
 		-- (How far is p-vertex from the origin)

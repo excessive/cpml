@@ -607,7 +607,7 @@ function OctreeNode:draw_objects(cube, filter)
 				:translate(m, object.bounds.center)
 				:scale(m, object.bounds.size)
 
-			love.graphics.updateMatrix("transform", m
+			love.graphics.updateMatrix("transform", m)
 			love.graphics.draw(cube)
 		end
 	end

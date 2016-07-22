@@ -21,7 +21,6 @@ local function new(m)
 		0, 0, 0, 0,
 		0, 0, 0, 0
 	}
-	m._m = m
 	return setmetatable(m, mat4_mt)
 end
 
@@ -33,48 +32,37 @@ local function identity(m)
 	return m
 end
 
--- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
-local status, ffi
-if type(jit) == "table" and jit.status() then
-	status, ffi = pcall(require, "ffi")
-	if status then
-		ffi.cdef "typedef struct { double _m[16]; } cpml_mat4;"
-		new = ffi.typeof("cpml_mat4")
-	end
-end
-
 -- Statically allocate a temporary variable used in some of our functions.
 local tmp = new()
 
 function mat4.new(a)
-	local o = new()
-	local m = o._m
+	local out = new()
 
 	if type(a) == "table" and #a == 16 then
-		for i=1,16 do
-			m[i] = tonumber(a[i])
+		for i = 1, 16 do
+			out[i] = tonumber(a[i])
 		end
 	elseif type(a) == "table" and #a == 9 then
-		m[1], m[2],  m[3]  = a[1], a[2], a[3]
-		m[5], m[6],  m[7]  = a[4], a[5], a[6]
-		m[9], m[10], m[11] = a[7], a[8], a[9]
-		m[16] = 1
+		out[1], out[2],  out[3]  = a[1], a[2], a[3]
+		out[5], out[6],  out[7]  = a[4], a[5], a[6]
+		out[9], out[10], out[11] = a[7], a[8], a[9]
+		out[16] = 1
 	elseif type(a) == "table" and type(a[1]) == "table" then
 		local idx = 1
 		for i = 1, 4 do
 			for j = 1, 4 do
-				m[idx] = a[i][j]
+				out[idx] = a[i][j]
 				idx = idx + 1
 			end
 		end
 	else
-		m[1]  = 1
-		m[6]  = 1
-		m[11] = 1
-		m[16] = 1
+		out[1]  = 1
+		out[6]  = 1
+		out[11] = 1
+		out[16] = 1
 	end
 
-	return o
+	return out
 end
 
 function mat4.identity()
@@ -498,10 +486,10 @@ function mat4.is_mat4(a)
 	return true
 end
 
-function mat4.to_string()
+function mat4.to_string(a)
 	local str = "[ "
-	for i, v in ipairs(a) do
-		str = str .. string.format("%+0.3f", v)
+	for i=1, 16 do
+		str = str .. string.format("%+0.3f", a[i])
 		if i < #a then
 			str = str .. ", "
 		end
@@ -522,12 +510,12 @@ end
 function mat4.to_quat(a)
 	identity(tmp):transpose(a)
 
-	local w     = sqrt(1 + m[1] + m[6] + m[11]) / 2
+	local w     = sqrt(1 + a[1] + a[6] + a[11]) / 2
 	local scale = w * 4
 	local q     = quat.new(
-		m[10] - m[7] / scale,
-		m[3]  - m[9] / scale,
-		m[5]  - m[2] / scale,
+		a[10] - a[7] / scale,
+		a[3]  - a[9] / scale,
+		a[5]  - a[2] / scale,
 		w
 	)
 
@@ -661,10 +649,6 @@ function mat4_mt.__mul(a, b)
 	end
 
 	return mat4.mul_mat4x1({}, a, b)
-end
-
-if status then
-	ffi.metatype(new, mat4_mt)
 end
 
 return setmetatable({}, mat4_mt)

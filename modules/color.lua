@@ -102,7 +102,6 @@ function color.new(r, g, b, a)
 		assert(type(a) == "number", "new: Wrong argument type for a (<number> expected)")
 
 		return new(r, g, b, a)
-	end
 
 	-- {x, y, z, w}
 	elseif type(x) == "table" then
