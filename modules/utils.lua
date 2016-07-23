@@ -49,6 +49,15 @@ function utils.threshold(value, threshold)
 	return abs(value) >= threshold
 end
 
+--- Check if value is equal or less than threshold.
+-- @param value
+-- @param threshold
+-- @return boolean
+function utils.tolerance(value, threshold)
+	-- I know, it barely saves any typing at all.
+	return abs(value) <= threshold
+end
+
 --- Scales a value from one range to another.
 -- @param value Input value
 -- @param min_in Minimum input value

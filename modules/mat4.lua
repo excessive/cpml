@@ -5,6 +5,7 @@ local constants = require(modules .. "constants")
 local vec2      = require(modules .. "vec2")
 local vec3      = require(modules .. "vec3")
 local quat      = require(modules .. "quat")
+local utils     = require(modules .. "utils")
 local sqrt      = math.sqrt
 local cos       = math.cos
 local sin       = math.sin
@@ -34,6 +35,8 @@ end
 
 -- Statically allocate a temporary variable used in some of our functions.
 local tmp = new()
+local t44 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+local t41 = { 0, 0, 0, 0 }
 
 function mat4.new(a)
 	local out = new()
@@ -161,7 +164,7 @@ function mat4.from_perspective(fovy, aspect, near, far)
 	out[11]   = -(far + near) / (far - near)
 	out[12]   = -1
 	out[15]   = -(2 * far * near) / (far - near)
-	out[16]   =  1
+	out[16]   =  0
 
 	return out
 end
@@ -254,52 +257,64 @@ function mat4.clone(a)
 end
 
 function mat4.mul(out, a, b)
-	out[1]  = a[1]  * b[1] + a[2]  * b[5] + a[3]  * b[9]  + a[4]  * b[13]
-	out[2]  = a[1]  * b[2] + a[2]  * b[6] + a[3]  * b[10] + a[4]  * b[14]
-	out[3]  = a[1]  * b[3] + a[2]  * b[7] + a[3]  * b[11] + a[4]  * b[15]
-	out[4]  = a[1]  * b[4] + a[2]  * b[8] + a[3]  * b[12] + a[4]  * b[16]
-	out[5]  = a[5]  * b[1] + a[6]  * b[5] + a[7]  * b[9]  + a[8]  * b[13]
-	out[6]  = a[5]  * b[2] + a[6]  * b[6] + a[7]  * b[10] + a[8]  * b[14]
-	out[7]  = a[5]  * b[3] + a[6]  * b[7] + a[7]  * b[11] + a[8]  * b[15]
-	out[8]  = a[5]  * b[4] + a[6]  * b[8] + a[7]  * b[12] + a[8]  * b[16]
-	out[9]  = a[9]  * b[1] + a[10] * b[5] + a[11] * b[9]  + a[12] * b[13]
-	out[10] = a[9]  * b[2] + a[10] * b[6] + a[11] * b[10] + a[12] * b[14]
-	out[11] = a[9]  * b[3] + a[10] * b[7] + a[11] * b[11] + a[12] * b[15]
-	out[12] = a[9]  * b[4] + a[10] * b[8] + a[11] * b[12] + a[12] * b[16]
-	out[13] = a[13] * b[1] + a[14] * b[5] + a[15] * b[9]  + a[16] * b[13]
-	out[14] = a[13] * b[2] + a[14] * b[6] + a[15] * b[10] + a[16] * b[14]
-	out[15] = a[13] * b[3] + a[14] * b[7] + a[15] * b[11] + a[16] * b[15]
-	out[16] = a[13] * b[4] + a[14] * b[8] + a[15] * b[12] + a[16] * b[16]
+	t44[1]  = a[1]  * b[1] + a[2]  * b[5] + a[3]  * b[9]  + a[4]  * b[13]
+	t44[2]  = a[1]  * b[2] + a[2]  * b[6] + a[3]  * b[10] + a[4]  * b[14]
+	t44[3]  = a[1]  * b[3] + a[2]  * b[7] + a[3]  * b[11] + a[4]  * b[15]
+	t44[4]  = a[1]  * b[4] + a[2]  * b[8] + a[3]  * b[12] + a[4]  * b[16]
+	t44[5]  = a[5]  * b[1] + a[6]  * b[5] + a[7]  * b[9]  + a[8]  * b[13]
+	t44[6]  = a[5]  * b[2] + a[6]  * b[6] + a[7]  * b[10] + a[8]  * b[14]
+	t44[7]  = a[5]  * b[3] + a[6]  * b[7] + a[7]  * b[11] + a[8]  * b[15]
+	t44[8]  = a[5]  * b[4] + a[6]  * b[8] + a[7]  * b[12] + a[8]  * b[16]
+	t44[9]  = a[9]  * b[1] + a[10] * b[5] + a[11] * b[9]  + a[12] * b[13]
+	t44[10] = a[9]  * b[2] + a[10] * b[6] + a[11] * b[10] + a[12] * b[14]
+	t44[11] = a[9]  * b[3] + a[10] * b[7] + a[11] * b[11] + a[12] * b[15]
+	t44[12] = a[9]  * b[4] + a[10] * b[8] + a[11] * b[12] + a[12] * b[16]
+	t44[13] = a[13] * b[1] + a[14] * b[5] + a[15] * b[9]  + a[16] * b[13]
+	t44[14] = a[13] * b[2] + a[14] * b[6] + a[15] * b[10] + a[16] * b[14]
+	t44[15] = a[13] * b[3] + a[14] * b[7] + a[15] * b[11] + a[16] * b[15]
+	t44[16] = a[13] * b[4] + a[14] * b[8] + a[15] * b[12] + a[16] * b[16]
+
+	for i=1, 16 do
+		out[i] = t44[i]
+	end
 
 	return out
 end
 
 function mat4.mul_mat4x1(out, a, b)
-	out[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
-	out[2] = b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14]
-	out[3] = b[1] * a[3] + b[2] * a[7] + b [3] * a[11] + b[4] * a[15]
-	out[4] = b[1] * a[4] + b[2] * a[8] + b [3] * a[12] + b[4] * a[16]
+	t41[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
+	t41[2] = b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14]
+	t41[3] = b[1] * a[3] + b[2] * a[7] + b [3] * a[11] + b[4] * a[15]
+	t41[4] = b[1] * a[4] + b[2] * a[8] + b [3] * a[12] + b[4] * a[16]
+
+	for i=1, 4 do
+		out[i] = t41[i]
+	end
 
 	return out
 end
 
 function mat4.invert(out, a)
-	out[1]  =  a[6] * a[11] * a[16] - a[6] * a[12] * a[15] - a[10] * a[7] * a[16] + a[10] * a[8] * a[15] + a[14] * a[7] * a[12] - a[14] * a[8] * a[11]
-	out[2]  = -a[2] * a[11] * a[16] + a[2] * a[12] * a[15] + a[10] * a[3] * a[16] - a[10] * a[4] * a[15] - a[14] * a[3] * a[12] + a[14] * a[4] * a[11]
-	out[3]  =  a[2] * a[7]  * a[16] - a[2] * a[8]  * a[15] - a[6]  * a[3] * a[16] + a[6]  * a[4] * a[15] + a[14] * a[3] * a[8]  - a[14] * a[4] * a[7]
-	out[4]  = -a[2] * a[7]  * a[12] + a[2] * a[8]  * a[11] + a[6]  * a[3] * a[12] - a[6]  * a[4] * a[11] - a[10] * a[3] * a[8]  + a[10] * a[4] * a[7]
-	out[5]  = -a[5] * a[11] * a[16] + a[5] * a[12] * a[15] + a[9]  * a[7] * a[16] - a[9]  * a[8] * a[15] - a[13] * a[7] * a[12] + a[13] * a[8] * a[11]
-	out[6]  =  a[1] * a[11] * a[16] - a[1] * a[12] * a[15] - a[9]  * a[3] * a[16] + a[9]  * a[4] * a[15] + a[13] * a[3] * a[12] - a[13] * a[4] * a[11]
-	out[7]  = -a[1] * a[7]  * a[16] + a[1] * a[8]  * a[15] + a[5]  * a[3] * a[16] - a[5]  * a[4] * a[15] - a[13] * a[3] * a[8]  + a[13] * a[4] * a[7]
-	out[8]  =  a[1] * a[7]  * a[12] - a[1] * a[8]  * a[11] - a[5]  * a[3] * a[12] + a[5]  * a[4] * a[11] + a[9]  * a[3] * a[8]  - a[9]  * a[4] * a[7]
-	out[9]  =  a[5] * a[10] * a[16] - a[5] * a[12] * a[14] - a[9]  * a[6] * a[16] + a[9]  * a[8] * a[14] + a[13] * a[6] * a[12] - a[13] * a[8] * a[10]
-	out[10] = -a[1] * a[10] * a[16] + a[1] * a[12] * a[14] + a[9]  * a[2] * a[16] - a[9]  * a[4] * a[14] - a[13] * a[2] * a[12] + a[13] * a[4] * a[10]
-	out[11] =  a[1] * a[6]  * a[16] - a[1] * a[8]  * a[14] - a[5]  * a[2] * a[16] + a[5]  * a[4] * a[14] + a[13] * a[2] * a[8]  - a[13] * a[4] * a[6]
-	out[12] = -a[1] * a[6]  * a[12] + a[1] * a[8]  * a[10] + a[5]  * a[2] * a[12] - a[5]  * a[4] * a[10] - a[9]  * a[2] * a[8]  + a[9]  * a[4] * a[6]
-	out[13] = -a[5] * a[10] * a[15] + a[5] * a[11] * a[14] + a[9]  * a[6] * a[15] - a[9]  * a[7] * a[14] - a[13] * a[6] * a[11] + a[13] * a[7] * a[10]
-	out[14] =  a[1] * a[10] * a[15] - a[1] * a[11] * a[14] - a[9]  * a[2] * a[15] + a[9]  * a[3] * a[14] + a[13] * a[2] * a[11] - a[13] * a[3] * a[10]
-	out[15] = -a[1] * a[6]  * a[15] + a[1] * a[7]  * a[14] + a[5]  * a[2] * a[15] - a[5]  * a[3] * a[14] - a[13] * a[2] * a[7]  + a[13] * a[3] * a[6]
-	out[16] =  a[1] * a[6]  * a[11] - a[1] * a[7]  * a[10] - a[5]  * a[2] * a[11] + a[5]  * a[3] * a[10] + a[9]  * a[2] * a[7]  - a[9]  * a[3] * a[6]
+	t44[1]  =  a[6] * a[11] * a[16] - a[6] * a[12] * a[15] - a[10] * a[7] * a[16] + a[10] * a[8] * a[15] + a[14] * a[7] * a[12] - a[14] * a[8] * a[11]
+	t44[2]  = -a[2] * a[11] * a[16] + a[2] * a[12] * a[15] + a[10] * a[3] * a[16] - a[10] * a[4] * a[15] - a[14] * a[3] * a[12] + a[14] * a[4] * a[11]
+	t44[3]  =  a[2] * a[7]  * a[16] - a[2] * a[8]  * a[15] - a[6]  * a[3] * a[16] + a[6]  * a[4] * a[15] + a[14] * a[3] * a[8]  - a[14] * a[4] * a[7]
+	t44[4]  = -a[2] * a[7]  * a[12] + a[2] * a[8]  * a[11] + a[6]  * a[3] * a[12] - a[6]  * a[4] * a[11] - a[10] * a[3] * a[8]  + a[10] * a[4] * a[7]
+	t44[5]  = -a[5] * a[11] * a[16] + a[5] * a[12] * a[15] + a[9]  * a[7] * a[16] - a[9]  * a[8] * a[15] - a[13] * a[7] * a[12] + a[13] * a[8] * a[11]
+	t44[6]  =  a[1] * a[11] * a[16] - a[1] * a[12] * a[15] - a[9]  * a[3] * a[16] + a[9]  * a[4] * a[15] + a[13] * a[3] * a[12] - a[13] * a[4] * a[11]
+	t44[7]  = -a[1] * a[7]  * a[16] + a[1] * a[8]  * a[15] + a[5]  * a[3] * a[16] - a[5]  * a[4] * a[15] - a[13] * a[3] * a[8]  + a[13] * a[4] * a[7]
+	t44[8]  =  a[1] * a[7]  * a[12] - a[1] * a[8]  * a[11] - a[5]  * a[3] * a[12] + a[5]  * a[4] * a[11] + a[9]  * a[3] * a[8]  - a[9]  * a[4] * a[7]
+	t44[9]  =  a[5] * a[10] * a[16] - a[5] * a[12] * a[14] - a[9]  * a[6] * a[16] + a[9]  * a[8] * a[14] + a[13] * a[6] * a[12] - a[13] * a[8] * a[10]
+	t44[10] = -a[1] * a[10] * a[16] + a[1] * a[12] * a[14] + a[9]  * a[2] * a[16] - a[9]  * a[4] * a[14] - a[13] * a[2] * a[12] + a[13] * a[4] * a[10]
+	t44[11] =  a[1] * a[6]  * a[16] - a[1] * a[8]  * a[14] - a[5]  * a[2] * a[16] + a[5]  * a[4] * a[14] + a[13] * a[2] * a[8]  - a[13] * a[4] * a[6]
+	t44[12] = -a[1] * a[6]  * a[12] + a[1] * a[8]  * a[10] + a[5]  * a[2] * a[12] - a[5]  * a[4] * a[10] - a[9]  * a[2] * a[8]  + a[9]  * a[4] * a[6]
+	t44[13] = -a[5] * a[10] * a[15] + a[5] * a[11] * a[14] + a[9]  * a[6] * a[15] - a[9]  * a[7] * a[14] - a[13] * a[6] * a[11] + a[13] * a[7] * a[10]
+	t44[14] =  a[1] * a[10] * a[15] - a[1] * a[11] * a[14] - a[9]  * a[2] * a[15] + a[9]  * a[3] * a[14] + a[13] * a[2] * a[11] - a[13] * a[3] * a[10]
+	t44[15] = -a[1] * a[6]  * a[15] + a[1] * a[7]  * a[14] + a[5]  * a[2] * a[15] - a[5]  * a[3] * a[14] - a[13] * a[2] * a[7]  + a[13] * a[3] * a[6]
+	t44[16] =  a[1] * a[6]  * a[11] - a[1] * a[7]  * a[10] - a[5]  * a[2] * a[11] + a[5]  * a[3] * a[10] + a[9]  * a[2] * a[7]  - a[9]  * a[3] * a[6]
+
+	for i=1, 16 do
+		out[i] = t44[i]
+	end
 
 	local det = a[1] * out[1] + a[2] * out[5] + a[3] * out[9] + a[4] * out[13]
 
@@ -349,7 +364,7 @@ function mat4.rotate(out, a, angle, axis)
 	tmp[10] = y * z * (1 - c) - x * s
 	tmp[11] = z * z * (1 - c) + c
 
-	return out:mul(a, tmp)
+	return out:mul(tmp, a)
 end
 
 function mat4.translate(out, a, t)
@@ -385,58 +400,58 @@ function mat4.look_at(out, a, eye, center, up)
 		:normalize(new_up)
 
 	identity(tmp)
-	local view = tmp
-
-	view[1]  =  side.x
-	view[5]  =  side.y
-	view[9]  =  side.z
-	view[2]  =  new_up.x
-	view[6]  =  new_up.y
-	view[10] =  new_up.z
-	view[3]  = -forward.x
-	view[7]  = -forward.y
-	view[11] = -forward.z
+	tmp[1]  =  side.x
+	tmp[5]  =  side.y
+	tmp[9]  =  side.z
+	tmp[2]  =  new_up.x
+	tmp[6]  =  new_up.y
+	tmp[10] =  new_up.z
+	tmp[3]  = -forward.x
+	tmp[7]  = -forward.y
+	tmp[11] = -forward.z
 
 	return out
 		:translate(-eye - forward)
-		:mul(out, view)
+		:mul(out, tmp)
 		:mul(out, a)
 end
 
 function mat4.transpose(out, a)
-	out[1]  = a[1]
-	out[2]  = a[5]
-	out[3]  = a[9]
-	out[4]  = a[13]
-	out[5]  = a[2]
-	out[6]  = a[6]
-	out[7]  = a[10]
-	out[8]  = a[14]
-	out[9]  = a[3]
-	out[10] = a[7]
-	out[11] = a[11]
-	out[12] = a[15]
-	out[13] = a[4]
-	out[14] = a[8]
-	out[15] = a[12]
-	out[16] = a[16]
+	t44[1]  = a[1]
+	t44[2]  = a[5]
+	t44[3]  = a[9]
+	t44[4]  = a[13]
+	t44[5]  = a[2]
+	t44[6]  = a[6]
+	t44[7]  = a[10]
+	t44[8]  = a[14]
+	t44[9]  = a[3]
+	t44[10] = a[7]
+	t44[11] = a[11]
+	t44[12] = a[15]
+	t44[13] = a[4]
+	t44[14] = a[8]
+	t44[15] = a[12]
+	t44[16] = a[16]
+
+	for i=1, 16 do
+		out[i] = t44[i]
+	end
 
 	return out
 end
 
--- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L317
+-- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L518
 -- Note: GLM calls the view matrix "model"
 function mat4.project(obj, view, projection, viewport)
 	local position = { obj.x, obj.y, obj.z, 1 }
 
-	identity(tmp)
-	mat4.mul_mat4x1(position, tmp:transpose(view),       position)
-	mat4.mul_mat4x1(position, tmp:transpose(projection), position)
+	mat4.mul_mat4x1(position, view,       position)
+	mat4.mul_mat4x1(position, projection, position)
 
 	position[1] = position[1] / position[4] * 0.5 + 0.5
 	position[2] = position[2] / position[4] * 0.5 + 0.5
 	position[3] = position[3] / position[4] * 0.5 + 0.5
-	position[4] = position[4] / position[4] * 0.5 + 0.5
 
 	position[1] = position[1] * viewport[3] + viewport[1]
 	position[2] = position[2] * viewport[4] + viewport[2]
@@ -444,7 +459,7 @@ function mat4.project(obj, view, projection, viewport)
 	return vec3(position[1], position[2], position[3])
 end
 
--- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L338
+-- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L544
 -- Note: GLM calls the view matrix "model"
 function mat4.unproject(win, view, projection, viewport)
 	local position = { win.x, win.y, win.z, 1 }
@@ -455,10 +470,8 @@ function mat4.unproject(win, view, projection, viewport)
 	position[1] = position[1] * 2 - 1
 	position[2] = position[2] * 2 - 1
 	position[3] = position[3] * 2 - 1
-	position[4] = position[4] * 2 - 1
 
-	identity(tmp)
-	tmp:mul(view, projection):invert(tmp)
+	tmp:mul(projection, view):invert(tmp)
 	mat4.mul_mat4x1(position, tmp, position)
 
 	position[1] = position[1] / position[4]
@@ -510,12 +523,12 @@ end
 function mat4.to_quat(a)
 	identity(tmp):transpose(a)
 
-	local w     = sqrt(1 + a[1] + a[6] + a[11]) / 2
+	local w     = sqrt(1 + tmp[1] + tmp[6] + tmp[11]) / 2
 	local scale = w * 4
 	local q     = quat.new(
-		a[10] - a[7] / scale,
-		a[3]  - a[9] / scale,
-		a[5]  - a[2] / scale,
+		tmp[10] - tmp[7] / scale,
+		tmp[3]  - tmp[9] / scale,
+		tmp[5]  - tmp[2] / scale,
 		w
 	)
 
@@ -530,8 +543,8 @@ function mat4.to_frustum(a, infinite)
 
 	-- Extract the TOP plane
 	frustum.top = {}
-	frustum.top.a = a[ 4] - a[ 2]
-	frustum.top.b = a[ 8] - a[ 6]
+	frustum.top.a = a[4]  - a[2]
+	frustum.top.b = a[8]  - a[6]
 	frustum.top.c = a[12] - a[10]
 	frustum.top.d = a[16] - a[14]
 
@@ -544,8 +557,8 @@ function mat4.to_frustum(a, infinite)
 
 	-- Extract the BOTTOM plane
 	frustum.bottom = {}
-	frustum.bottom.a = a[ 4] + a[ 2]
-	frustum.bottom.b = a[ 8] + a[ 6]
+	frustum.bottom.a = a[4]  + a[2]
+	frustum.bottom.b = a[8]  + a[6]
 	frustum.bottom.c = a[12] + a[10]
 	frustum.bottom.d = a[16] + a[14]
 
@@ -557,9 +570,9 @@ function mat4.to_frustum(a, infinite)
 	frustum.bottom.d = frustum.bottom.d / t
 
 	-- Extract the LEFT plane
-	frustum.left.a = a[ 4] + a[ 1]
-	frustum.left.b = a[ 8] + a[ 5]
-	frustum.left.c = a[12] + a[ 9]
+	frustum.left.a = a[4]  + a[1]
+	frustum.left.b = a[8]  + a[5]
+	frustum.left.c = a[12] + a[9]
 	frustum.left.d = a[16] + a[13]
 
 	-- Normalize the result
@@ -571,9 +584,9 @@ function mat4.to_frustum(a, infinite)
 
 	-- Extract the RIGHT plane
 	frustum.right = {}
-	frustum.right.a = a[ 4] - a[ 1]
-	frustum.right.b = a[ 8] - a[ 5]
-	frustum.right.c = a[12] - a[ 9]
+	frustum.right.a = a[4]  - a[1]
+	frustum.right.b = a[8]  - a[5]
+	frustum.right.c = a[12] - a[9]
 	frustum.right.d = a[16] - a[13]
 
 	-- Normalize the result
@@ -585,8 +598,8 @@ function mat4.to_frustum(a, infinite)
 
 	-- Extract the NEAR plane
 	frustum.near = {}
-	frustum.near.a = a[ 4] + a[ 3]
-	frustum.near.b = a[ 8] + a[ 7]
+	frustum.near.a = a[4]  + a[3]
+	frustum.near.b = a[8]  + a[7]
 	frustum.near.c = a[12] + a[11]
 	frustum.near.d = a[16] + a[15]
 
@@ -600,8 +613,8 @@ function mat4.to_frustum(a, infinite)
 	if not infinite then
 		-- Extract the FAR plane
 		frustum.far = {}
-		frustum.far.a = a[ 4] - a[ 3]
-		frustum.far.b = a[ 8] - a[ 7]
+		frustum.far.a = a[4]  - a[3]
+		frustum.far.b = a[8]  - a[7]
 		frustum.far.c = a[12] - a[11]
 		frustum.far.d = a[16] - a[15]
 
@@ -632,7 +645,7 @@ function mat4_mt.__eq(a, b)
 	assert(mat4.is_mat4(b), "__eq: Wrong argument type for right hand operant. (<cpml.mat4> expected)")
 
 	for i = 1, 16 do
-		if a[i] ~= b[i] then
+		if not utils.tolerance(b[i] - a[i], constants.FLT_EPSILON) then
 			return false
 		end
 	end
