@@ -58,6 +58,40 @@ function intersect.point_aabb(point, aabb)
 		aabb.max.z >= point.z
 end
 
+-- point          is a vec3
+-- frustum.left   is a plane { a, b, c, d }
+-- frustum.right  is a plane { a, b, c, d }
+-- frustum.bottom is a plane { a, b, c, d }
+-- frustum.top    is a plane { a, b, c, d }
+-- frustum.near   is a plane { a, b, c, d }
+-- frustum.far    is a plane { a, b, c, d }
+function intersect.point_frustum(point, frustum)
+	local x, y, z = point:unpack()
+	local planes  = {
+		frustum.left,
+		frustum.right,
+		frustum.bottom,
+		frustum.top,
+		frustum.near,
+		frustum.far or false
+	}
+
+	-- Skip the last test for infinite projections, it'll never fail.
+	if not planes[6] then
+		table.remove(planes)
+	end
+
+	local dot
+	for i = 1, #planes do
+		dot = planes[i].a * x + planes[i].b * y + planes[i].c * z + planes[i].d
+		if dot <= 0 then
+			return false
+		end
+	end
+
+	return true
+end
+
 -- http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 -- ray.position  is a vec3
 -- ray.direction is a vec3
@@ -413,10 +447,10 @@ end
 
 -- aabb.min       is a vec3
 -- aabb.max       is a vec3
--- frustum.top    is a plane { a, b, c, d }
--- frustum.bottom is a plane { a, b, c, d }
 -- frustum.left   is a plane { a, b, c, d }
 -- frustum.right  is a plane { a, b, c, d }
+-- frustum.bottom is a plane { a, b, c, d }
+-- frustum.top    is a plane { a, b, c, d }
 -- frustum.near   is a plane { a, b, c, d }
 -- frustum.far    is a plane { a, b, c, d }
 function intersect.aabb_frustum(aabb, frustum)
@@ -428,10 +462,10 @@ function intersect.aabb_frustum(aabb, frustum)
 
 	-- We have 6 planes defining the frustum, 5 if infinite.
 	local planes = {
-		frustum.top,
-		frustum.bottom,
 		frustum.left,
 		frustum.right,
+		frustum.bottom,
+		frustum.top,
 		frustum.near,
 		frustum.far or false
 	}
@@ -493,20 +527,19 @@ end
 
 -- sphere.position is a vec3
 -- sphere.radius   is a number
--- frustum.top     is a plane { a, b, c, d }
--- frustum.bottom  is a plane { a, b, c, d }
 -- frustum.left    is a plane { a, b, c, d }
 -- frustum.right   is a plane { a, b, c, d }
+-- frustum.bottom  is a plane { a, b, c, d }
+-- frustum.top     is a plane { a, b, c, d }
 -- frustum.near    is a plane { a, b, c, d }
 -- frustum.far     is a plane { a, b, c, d }
 function intersect.sphere_frustum(sphere, frustum)
 	local x, y, z = sphere.position:unpack()
-
-	local planes = {
-		frustum.top,
-		frustum.bottom,
+	local planes  = {
 		frustum.left,
 		frustum.right,
+		frustum.bottom,
+		frustum.top,
 		frustum.near
 	}
 
@@ -515,8 +548,8 @@ function intersect.sphere_frustum(sphere, frustum)
 	end
 
 	local dot
-	for p = 1, #planes do
-		dot = planes[p].a * x + planes[p].b * y + planes[p].c * z + planes[p].d
+	for i = 1, #planes do
+		dot = planes[i].a * x + planes[i].b * y + planes[i].c * z + planes[i].d
 
 		if dot <= -sphere.radius then
 			return false

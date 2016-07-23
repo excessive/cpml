@@ -520,6 +520,7 @@ function mat4.to_vec4s(a)
 	}
 end
 
+-- http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
 function mat4.to_quat(a)
 	identity(tmp):transpose(a)
 
@@ -540,34 +541,6 @@ end
 function mat4.to_frustum(a, infinite)
 	local t
 	local frustum = {}
-
-	-- Extract the TOP plane
-	frustum.top = {}
-	frustum.top.a = a[4]  - a[2]
-	frustum.top.b = a[8]  - a[6]
-	frustum.top.c = a[12] - a[10]
-	frustum.top.d = a[16] - a[14]
-
-	-- Normalize the result
-	t = sqrt(frustum.top.a * frustum.top.a + frustum.top.b * frustum.top.b + frustum.top.c * frustum.top.c)
-	frustum.top.a = frustum.top.a / t
-	frustum.top.b = frustum.top.b / t
-	frustum.top.c = frustum.top.c / t
-	frustum.top.d = frustum.top.d / t
-
-	-- Extract the BOTTOM plane
-	frustum.bottom = {}
-	frustum.bottom.a = a[4]  + a[2]
-	frustum.bottom.b = a[8]  + a[6]
-	frustum.bottom.c = a[12] + a[10]
-	frustum.bottom.d = a[16] + a[14]
-
-	-- Normalize the result
-	t = sqrt(frustum.bottom.a * frustum.bottom.a + frustum.bottom.b * frustum.bottom.b + frustum.bottom.c * frustum.bottom.c)
-	frustum.bottom.a = frustum.bottom.a / t
-	frustum.bottom.b = frustum.bottom.b / t
-	frustum.bottom.c = frustum.bottom.c / t
-	frustum.bottom.d = frustum.bottom.d / t
 
 	-- Extract the LEFT plane
 	frustum.left.a = a[4]  + a[1]
@@ -595,6 +568,34 @@ function mat4.to_frustum(a, infinite)
 	frustum.right.b = frustum.right.b / t
 	frustum.right.c = frustum.right.c / t
 	frustum.right.d = frustum.right.d / t
+
+	-- Extract the BOTTOM plane
+	frustum.bottom = {}
+	frustum.bottom.a = a[4]  + a[2]
+	frustum.bottom.b = a[8]  + a[6]
+	frustum.bottom.c = a[12] + a[10]
+	frustum.bottom.d = a[16] + a[14]
+
+	-- Normalize the result
+	t = sqrt(frustum.bottom.a * frustum.bottom.a + frustum.bottom.b * frustum.bottom.b + frustum.bottom.c * frustum.bottom.c)
+	frustum.bottom.a = frustum.bottom.a / t
+	frustum.bottom.b = frustum.bottom.b / t
+	frustum.bottom.c = frustum.bottom.c / t
+	frustum.bottom.d = frustum.bottom.d / t
+
+	-- Extract the TOP plane
+	frustum.top = {}
+	frustum.top.a = a[4]  - a[2]
+	frustum.top.b = a[8]  - a[6]
+	frustum.top.c = a[12] - a[10]
+	frustum.top.d = a[16] - a[14]
+
+	-- Normalize the result
+	t = sqrt(frustum.top.a * frustum.top.a + frustum.top.b * frustum.top.b + frustum.top.c * frustum.top.c)
+	frustum.top.a = frustum.top.a / t
+	frustum.top.b = frustum.top.b / t
+	frustum.top.c = frustum.top.c / t
+	frustum.top.d = frustum.top.d / t
 
 	-- Extract the NEAR plane
 	frustum.near = {}

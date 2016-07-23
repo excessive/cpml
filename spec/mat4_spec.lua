@@ -100,8 +100,18 @@ describe("mat4:", function()
 
 	it("tests multiplication", function()
 		do
-			local a = mat4 { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }
-			local b = mat4 { 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 }
+			local a = mat4 {
+				1,  2,  3,  4,
+				5,  6,  7,  8,
+				9,  10, 11, 12,
+				13, 14, 15, 16
+			}
+			local b = mat4 {
+				1, 5, 9,  13,
+				2, 6, 10, 14,
+				3, 7, 11, 15,
+				4, 8, 12, 16
+			}
 			local c = mat4():mul(a, b)
 			assert.is.equal(c[1],  30)
 			assert.is.equal(c[2],  70)
@@ -125,13 +135,18 @@ describe("mat4:", function()
 		end
 
 		do
-			local a = mat4 { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 , 13, 14, 15, 16 }
+			local a = mat4 {
+				1,  2,  3,  4,
+				5,  6,  7,  8,
+				9,  10, 11, 12,
+				13, 14, 15, 16
+			}
 			local b = { 10, 20, 30, 40 }
 			local c = mat4.mul_mat4x1({}, a, b)
-			assert.is.equal(c[1],  900)
-			assert.is.equal(c[2],  1000)
-			assert.is.equal(c[3],  1100)
-			assert.is.equal(c[4],  1200)
+			assert.is.equal(c[1], 900)
+			assert.is.equal(c[2], 1000)
+			assert.is.equal(c[3], 1100)
+			assert.is.equal(c[4], 1200)
 		end
 	end)
 
@@ -172,7 +187,12 @@ describe("mat4:", function()
 	end)
 
 	it("tests transpose", function()
-		local a = mat4 { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3 ,3 ,4, 4 ,4 ,4 }
+		local a = mat4 {
+			1, 1, 1, 1,
+			2, 2, 2, 2,
+			3, 3, 3, 3,
+			4, 4, 4, 4
+		}
 		local b = mat4():transpose(a)
 		assert.is.equal(b[1],  1)
 		assert.is.equal(b[2],  2)
@@ -211,8 +231,6 @@ describe("mat4:", function()
 
 	it("tests convertions", function()
 		local a = mat4()
-		local b = mat4 { 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4 }
-
 		local v = a:to_vec4s()
 		assert.is_true(type(v)    == "table")
 		assert.is_true(type(v[1]) == "table")
@@ -236,11 +254,17 @@ describe("mat4:", function()
 		assert.is.equal(v[4][3], 0)
 		assert.is.equal(v[4][4], 1)
 
+		local b = mat4 {
+			0, 0, 1, 0,
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 0, 0
+		}
 		local q = b:to_quat()
-		--assert.is.equal(q.x, 0)
-		--assert.is.equal(q.y, 0)
-		--assert.is.equal(q.z, 0)
-		--assert.is.equal(q.w, 0)
+		assert.is.equal(q.x, -0.5)
+		assert.is.equal(q.y, -0.5)
+		assert.is.equal(q.z, -0.5)
+		assert.is.equal(q.w,  0.5)
 	end)
 end)
 
