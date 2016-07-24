@@ -302,11 +302,8 @@ function color_mt.__newindex(t, k, v)
 	if type(t) == "cdata" then
 		if type(k) == "number" then
 			t._c[k-1] = v
-			return
 		end
 	end
-
-	rawset(color, k, v)
 end
 
 color_mt.__tostring = color.to_string

@@ -651,11 +651,8 @@ function mat4_mt.__newindex(t, k, v)
 	if type(t) == "cdata" then
 		if type(k) == "number" then
 			t._m[k-1] = v
-			return
 		end
 	end
-
-	rawset(mat4, k, v)
 end
 
 mat4_mt.__tostring = mat4.to_string
@@ -673,7 +670,7 @@ function mat4_mt.__eq(a, b)
 	assert(mat4.is_mat4(b), "__eq: Wrong argument type for right hand operant. (<cpml.mat4> expected)")
 
 	for i = 1, 16 do
-		if not utils.tolerance(b[i] - a[i], constants.FLT_EPSILON) then
+		if not utils.tolerance(b[i]-a[i], constants.FLT_EPSILON) then
 			return false
 		end
 	end
