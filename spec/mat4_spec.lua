@@ -212,6 +212,28 @@ describe("mat4:", function()
 		assert.is.equal(b[16], 4)
 	end)
 
+	it("tests shear", function()
+		local a = mat4()
+		local yx, zx, xy, zy, xz, yz = 1, 1, 1, -1, -1, -1
+		local b = mat4():shear(a, yx, zx, xy, zy, xz, yz)
+		assert.is.equal(b[1],   1)
+		assert.is.equal(b[2],   1)
+		assert.is.equal(b[3],   1)
+		assert.is.equal(b[4],   0)
+		assert.is.equal(b[5],   1)
+		assert.is.equal(b[6],   1)
+		assert.is.equal(b[7],  -1)
+		assert.is.equal(b[8],   0)
+		assert.is.equal(b[9],  -1)
+		assert.is.equal(b[10], -1)
+		assert.is.equal(b[11],  1)
+		assert.is.equal(b[12],  0)
+		assert.is.equal(b[13],  0)
+		assert.is.equal(b[14],  0)
+		assert.is.equal(b[15],  0)
+		assert.is.equal(b[16],  1)
+	end)
+
 	it("tests projections", function()
 		local a  = mat4()
 		local b  = mat4.from_perspective(45, 1, 0.1, 1000)
@@ -275,7 +297,6 @@ end)
 	from_ortho
 	from_perspective
 	from_hmd_perspective
-	shear
 	look_at
 	to_frustum
 --]]

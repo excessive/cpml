@@ -79,8 +79,8 @@ function mat4.new(a)
 	return out
 end
 
-function mat4.identity()
-	return identity(new())
+function mat4.identity(a)
+	return identity(a or new())
 end
 
 function mat4.from_angle_axis(angle, axis)
@@ -399,16 +399,11 @@ function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	return out:mul(tmp, a)
 end
 
+local forward, side, new_up = vec3(), vec3(), vec3()
 function mat4.look_at(out, a, eye, center, up)
-	local forward = vec3():normalize(center - eye)
-
-	local side = vec3()
-		:cross(forward, up)
-		:normalize(side)
-
-	local new_up = vec3()
-		:cross(side, forward)
-		:normalize(new_up)
+	forward:normalize(center - eye)
+	side:cross(forward, up):normalize(side)
+	new_up:cross(side, forward):normalize(new_up)
 
 	identity(tmp)
 	tmp[1]  =  side.x
@@ -512,9 +507,9 @@ end
 
 function mat4.to_string(a)
 	local str = "[ "
-	for i=1, 16 do
+	for i = 1, 16 do
 		str = str .. string.format("%+0.3f", a[i])
-		if i < #a then
+		if i < 16 then
 			str = str .. ", "
 		end
 	end
@@ -641,7 +636,6 @@ function mat4.to_frustum(a, infinite)
 	return frustum
 end
 
---mat4_mt.__index    = mat4
 function mat4_mt.__index(t, k)
 	if type(t) == "cdata" then
 		if type(k) == "number" then
