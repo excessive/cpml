@@ -549,6 +549,7 @@ function mat4.to_frustum(a, infinite)
 	local frustum = {}
 
 	-- Extract the LEFT plane
+	frustum.left   = {}
 	frustum.left.a = a[4]  + a[1]
 	frustum.left.b = a[8]  + a[5]
 	frustum.left.c = a[12] + a[9]
@@ -562,7 +563,7 @@ function mat4.to_frustum(a, infinite)
 	frustum.left.d = frustum.left.d / t
 
 	-- Extract the RIGHT plane
-	frustum.right = {}
+	frustum.right   = {}
 	frustum.right.a = a[4]  - a[1]
 	frustum.right.b = a[8]  - a[5]
 	frustum.right.c = a[12] - a[9]
@@ -576,7 +577,7 @@ function mat4.to_frustum(a, infinite)
 	frustum.right.d = frustum.right.d / t
 
 	-- Extract the BOTTOM plane
-	frustum.bottom = {}
+	frustum.bottom   = {}
 	frustum.bottom.a = a[4]  + a[2]
 	frustum.bottom.b = a[8]  + a[6]
 	frustum.bottom.c = a[12] + a[10]
@@ -590,7 +591,7 @@ function mat4.to_frustum(a, infinite)
 	frustum.bottom.d = frustum.bottom.d / t
 
 	-- Extract the TOP plane
-	frustum.top = {}
+	frustum.top   = {}
 	frustum.top.a = a[4]  - a[2]
 	frustum.top.b = a[8]  - a[6]
 	frustum.top.c = a[12] - a[10]
@@ -604,7 +605,7 @@ function mat4.to_frustum(a, infinite)
 	frustum.top.d = frustum.top.d / t
 
 	-- Extract the NEAR plane
-	frustum.near = {}
+	frustum.near   = {}
 	frustum.near.a = a[4]  + a[3]
 	frustum.near.b = a[8]  + a[7]
 	frustum.near.c = a[12] + a[11]
@@ -619,7 +620,7 @@ function mat4.to_frustum(a, infinite)
 
 	if not infinite then
 		-- Extract the FAR plane
-		frustum.far = {}
+		frustum.far   = {}
 		frustum.far.a = a[4]  - a[3]
 		frustum.far.b = a[8]  - a[7]
 		frustum.far.c = a[12] - a[11]
