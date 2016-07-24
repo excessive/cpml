@@ -3,192 +3,190 @@ local vec3  = require "modules.vec3"
 local utils = require "modules.utils"
 
 describe("mat4:", function()
-	it("tests new matrices", function()
+	it("creates an identity matrix", function()
 		local a = mat4()
-		assert.is.equal(a[1],  1)
-		assert.is.equal(a[2],  0)
-		assert.is.equal(a[3],  0)
-		assert.is.equal(a[4],  0)
-		assert.is.equal(a[5],  0)
-		assert.is.equal(a[6],  1)
-		assert.is.equal(a[7],  0)
-		assert.is.equal(a[8],  0)
-		assert.is.equal(a[9],  0)
-		assert.is.equal(a[10], 0)
-		assert.is.equal(a[11], 1)
-		assert.is.equal(a[12], 0)
-		assert.is.equal(a[13], 0)
-		assert.is.equal(a[14], 0)
-		assert.is.equal(a[15], 0)
-		assert.is.equal(a[16], 1)
+		assert.is.equal(1, a[1])
+		assert.is.equal(0, a[2])
+		assert.is.equal(0, a[3])
+		assert.is.equal(0, a[4])
+		assert.is.equal(0, a[5])
+		assert.is.equal(1, a[6])
+		assert.is.equal(0, a[7])
+		assert.is.equal(0, a[8])
+		assert.is.equal(0, a[9])
+		assert.is.equal(0, a[10])
+		assert.is.equal(1, a[11])
+		assert.is.equal(0, a[12])
+		assert.is.equal(0, a[13])
+		assert.is.equal(0, a[14])
+		assert.is.equal(0, a[15])
+		assert.is.equal(1, a[16])
 		assert.is_true(a:is_mat4())
+	end)
 
-		local b = mat4 {
+	it("creates a filled matrix", function()
+		local a = mat4 {
 			3, 3, 3, 3,
 			4, 4, 4, 4,
 			5, 5, 5, 5,
 			6, 6, 6, 6
 		}
-		assert.is.equal(b[1],  3)
-		assert.is.equal(b[2],  3)
-		assert.is.equal(b[3],  3)
-		assert.is.equal(b[4],  3)
-		assert.is.equal(b[5],  4)
-		assert.is.equal(b[6],  4)
-		assert.is.equal(b[7],  4)
-		assert.is.equal(b[8],  4)
-		assert.is.equal(b[9],  5)
-		assert.is.equal(b[10], 5)
-		assert.is.equal(b[11], 5)
-		assert.is.equal(b[12], 5)
-		assert.is.equal(b[13], 6)
-		assert.is.equal(b[14], 6)
-		assert.is.equal(b[15], 6)
-		assert.is.equal(b[16], 6)
+		assert.is.equal(3, a[1])
+		assert.is.equal(3, a[2])
+		assert.is.equal(3, a[3])
+		assert.is.equal(3, a[4])
+		assert.is.equal(4, a[5])
+		assert.is.equal(4, a[6])
+		assert.is.equal(4, a[7])
+		assert.is.equal(4, a[8])
+		assert.is.equal(5, a[9])
+		assert.is.equal(5, a[10])
+		assert.is.equal(5, a[11])
+		assert.is.equal(5, a[12])
+		assert.is.equal(6, a[13])
+		assert.is.equal(6, a[14])
+		assert.is.equal(6, a[15])
+		assert.is.equal(6, a[16])
+	end)
 
-		local c = mat4 {
+	it("creates a filled matrix from vec4s", function()
+		local a = mat4 {
 			{ 3, 3, 3, 3 },
 			{ 4, 4, 4, 4 },
 			{ 5, 5, 5, 5 },
 			{ 6, 6, 6, 6 }
 		}
-		assert.is.equal(c[1],  3)
-		assert.is.equal(c[2],  3)
-		assert.is.equal(c[3],  3)
-		assert.is.equal(c[4],  3)
-		assert.is.equal(c[5],  4)
-		assert.is.equal(c[6],  4)
-		assert.is.equal(c[7],  4)
-		assert.is.equal(c[8],  4)
-		assert.is.equal(c[9],  5)
-		assert.is.equal(c[10], 5)
-		assert.is.equal(c[11], 5)
-		assert.is.equal(c[12], 5)
-		assert.is.equal(c[13], 6)
-		assert.is.equal(c[14], 6)
-		assert.is.equal(c[15], 6)
-		assert.is.equal(c[16], 6)
+		assert.is.equal(3, a[1])
+		assert.is.equal(3, a[2])
+		assert.is.equal(3, a[3])
+		assert.is.equal(3, a[4])
+		assert.is.equal(4, a[5])
+		assert.is.equal(4, a[6])
+		assert.is.equal(4, a[7])
+		assert.is.equal(4, a[8])
+		assert.is.equal(5, a[9])
+		assert.is.equal(5, a[10])
+		assert.is.equal(5, a[11])
+		assert.is.equal(5, a[12])
+		assert.is.equal(6, a[13])
+		assert.is.equal(6, a[14])
+		assert.is.equal(6, a[15])
+		assert.is.equal(6, a[16])
+	end)
 
-		local d = mat4 {
+	it("creates a filled matrix from a 3x3 matrix", function()
+		local a = mat4 {
 			3, 3, 3,
 			4, 4, 4,
 			5, 5, 5
 		}
-		assert.is.equal(d[1],  3)
-		assert.is.equal(d[2],  3)
-		assert.is.equal(d[3],  3)
-		assert.is.equal(d[4],  0)
-		assert.is.equal(d[5],  4)
-		assert.is.equal(d[6],  4)
-		assert.is.equal(d[7],  4)
-		assert.is.equal(d[8],  0)
-		assert.is.equal(d[9],  5)
-		assert.is.equal(d[10], 5)
-		assert.is.equal(d[11], 5)
-		assert.is.equal(d[12], 0)
-		assert.is.equal(d[13], 0)
-		assert.is.equal(d[14], 0)
-		assert.is.equal(d[15], 0)
-		assert.is.equal(d[16], 1)
-
-		local e = mat4.identity()
-		assert.is.equal(a, e)
-
-		local f = c:clone()
-		assert.is.equal(c, f)
+		assert.is.equal(3, a[1])
+		assert.is.equal(3, a[2])
+		assert.is.equal(3, a[3])
+		assert.is.equal(0, a[4])
+		assert.is.equal(4, a[5])
+		assert.is.equal(4, a[6])
+		assert.is.equal(4, a[7])
+		assert.is.equal(0, a[8])
+		assert.is.equal(5, a[9])
+		assert.is.equal(5, a[10])
+		assert.is.equal(5, a[11])
+		assert.is.equal(0, a[12])
+		assert.is.equal(0, a[13])
+		assert.is.equal(0, a[14])
+		assert.is.equal(0, a[15])
+		assert.is.equal(1, a[16])
 	end)
 
-	it("tests multiplication", function()
-		-- 4x4 * 4x4
-		do
-			local a = mat4 {
-				1,  2,  3,  4,
-				5,  6,  7,  8,
-				9,  10, 11, 12,
-				13, 14, 15, 16
-			}
-			local b = mat4 {
-				1, 5, 9,  13,
-				2, 6, 10, 14,
-				3, 7, 11, 15,
-				4, 8, 12, 16
-			}
-			local c = mat4():mul(a, b)
-			assert.is.equal(c[1],  30)
-			assert.is.equal(c[2],  70)
-			assert.is.equal(c[3],  110)
-			assert.is.equal(c[4],  150)
-			assert.is.equal(c[5],  70)
-			assert.is.equal(c[6],  174)
-			assert.is.equal(c[7],  278)
-			assert.is.equal(c[8],  382)
-			assert.is.equal(c[9],  110)
-			assert.is.equal(c[10], 278)
-			assert.is.equal(c[11], 446)
-			assert.is.equal(c[12], 614)
-			assert.is.equal(c[13], 150)
-			assert.is.equal(c[14], 382)
-			assert.is.equal(c[15], 614)
-			assert.is.equal(c[16], 846)
-		end
-
-		-- 4x4 * 4x1
-		do
-			local a = mat4 {
-				1,  2,  3,  4,
-				5,  6,  7,  8,
-				9,  10, 11, 12,
-				13, 14, 15, 16
-			}
-			local b = { 10, 20, 30, 40 }
-			local c = mat4.mul_mat4x1({}, a, b)
-			assert.is.equal(c[1], 900)
-			assert.is.equal(c[2], 1000)
-			assert.is.equal(c[3], 1100)
-			assert.is.equal(c[4], 1200)
-		end
+	it("clones a matrix", function()
+		local a = mat4.identity()
+		local b = a:clone()
+		assert.is.equal(a, b)
 	end)
 
-	it("tests transforms", function()
+	it("multiplies two 4x4 matrices", function()
+		local a = mat4 {
+			1,  2,  3,  4,
+			5,  6,  7,  8,
+			9,  10, 11, 12,
+			13, 14, 15, 16
+		}
+		local b = mat4 {
+			1, 5, 9,  13,
+			2, 6, 10, 14,
+			3, 7, 11, 15,
+			4, 8, 12, 16
+		}
+		local c = mat4():mul(a, b)
+		assert.is.equal(30,  c[1])
+		assert.is.equal(70,  c[2])
+		assert.is.equal(110, c[3])
+		assert.is.equal(150, c[4])
+		assert.is.equal(70,  c[5])
+		assert.is.equal(174, c[6])
+		assert.is.equal(278, c[7])
+		assert.is.equal(382, c[8])
+		assert.is.equal(110, c[9])
+		assert.is.equal(278, c[10])
+		assert.is.equal(446, c[11])
+		assert.is.equal(614, c[12])
+		assert.is.equal(150, c[13])
+		assert.is.equal(382, c[14])
+		assert.is.equal(614, c[15])
+		assert.is.equal(846, c[16])
+	end)
+
+	it("multiplies a matrix and a vec4", function()
+		local a = mat4 {
+			1,  2,  3,  4,
+			5,  6,  7,  8,
+			9,  10, 11, 12,
+			13, 14, 15, 16
+		}
+		local b = { 10, 20, 30, 40 }
+		local c = mat4.mul_vec4({}, a, b)
+		assert.is.equal(900,  c[1])
+		assert.is.equal(1000, c[2])
+		assert.is.equal(1100, c[3])
+		assert.is.equal(1200, c[4])
+	end)
+
+	it("scales a matrix", function()
 		local a = mat4()
-
-		-- Scale matrix
-		do
-			local b = mat4():scale(a, vec3(5, 5, 5))
-			assert.is.equal(b[1],  5)
-			assert.is.equal(b[6],  5)
-			assert.is.equal(b[11], 5)
-		end
-
-		-- Rotate matrix
-		do
-			local b = mat4():rotate(a, math.rad(45), vec3.unit_z)
-			assert.is_true(utils.tolerance( 0.7071-b[1], 0.001))
-			assert.is_true(utils.tolerance( 0.7071-b[2], 0.001))
-			assert.is_true(utils.tolerance(-0.7071-b[5], 0.001))
-			assert.is_true(utils.tolerance( 0.7071-b[6], 0.001))
-		end
-
-		-- Translate matrix
-		do
-			local b = mat4():translate(a, vec3(5, 5, 5))
-			assert.is.equal(b[13], 5)
-			assert.is.equal(b[14], 5)
-			assert.is.equal(b[15], 5)
-		end
+		local b = mat4():scale(a, vec3(5, 5, 5))
+		assert.is.equal(5, b[1])
+		assert.is.equal(5, b[6])
+		assert.is.equal(5, b[11])
 	end)
 
-	it("tests inversion", function()
+	it("rotates a matrix", function()
+		local a = mat4()
+		local b = mat4():rotate(a, math.rad(45), vec3.unit_z)
+		assert.is_true(utils.tolerance( 0.7071-b[1], 0.001))
+		assert.is_true(utils.tolerance( 0.7071-b[2], 0.001))
+		assert.is_true(utils.tolerance(-0.7071-b[5], 0.001))
+		assert.is_true(utils.tolerance( 0.7071-b[6], 0.001))
+	end)
+
+	it("translates a matrix", function()
+		local a = mat4()
+		local b = mat4():translate(a, vec3(5, 5, 5))
+		assert.is.equal(5, b[13])
+		assert.is.equal(5, b[14])
+		assert.is.equal(5, b[15])
+	end)
+
+	it("inverts a matrix", function()
 		local a = mat4()
 		a:rotate(a, math.pi/4, vec3.unit_y)
 		a:translate(a, vec3(4, 5, 6))
 
 		local b = mat4():invert(a)
 		local c = mat4():mul(a, b)
-		assert.is.equal(c, mat4())
+		assert.is.equal(mat4(), c)
 	end)
 
-	it("tests transpose", function()
+	it("transposes a matrix", function()
 		local a = mat4 {
 			1, 1, 1, 1,
 			2, 2, 2, 2,
@@ -196,144 +194,138 @@ describe("mat4:", function()
 			4, 4, 4, 4
 		}
 		local b = mat4():transpose(a)
-		assert.is.equal(b[1],  1)
-		assert.is.equal(b[2],  2)
-		assert.is.equal(b[3],  3)
-		assert.is.equal(b[4],  4)
-		assert.is.equal(b[5],  1)
-		assert.is.equal(b[6],  2)
-		assert.is.equal(b[7],  3)
-		assert.is.equal(b[8],  4)
-		assert.is.equal(b[9],  1)
-		assert.is.equal(b[10], 2)
-		assert.is.equal(b[11], 3)
-		assert.is.equal(b[12], 4)
-		assert.is.equal(b[13], 1)
-		assert.is.equal(b[14], 2)
-		assert.is.equal(b[15], 3)
-		assert.is.equal(b[16], 4)
+		assert.is.equal(1, b[1])
+		assert.is.equal(2, b[2])
+		assert.is.equal(3, b[3])
+		assert.is.equal(4, b[4])
+		assert.is.equal(1, b[5])
+		assert.is.equal(2, b[6])
+		assert.is.equal(3, b[7])
+		assert.is.equal(4, b[8])
+		assert.is.equal(1, b[9])
+		assert.is.equal(2, b[10])
+		assert.is.equal(3, b[11])
+		assert.is.equal(4, b[12])
+		assert.is.equal(1, b[13])
+		assert.is.equal(2, b[14])
+		assert.is.equal(3, b[15])
+		assert.is.equal(4, b[16])
 	end)
 
-	it("tests shear", function()
+	it("shears a matrix", function()
 		local a = mat4()
 		local yx, zx, xy, zy, xz, yz = 1, 1, 1, -1, -1, -1
 		local b = mat4():shear(a, yx, zx, xy, zy, xz, yz)
-		assert.is.equal(b[1],   1)
-		assert.is.equal(b[2],   1)
-		assert.is.equal(b[3],   1)
-		assert.is.equal(b[4],   0)
-		assert.is.equal(b[5],   1)
-		assert.is.equal(b[6],   1)
-		assert.is.equal(b[7],  -1)
-		assert.is.equal(b[8],   0)
-		assert.is.equal(b[9],  -1)
-		assert.is.equal(b[10], -1)
-		assert.is.equal(b[11],  1)
-		assert.is.equal(b[12],  0)
-		assert.is.equal(b[13],  0)
-		assert.is.equal(b[14],  0)
-		assert.is.equal(b[15],  0)
-		assert.is.equal(b[16],  1)
+		assert.is.equal( 1, b[2])
+		assert.is.equal( 1, b[3])
+		assert.is.equal( 1, b[5])
+		assert.is.equal(-1, b[7])
+		assert.is.equal(-1, b[9])
+		assert.is.equal(-1, b[10])
 	end)
 
-	it("tests projections", function()
+	it("projects a matrix into screen space", function()
+		local v  = vec3(0, 0, 10)
 		local a  = mat4()
 		local b  = mat4.from_perspective(45, 1, 0.1, 1000)
-		local v  = vec3(0, 0, 10)
 		local vp = { 0, 0, 400, 400 }
-
-		-- Project to pixel space
 		local c  = mat4.project(v, a, b, vp)
-		assert.is.equal(c.x, 200)
-		assert.is.equal(c.y, 200)
+		assert.is.equal(200, c.x)
+		assert.is.equal(200, c.y)
 		assert.is_true(utils.tolerance(1.0101-c.z, 0.001))
+	end)
 
-		-- Unproject to vector space
+	it("unprojects a matrix into world space", function()
+		local v  = vec3(0, 0, 10)
+		local a  = mat4()
+		local b  = mat4.from_perspective(45, 1, 0.1, 1000)
+		local vp = { 0, 0, 400, 400 }
+		local c  = mat4.project(v, a, b, vp)
 		local d  = mat4.unproject(c, a, b, vp)
 		assert.is_true(utils.tolerance(v.x-d.x, 0.001))
 		assert.is_true(utils.tolerance(v.y-d.y, 0.001))
 		assert.is_true(utils.tolerance(v.z-d.z, 0.001))
 	end)
 
-	it("tests convertions", function()
+	it("converts a matrix to vec4s", function()
 		local a = mat4()
+		local v = a:to_vec4s()
+		assert.is_true(type(v)    == "table")
+		assert.is_true(type(v[1]) == "table")
+		assert.is_true(type(v[2]) == "table")
+		assert.is_true(type(v[3]) == "table")
+		assert.is_true(type(v[4]) == "table")
 
-		-- Convert to vec4s
-		do
-			local v = a:to_vec4s()
-			assert.is_true(type(v)    == "table")
-			assert.is_true(type(v[1]) == "table")
-			assert.is_true(type(v[2]) == "table")
-			assert.is_true(type(v[3]) == "table")
-			assert.is_true(type(v[4]) == "table")
-			assert.is.equal(v[1][1], 1)
-			assert.is.equal(v[1][2], 0)
-			assert.is.equal(v[1][3], 0)
-			assert.is.equal(v[1][4], 0)
-			assert.is.equal(v[2][1], 0)
-			assert.is.equal(v[2][2], 1)
-			assert.is.equal(v[2][3], 0)
-			assert.is.equal(v[2][4], 0)
-			assert.is.equal(v[3][1], 0)
-			assert.is.equal(v[3][2], 0)
-			assert.is.equal(v[3][3], 1)
-			assert.is.equal(v[3][4], 0)
-			assert.is.equal(v[4][1], 0)
-			assert.is.equal(v[4][2], 0)
-			assert.is.equal(v[4][3], 0)
-			assert.is.equal(v[4][4], 1)
-		end
+		assert.is.equal(1, v[1][1])
+		assert.is.equal(0, v[1][2])
+		assert.is.equal(0, v[1][3])
+		assert.is.equal(0, v[1][4])
 
-		-- Convert to quaternion
-		do
-			local b = mat4 {
-				0, 0, 1, 0,
-				1, 0, 0, 0,
-				0, 1, 0, 0,
-				0, 0, 0, 0
-			}
-			local q = b:to_quat()
-			assert.is.equal(q.x, -0.5)
-			assert.is.equal(q.y, -0.5)
-			assert.is.equal(q.z, -0.5)
-			assert.is.equal(q.w,  0.5)
-		end
+		assert.is.equal(0, v[2][1])
+		assert.is.equal(1, v[2][2])
+		assert.is.equal(0, v[2][3])
+		assert.is.equal(0, v[2][4])
 
-		-- Convert to frustum
-		do
-			local b = mat4.from_perspective(45, 1, 0.1, 1000)
-			local f = mat4():mul(b, a):to_frustum()
+		assert.is.equal(0, v[3][1])
+		assert.is.equal(0, v[3][2])
+		assert.is.equal(1, v[3][3])
+		assert.is.equal(0, v[3][4])
 
-			assert.is_true(utils.tolerance( 0.9239-f.left.a, 0.001))
-			assert.is_true(utils.tolerance( 0     -f.left.b, 0.001))
-			assert.is_true(utils.tolerance(-0.3827-f.left.c, 0.001))
-			assert.is_true(utils.tolerance( 0     -f.left.d, 0.001))
+		assert.is.equal(0, v[4][1])
+		assert.is.equal(0, v[4][2])
+		assert.is.equal(0, v[4][3])
+		assert.is.equal(1, v[4][4])
+	end)
 
-			assert.is_true(utils.tolerance(-0.9239-f.right.a, 0.001))
-			assert.is_true(utils.tolerance( 0     -f.right.b, 0.001))
-			assert.is_true(utils.tolerance(-0.3827-f.right.c, 0.001))
-			assert.is_true(utils.tolerance( 0     -f.right.d, 0.001))
+	it("converts a matrix to a quaternion", function()
+		local a = mat4()
+		local b = mat4 {
+			0, 0, 1, 0,
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 0, 0
+		}
+		local q = b:to_quat()
+		assert.is.equal(-0.5, q.x)
+		assert.is.equal(-0.5, q.y)
+		assert.is.equal(-0.5, q.z)
+		assert.is.equal( 0.5, q.w)
+	end)
 
-			assert.is_true(utils.tolerance( 0     -f.bottom.a, 0.001))
-			assert.is_true(utils.tolerance( 0.9239-f.bottom.b, 0.001))
-			assert.is_true(utils.tolerance(-0.3827-f.bottom.c, 0.001))
-			assert.is_true(utils.tolerance( 0     -f.bottom.d, 0.001))
+	it("converts a matrix to a frustum", function()
+		local a = mat4()
+		local b = mat4.from_perspective(45, 1, 0.1, 1000)
+		local f = mat4():mul(b, a):to_frustum()
 
-			assert.is_true(utils.tolerance( 0     -f.top.a, 0.001))
-			assert.is_true(utils.tolerance(-0.9239-f.top.b, 0.001))
-			assert.is_true(utils.tolerance(-0.3827-f.top.c, 0.001))
-			assert.is_true(utils.tolerance( 0     -f.top.d, 0.001))
+		assert.is_true(utils.tolerance( 0.9239-f.left.a, 0.001))
+		assert.is_true(utils.tolerance( 0     -f.left.b, 0.001))
+		assert.is_true(utils.tolerance(-0.3827-f.left.c, 0.001))
+		assert.is_true(utils.tolerance( 0     -f.left.d, 0.001))
 
-			assert.is_true(utils.tolerance( 0  -f.near.a, 0.001))
-			assert.is_true(utils.tolerance( 0  -f.near.b, 0.001))
-			assert.is_true(utils.tolerance(-1  -f.near.c, 0.001))
-			assert.is_true(utils.tolerance(-0.1-f.near.d, 0.001))
+		assert.is_true(utils.tolerance(-0.9239-f.right.a, 0.001))
+		assert.is_true(utils.tolerance( 0     -f.right.b, 0.001))
+		assert.is_true(utils.tolerance(-0.3827-f.right.c, 0.001))
+		assert.is_true(utils.tolerance( 0     -f.right.d, 0.001))
 
-			assert.is_true(utils.tolerance( 0   -f.far.a, 0.001))
-			assert.is_true(utils.tolerance( 0   -f.far.b, 0.001))
-			assert.is_true(utils.tolerance( 1   -f.far.c, 0.001))
-			assert.is_true(utils.tolerance( 1000-f.far.d, 0.001))
-		end
+		assert.is_true(utils.tolerance( 0     -f.bottom.a, 0.001))
+		assert.is_true(utils.tolerance( 0.9239-f.bottom.b, 0.001))
+		assert.is_true(utils.tolerance(-0.3827-f.bottom.c, 0.001))
+		assert.is_true(utils.tolerance( 0     -f.bottom.d, 0.001))
+
+		assert.is_true(utils.tolerance( 0     -f.top.a, 0.001))
+		assert.is_true(utils.tolerance(-0.9239-f.top.b, 0.001))
+		assert.is_true(utils.tolerance(-0.3827-f.top.c, 0.001))
+		assert.is_true(utils.tolerance( 0     -f.top.d, 0.001))
+
+		assert.is_true(utils.tolerance( 0  -f.near.a, 0.001))
+		assert.is_true(utils.tolerance( 0  -f.near.b, 0.001))
+		assert.is_true(utils.tolerance(-1  -f.near.c, 0.001))
+		assert.is_true(utils.tolerance(-0.1-f.near.d, 0.001))
+
+		assert.is_true(utils.tolerance( 0   -f.far.a, 0.001))
+		assert.is_true(utils.tolerance( 0   -f.far.b, 0.001))
+		assert.is_true(utils.tolerance( 1   -f.far.c, 0.001))
+		assert.is_true(utils.tolerance( 1000-f.far.d, 0.001))
 	end)
 end)
 

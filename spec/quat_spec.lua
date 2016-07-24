@@ -1,233 +1,247 @@
-local quat = require "modules.quat"
-local vec3 = require "modules.vec3"
+local quat  = require "modules.quat"
+local vec3  = require "modules.vec3"
+local utils = require "modules.utils"
 
 describe("quat:", function()
-	it("tests creating new quaternions", function()
+	it("creates an identity quaternion", function()
 		local a = quat()
-		assert.is.equal(a.x, 0)
-		assert.is.equal(a.y, 0)
-		assert.is.equal(a.z, 0)
-		assert.is.equal(a.w, 1)
+		assert.is.equal(0, a.x)
+		assert.is.equal(0, a.y)
+		assert.is.equal(0, a.z)
+		assert.is.equal(1, a.w)
 		assert.is_true(a:is_quat())
 		assert.is_true(a:is_real())
-
-		local b = quat(0, 0, 0, 0)
-		assert.is.equal(b.x, 0)
-		assert.is.equal(b.y, 0)
-		assert.is.equal(b.z, 0)
-		assert.is.equal(b.w, 0)
-		assert.is_true(b:is_zero())
-		assert.is_true(b:is_imaginary())
-
-		local c = quat { 2, 3, 4, 1 }
-		assert.is.equal(c.x, 2)
-		assert.is.equal(c.y, 3)
-		assert.is.equal(c.z, 4)
-		assert.is.equal(c.w, 1)
-
-		local d = quat { x=2, y=3, z=4, w=1 }
-		assert.is.equal(d.x, 2)
-		assert.is.equal(d.y, 3)
-		assert.is.equal(d.z, 4)
-		assert.is.equal(d.w, 1)
-
-		local e           = quat.from_angle_axis(math.pi, vec3.unit_z)
-		local angle, axis = e:to_angle_axis()
-		assert.is.equal(angle, math.pi)
-		assert.is.equal(axis, vec3.unit_z)
-
-		local f = quat.from_direction(vec3():normalize(vec3(5, 10, 15)), vec3.unit_z)
-		--assert.is.equal(f.x, 0)
-		--assert.is.equal(f.y, 0)
-		--assert.is.equal(f.z, 0)
-		--assert.is.equal(f.w, 0)
-
-		local g = a:clone()
-		assert.is.equal(g.x, a.x)
-		assert.is.equal(g.y, a.y)
-		assert.is.equal(g.z, a.z)
-		assert.is.equal(g.w, a.w)
 	end)
 
-	it("tests standard operators", function()
+	it("creates a quaternion from numbers", function()
+		local a = quat(0, 0, 0, 0)
+		assert.is.equal(0, a.x)
+		assert.is.equal(0, a.y)
+		assert.is.equal(0, a.z)
+		assert.is.equal(0, a.w)
+		assert.is_true(a:is_zero())
+		assert.is_true(a:is_imaginary())
+	end)
+
+	it("creates a quaternion from a list", function()
+		local a = quat { 2, 3, 4, 1 }
+		assert.is.equal(2, a.x)
+		assert.is.equal(3, a.y)
+		assert.is.equal(4, a.z)
+		assert.is.equal(1, a.w)
+	end)
+
+	it("creates a quaternion from a record", function()
+		local a = quat { x=2, y=3, z=4, w=1 }
+		assert.is.equal(2, a.x)
+		assert.is.equal(3, a.y)
+		assert.is.equal(4, a.z)
+		assert.is.equal(1, a.w)
+	end)
+
+	it("creates a quaternion from a direction", function()
+		local v = vec3():normalize(vec3(-80, 80, -80))
+		local a = quat.from_direction(v, vec3.unit_z)
+		assert.is_true(utils.tolerance(-0.577-a.x, 0.001))
+		assert.is_true(utils.tolerance(-0.577-a.y, 0.001))
+		assert.is_true(utils.tolerance( 0    -a.z, 0.001))
+		assert.is_true(utils.tolerance( 0.423-a.w, 0.001))
+	end)
+
+	it("clones a quaternion", function()
+		local a = quat()
+		local b = a:clone()
+		assert.is.equal(a.x, b.x)
+		assert.is.equal(a.y, b.y)
+		assert.is.equal(a.z, b.z)
+		assert.is.equal(a.w, b.w)
+	end)
+
+	it("adds a quaternion to another", function()
 		local a = quat(2, 3, 4, 1)
 		local b = quat(3, 6, 9, 1)
-
-		do
-			local c = quat():add(a, b)
-			assert.is.equal(c.x, 5)
-			assert.is.equal(c.y, 9)
-			assert.is.equal(c.z, 13)
-			assert.is.equal(c.w, 2)
-
-			local d = a + b
-			assert.is.equal(c.x, d.x)
-			assert.is.equal(c.y, d.y)
-			assert.is.equal(c.z, d.z)
-			assert.is.equal(c.w, d.w)
-		end
-
-		do
-			local c = quat():sub(a, b)
-			assert.is.equal(c.x, -1)
-			assert.is.equal(c.y, -3)
-			assert.is.equal(c.z, -5)
-			assert.is.equal(c.w,  0)
-
-			local d = a - b
-			assert.is.equal(c.x, d.x)
-			assert.is.equal(c.y, d.y)
-			assert.is.equal(c.z, d.z)
-			assert.is.equal(c.w, d.w)
-		end
-
-		do
-			local c = quat():mul(a, b)
-			assert.is.equal(c.x,  8)
-			assert.is.equal(c.y,  3)
-			assert.is.equal(c.z,  16)
-			assert.is.equal(c.w, -59)
-
-			local d = a * b
-			assert.is.equal(c.x, d.x)
-			assert.is.equal(c.y, d.y)
-			assert.is.equal(c.z, d.z)
-			assert.is.equal(c.w, d.w)
-		end
-
-		do
-			local c = quat():scale(a, 3)
-			assert.is.equal(c.x, 6)
-			assert.is.equal(c.y, 9)
-			assert.is.equal(c.z, 12)
-			assert.is.equal(c.w, 3)
-
-			local d = a * 3
-			assert.is.equal(c.x, d.x)
-			assert.is.equal(c.y, d.y)
-			assert.is.equal(c.z, d.z)
-			assert.is.equal(c.w, d.w)
-
-			local e = -a
-			assert.is.equal(e.x, -a.x)
-			assert.is.equal(e.y, -a.y)
-			assert.is.equal(e.z, -a.z)
-			assert.is.equal(e.w, -a.w)
-		end
-
-		do
-			local v = vec3(3, 4, 5)
-			local c = quat.mul_vec3(vec3(), a, v)
-			--assert.is.equal(c.x, 0)
-			--assert.is.equal(c.y, 0)
-			--assert.is.equal(c.z, 0)
-			--assert.is.equal(c.w, 0)
-
-			local d = a * v
-			--assert.is.equal(c.x, d.x)
-			--assert.is.equal(c.y, d.y)
-			--assert.is.equal(c.z, d.z)
-			--assert.is.equal(c.w, d.w)
-		end
-
-		do
-			local c = quat():pow(a, 2)
-			--assert.is.equal(c.x, 0)
-			--assert.is.equal(c.y, 0)
-			--assert.is.equal(c.z, 0)
-			--assert.is.equal(c.w, 0)
-
-			local d = a^2
-			--assert.is.equal(c.x, d.x)
-			--assert.is.equal(c.y, d.y)
-			--assert.is.equal(c.z, d.z)
-			--assert.is.equal(c.w, d.w)
-		end
+		local c = quat():add(a, b)
+		local d = a + b
+		assert.is.equal(5,  c.x)
+		assert.is.equal(9,  c.y)
+		assert.is.equal(13, c.z)
+		assert.is.equal(2,  c.w)
+		assert.is.equal(c,  d)
 	end)
 
-	it("tests normal, dot", function()
+	it("subtracts a quaternion from another", function()
+		local a = quat(2, 3, 4, 1)
+		local b = quat(3, 6, 9, 1)
+		local c = quat():sub(a, b)
+		local d = a - b
+		assert.is.equal(-1, c.x)
+		assert.is.equal(-3, c.y)
+		assert.is.equal(-5, c.z)
+		assert.is.equal( 0, c.w)
+		assert.is.equal(c,  d)
+	end)
+
+	it("multiplies a quaternion by another", function()
+		local a = quat(2, 3, 4, 1)
+		local b = quat(3, 6, 9, 1)
+		local c = quat():mul(a, b)
+		local d = a * b
+		assert.is.equal( 8,  c.x)
+		assert.is.equal( 3,  c.y)
+		assert.is.equal( 16, c.z)
+		assert.is.equal(-59, c.w)
+		assert.is.equal(c,   d)
+	end)
+
+	it("multiplies a quaternion by a scale factor", function()
+		local a = quat(2, 3, 4, 1)
+		local s = 3
+		local b = quat():scale(a, s)
+		local c = a * s
+		assert.is.equal(6,  b.x)
+		assert.is.equal(9,  b.y)
+		assert.is.equal(12, b.z)
+		assert.is.equal(3,  b.w)
+		assert.is.equal(b,  c)
+	end)
+
+	it("inverts a quaternion", function()
+		local a = quat(2, 3, 4, 1)
+		local b = -a
+		assert.is.equal(-a.x, b.x)
+		assert.is.equal(-a.y, b.y)
+		assert.is.equal(-a.z, b.z)
+		assert.is.equal(-a.w, b.w)
+	end)
+
+	it("multiplies a quaternion by a vec3", function()
+		local a = quat(2, 3, 4, 1)
+		local v = vec3(3, 4, 5)
+		local b = quat.mul_vec3(vec3(), a, v)
+		local c = a * v
+		assert.is.equal(-21, c.x)
+		assert.is.equal( 4,  c.y)
+		assert.is.equal( 17, c.z)
+		assert.is.equal(b, c)
+	end)
+
+	it("multiplies a quaternion by an exponent", function()
+		local a = quat(2, 3, 4, 1)
+		local e = 2
+		local b = quat():pow(a, e)
+		local c = a^e
+		assert.is.equal( 4,   b.x)
+		assert.is.equal( 14,  b.y)
+		assert.is.equal( 24,  b.z)
+		assert.is.equal(-145, b.w)
+		assert.is.equal(b,    c)
+	end)
+
+	it("inverts a quaternion", function()
+		local a = quat(1, 1, 1, 1)
+		local b = quat():inverse(a)
+		assert.is.equal(-0.5, b.x)
+		assert.is.equal(-0.5, b.y)
+		assert.is.equal(-0.5, b.z)
+		assert.is.equal( 0.5, b.w)
+	end)
+
+	it("normalizes a quaternion", function()
+		local a = quat(1, 1, 1, 1)
+		local b = quat():normalize(a)
+		assert.is.equal(0.5, b.x)
+		assert.is.equal(0.5, b.y)
+		assert.is.equal(0.5, b.z)
+		assert.is.equal(0.5, b.w)
+	end)
+
+	it("dots two quaternions", function()
 		local a = quat(1, 1, 1, 1)
 		local b = quat(4, 4, 4, 4)
-		local c = quat():normalize(a)
-		local d = a:dot(b)
-
-		assert.is.equal(c.x, 0.5)
-		assert.is.equal(c.y, 0.5)
-		assert.is.equal(c.z, 0.5)
-		assert.is.equal(c.w, 0.5)
-		assert.is.equal(d,    16)
+		local c = a:dot(b)
+		assert.is.equal(16, c)
 	end)
 
-	it("tests length", function()
+	it("gets the length of a quaternion", function()
 		local a = quat(2, 3, 4, 5)
 		local b = a:len()
-		local c = a:len2()
-
-		assert.is.equal(b, math.sqrt(54))
-		assert.is.equal(c, 54)
+		assert.is.equal(math.sqrt(54), b)
 	end)
 
-	it("tests interpolation", function()
+	it("gets the square length of a quaternion", function()
+		local a = quat(2, 3, 4, 5)
+		local b = a:len2()
+		assert.is.equal(54, b)
+	end)
+
+	it("interpolates between two quaternions", function()
 		local a = quat(3, 3, 3, 3)
 		local b = quat(6, 6, 6, 6)
 		local s = 0.1
-
 		local c = quat():lerp(a, b, s)
-		assert.is.equal(c.x, 0.5)
-		assert.is.equal(c.y, 0.5)
-		assert.is.equal(c.z, 0.5)
-		assert.is.equal(c.w, 0.5)
-
-		local d = quat():slerp(a, b, s)
-		assert.is.equal(d.x, 0.5)
-		assert.is.equal(d.y, 0.5)
-		assert.is.equal(d.z, 0.5)
-		assert.is.equal(d.w, 0.5)
+		assert.is.equal(0.5, c.x)
+		assert.is.equal(0.5, c.y)
+		assert.is.equal(0.5, c.z)
+		assert.is.equal(0.5, c.w)
 	end)
 
-	it("tests extraction", function()
+	it("interpolates between two quaternions (spherical)", function()
+		local a = quat(3, 3, 3, 3)
+		local b = quat(6, 6, 6, 6)
+		local s = 0.1
+		local c = quat():slerp(a, b, s)
+		assert.is.equal(0.5, c.x)
+		assert.is.equal(0.5, c.y)
+		assert.is.equal(0.5, c.z)
+		assert.is.equal(0.5, c.w)
+	end)
+
+	it("unpacks a quaternion", function()
 		local a = quat(2, 3, 4, 1)
-
 		local x, y, z, w = a:unpack()
-		assert.is.equal(x, 2)
-		assert.is.equal(y, 3)
-		assert.is.equal(z, 4)
-		assert.is.equal(w, 1)
-
-		local v = a:to_vec3()
-		assert.is.equal(v.x, 2)
-		assert.is.equal(v.y, 3)
-		assert.is.equal(v.z, 4)
+		assert.is.equal(2, x)
+		assert.is.equal(3, y)
+		assert.is.equal(4, z)
+		assert.is.equal(1, w)
 	end)
 
-	it("tests conjugate", function()
+	it("converts quaternion to a vec3", function()
+		local a = quat(2, 3, 4, 1)
+		local v = a:to_vec3()
+		assert.is.equal(2, v.x)
+		assert.is.equal(3, v.y)
+		assert.is.equal(4, v.z)
+	end)
+
+	it("gets the conjugate quaternion", function()
 		local a = quat(2, 3, 4, 1)
 		local b = quat():conjugate(a)
-
-		assert.is.equal(b.x, -2)
-		assert.is.equal(b.y, -3)
-		assert.is.equal(b.z, -4)
-		assert.is.equal(b.w,  1)
+		assert.is.equal(-2, b.x)
+		assert.is.equal(-3, b.y)
+		assert.is.equal(-4, b.z)
+		assert.is.equal( 1, b.w)
 	end)
 
-	it("tests inverse", function()
-		local a = quat(1, 1, 1, 1)
-		local b = quat():inverse(a)
-
-		assert.is.equal(b.x, -0.5)
-		assert.is.equal(b.y, -0.5)
-		assert.is.equal(b.z, -0.5)
-		assert.is.equal(b.w,  0.5)
-	end)
-
-	it("tests reciprocal", function()
+	it("gets the reciprocal quaternion", function()
 		local a = quat(1, 1, 1, 1)
 		local b = quat():reciprocal(a)
 		local c = quat():reciprocal(b)
 
-		assert.is.equal(c.x, a.x)
-		assert.is.equal(c.y, a.y)
-		assert.is.equal(c.z, a.z)
-		assert.is.equal(c.w, a.w)
+		assert.is_not.equal(a.x, b.x)
+		assert.is_not.equal(a.y, b.y)
+		assert.is_not.equal(a.z, b.z)
+		assert.is_not.equal(a.w, b.w)
+
+		assert.is.equal(a.x, c.x)
+		assert.is.equal(a.y, c.y)
+		assert.is.equal(a.z, c.z)
+		assert.is.equal(a.w, c.w)
+	end)
+
+	it("converts between a quaternion and angle/axis", function()
+		local a = quat.from_angle_axis(math.pi, vec3.unit_z)
+		local angle, axis = a:to_angle_axis()
+		assert.is.equal(math.pi,     angle)
+		assert.is.equal(vec3.unit_z, axis)
 	end)
 end)
