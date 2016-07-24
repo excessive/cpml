@@ -40,6 +40,7 @@ vec2.zero   = new(0, 0)
 -- table {x, y} or {x = x, y = y}
 -- scalar to fill the vector eg. {x, x}
 -- @tparam number y Y component
+-- @treturn vec2 out
 function vec2.new(x, y)
 	-- number, number
 	if x and y then
@@ -67,14 +68,14 @@ end
 --- Convert point from polar to cartesian.
 -- @tparam number radius Radius of the point
 -- @tparam number theta Angle of the point (in radians)
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.from_cartesian(radius, theta)
 	return new(radius * cos(theta), radius * sin(theta))
 end
 
 --- Clone a vector.
 -- @tparam vec2 a Vector to be cloned
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.clone(a)
 	return new(a.x, a.y)
 end
@@ -83,7 +84,7 @@ end
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.add(out, a, b)
 	out.x = a.x + b.x
 	out.y = a.y + b.y
@@ -94,7 +95,7 @@ end
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.sub(out, a, b)
 	out.x = a.x - b.x
 	out.y = a.y - b.y
@@ -105,7 +106,7 @@ end
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.mul(out, a, b)
 	out.x = a.x * b
 	out.y = a.y * b
@@ -116,7 +117,7 @@ end
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.div(out, a, b)
 	out.x = a.x / b
 	out.y = a.y / b
@@ -126,7 +127,7 @@ end
 --- Get the normal of a vector.
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Vector to normalize
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.normalize(out, a)
 	local l = a:len()
 	out.x = a.x / l
@@ -138,7 +139,7 @@ end
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Vector to be trimmed
 -- @tparam number len Length to trim the vector to
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.trim(out, a, len)
 	return out
 		:normalize(a)
@@ -148,7 +149,7 @@ end
 --- Get the cross product of two vectors.
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn number Magnitude of cross product in 3D
+-- @treturn number magnitude
 function vec2.cross(a, b)
 	return a.x * b.y - a.y * b.x
 end
@@ -156,21 +157,21 @@ end
 --- Get the dot product of two vectors.
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn number
+-- @treturn number dot
 function vec2.dot(a, b)
 	return a.x * b.x + a.y * b.y
 end
 
 --- Get the length of a vector.
 -- @tparam vec2 a Vector to get the length of
--- @treturn number
+-- @treturn number len
 function vec2.len(a)
 	return sqrt(a.x * a.x + a.y * a.y)
 end
 
 --- Get the squared length of a vector.
 -- @tparam vec2 a Vector to get the squared length of
--- @treturn number
+-- @treturn number len
 function vec2.len2(a)
 	return a.x * a.x + a.y * a.y
 end
@@ -178,7 +179,7 @@ end
 --- Get the distance between two vectors.
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn number
+-- @treturn number dist
 function vec2.dist(a, b)
 	local dx = a.x - b.x
 	local dy = a.y - b.y
@@ -188,7 +189,7 @@ end
 --- Get the squared distance between two vectors.
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
--- @treturn number
+-- @treturn number dist
 function vec2.dist2(a, b)
 	local dx = a.x - b.x
 	local dy = a.y - b.y
@@ -199,7 +200,7 @@ end
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Vector to rotate
 -- @tparam number phi Angle to rotate vector by (in radians)
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.rotate(out, a, phi)
 	local c = cos(phi)
 	local s = sin(phi)
@@ -211,7 +212,7 @@ end
 --- Get the perpendicular vector of a vector.
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Vector to get perpendicular axes from
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.perpendicular(out, a)
 	out.x = -a.y
 	out.y =  a.x
@@ -223,7 +224,7 @@ end
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
 -- @tparam number s Step value
--- @treturn vec2
+-- @treturn vec2 out
 function vec2.lerp(out, a, b, s)
 	return out
 		:sub(b, a)
@@ -233,15 +234,15 @@ end
 
 --- Unpack a vector into individual components.
 -- @tparam vec2 a Vector to unpack
--- @treturn number x X component
--- @treturn number y Y component
+-- @treturn number x
+-- @treturn number y
 function vec2.unpack(a)
 	return a.x, a.y
 end
 
 --- Return a boolean showing if a table is or is not a vec2.
 -- @tparam vec2 a Vector to be tested
--- @treturn boolean
+-- @treturn boolean is_vec2
 function vec2.is_vec2(a)
 	if type(a) == "cdata" then
 		return ffi.istype("cpml_vec2", a)
@@ -255,7 +256,7 @@ end
 
 --- Return a boolean showing if a table is or is not a zero vec2.
 -- @tparam vec2 a Vector to be tested
--- @treturn boolean
+-- @treturn boolean is_zero
 function vec2.is_zero(a)
 	return a.x == 0 and a.y == 0
 end
@@ -273,7 +274,7 @@ end
 
 --- Return a formatted string.
 -- @tparam vec2 a Vector to be turned into a string
--- @treturn string
+-- @treturn string formatted
 function vec2.to_string(a)
 	return string.format("(%+0.3f,%+0.3f)", a.x, a.y)
 end
