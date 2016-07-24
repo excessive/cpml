@@ -22,6 +22,7 @@ local function new(m)
 		0, 0, 0, 0,
 		0, 0, 0, 0
 	}
+	m._m = m
 	return setmetatable(m, mat4_mt)
 end
 
@@ -31,6 +32,16 @@ local function identity(m)
 	m[9],  m[10], m[11], m[12] = 0, 0, 1, 0
 	m[13], m[14], m[15], m[16] = 0, 0, 0, 1
 	return m
+end
+
+-- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
+local status, ffi, the_type
+if type(jit) == "table" and jit.status() then
+    status, ffi = pcall(require, "ffi")
+    if status then
+        ffi.cdef "typedef struct { double _m[16]; } cpml_mat4;"
+        new = ffi.typeof("cpml_mat4")
+    end
 end
 
 -- Statically allocate a temporary variable used in some of our functions.
@@ -630,7 +641,31 @@ function mat4.to_frustum(a, infinite)
 	return frustum
 end
 
-mat4_mt.__index    = mat4
+--mat4_mt.__index    = mat4
+function mat4_mt.__index(t, k)
+	if type(t) == "cdata" then
+		if type(k) == "number" then
+			return t._m[k-1]
+		end
+	elseif type(k) == "number" then
+		return t._m[k]
+	end
+
+	return rawget(mat4, k)
+end
+
+function mat4_mt.__newindex(t, k, v)
+	if type(t) == "cdata" then
+		if type(k) == "number" then
+			t._m[k-1] = v
+		end
+	elseif type(k) == "number" then
+		t._m[k] = v
+	end
+
+	rawset(mat4, k, v)
+end
+
 mat4_mt.__tostring = mat4.to_string
 
 function mat4_mt.__call(_, a)
@@ -663,6 +698,10 @@ function mat4_mt.__mul(a, b)
 	end
 
 	return mat4.mul_mat4x1({}, a, b)
+end
+
+if status then
+	ffi.metatype(new, mat4_mt)
 end
 
 return setmetatable({}, mat4_mt)
