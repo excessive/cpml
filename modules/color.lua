@@ -293,8 +293,6 @@ function color_mt.__index(t, k)
 		if type(k) == "number" then
 			return t._c[k-1]
 		end
-	elseif type(k) == "number" then
-		return t._c[k]
 	end
 
 	return rawget(color, k)
@@ -304,9 +302,8 @@ function color_mt.__newindex(t, k, v)
 	if type(t) == "cdata" then
 		if type(k) == "number" then
 			t._c[k-1] = v
+			return
 		end
-	elseif type(k) == "number" then
-		t._c[k] = v
 	end
 
 	rawset(color, k, v)

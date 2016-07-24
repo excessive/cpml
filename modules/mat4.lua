@@ -651,6 +651,7 @@ function mat4_mt.__newindex(t, k, v)
 	if type(t) == "cdata" then
 		if type(k) == "number" then
 			t._m[k-1] = v
+			return
 		end
 	end
 
