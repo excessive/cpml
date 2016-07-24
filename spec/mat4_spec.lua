@@ -118,6 +118,7 @@ describe("mat4:", function()
 			4, 8, 12, 16
 		}
 		local c = mat4():mul(a, b)
+		local d = a * b
 		assert.is.equal(30,  c[1])
 		assert.is.equal(70,  c[2])
 		assert.is.equal(110, c[3])
@@ -134,6 +135,7 @@ describe("mat4:", function()
 		assert.is.equal(382, c[14])
 		assert.is.equal(614, c[15])
 		assert.is.equal(846, c[16])
+		assert.is.equal(c, d)
 	end)
 
 	it("multiplies a matrix and a vec4", function()
@@ -145,10 +147,16 @@ describe("mat4:", function()
 		}
 		local b = { 10, 20, 30, 40 }
 		local c = mat4.mul_vec4({}, a, b)
+		local d = a * b
 		assert.is.equal(900,  c[1])
 		assert.is.equal(1000, c[2])
 		assert.is.equal(1100, c[3])
 		assert.is.equal(1200, c[4])
+
+		assert.is.equal(c[1], d[1])
+		assert.is.equal(c[2], d[2])
+		assert.is.equal(c[3], d[3])
+		assert.is.equal(c[4], d[4])
 	end)
 
 	it("scales a matrix", function()
@@ -184,6 +192,14 @@ describe("mat4:", function()
 		local b = mat4():invert(a)
 		local c = mat4():mul(a, b)
 		assert.is.equal(mat4(), c)
+
+		local d = mat4()
+		d:rotate(d, math.pi/4, vec3.unit_y)
+		d:translate(d, vec3(4, 5, 6))
+
+		local e = -d
+		local f = mat4():mul(d, e)
+		assert.is.equal(mat4(), f)
 	end)
 
 	it("transposes a matrix", function()
@@ -326,6 +342,26 @@ describe("mat4:", function()
 		assert.is_true(utils.tolerance( 0   -f.far.b, 0.001))
 		assert.is_true(utils.tolerance( 1   -f.far.c, 0.001))
 		assert.is_true(utils.tolerance( 1000-f.far.d, 0.001))
+	end)
+
+	it("checks to see if data is a valid matrix (not a table)", function()
+		assert.is_not_true(mat4.is_mat4(0))
+	end)
+
+	it("checks to see if data is a valid matrix (invalid data)", function()
+		assert.is_not_true(mat4.is_mat4({}))
+	end)
+
+	it("gets a string representation of a matrix", function()
+		local a = mat4()
+		local b = a:to_string()
+		local z = "+0.000"
+		local o = "+1.000"
+		local s = string.format(
+			"[ %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ]",
+			o, z, z, z, z, o, z, z, z, z, o, z, z, z ,z, o
+		)
+		assert.is.equal(s, b)
 	end)
 end)
 

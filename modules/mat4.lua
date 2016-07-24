@@ -642,8 +642,6 @@ function mat4_mt.__index(t, k)
 		if type(k) == "number" then
 			return t._m[k-1]
 		end
-	elseif type(k) == "number" then
-		return t._m[k]
 	end
 
 	return rawget(mat4, k)
@@ -654,8 +652,6 @@ function mat4_mt.__newindex(t, k, v)
 		if type(k) == "number" then
 			t._m[k-1] = v
 		end
-	elseif type(k) == "number" then
-		t._m[k] = v
 	end
 
 	rawset(mat4, k, v)
