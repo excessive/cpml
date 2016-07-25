@@ -1,5 +1,10 @@
 -- @module constants
 
+--- Constants
+-- @table constants
+-- @field FLT_EPSILON Floating point precision breaks down
+-- @field DBL_EPSILON Double-precise floating point precision breaks down
+-- @field DOT_THRESHOLD Close enough to 1 for interpolations to occur
 local constants = {}
 
 -- same as C's FLT_EPSILON
