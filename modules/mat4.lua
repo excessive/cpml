@@ -101,11 +101,11 @@ function mat4.identity(a)
 	return identity(a or new())
 end
 
+--- Create a matrix from an angle/axis pair.
+-- @tparam number angle Angle of rotation
+-- @tparam vec3 axis Axis of rotation
+-- @treturn mat4 out
 function mat4.from_angle_axis(angle, axis)
-	if type(angle) == "table" then
-		angle, axis = angle:to_angle_axis()
-	end
-
 	local l = axis:len()
 	if l == 0 then
 		return new()
@@ -123,6 +123,17 @@ function mat4.from_angle_axis(angle, axis)
 	}
 end
 
+--- Create a matrix from a quaternion.
+-- @tparam quat q Rotation quaternion
+-- @treturn mat4 out
+function mat4.from_quaternion(q)
+	return mat4.from_angle_axis(q:to_angle_axis())
+end
+
+--- Create a matrix from a direction/up pair.
+-- @tparam vec3 direction Vector direction
+-- @tparam vec3 up Up direction
+-- @treturn mat4 out
 function mat4.from_direction(direction, up)
 	local forward = vec3():normalize(direction)
 
@@ -149,6 +160,11 @@ function mat4.from_direction(direction, up)
 	return out
 end
 
+--- Create a matrix from a transform.
+-- @tparam vec3 trans Translation vector
+-- @tparam quat rot Rotation quaternion
+-- @tparam vec3 scale Scale vector
+-- @treturn mat4 out
 function mat4.from_transform(trans, rot, scale)
 	local angle, axis = rot:to_angle_axis()
 	local l = axis:len()
@@ -169,6 +185,14 @@ function mat4.from_transform(trans, rot, scale)
 	}
 end
 
+--- Create matrix from orthogonal.
+-- @tparam number left
+-- @tparam number right
+-- @tparam number top
+-- @tparam number bottom
+-- @tparam number near
+-- @tparam number far
+-- @treturn mat4 out
 function mat4.from_ortho(left, right, top, bottom, near, far)
 	local out = new()
 	out[1]    =  2 / (right - left)
@@ -182,6 +206,12 @@ function mat4.from_ortho(left, right, top, bottom, near, far)
 	return out
 end
 
+--- Create matrix from perspective.
+-- @tparam number fovy Field of view
+-- @tparam number aspect Aspect ratio
+-- @tparam number near Near plane
+-- @tparam number far Far plane
+-- @treturn mat4 out
 function mat4.from_perspective(fovy, aspect, near, far)
 	assert(aspect ~= 0)
 	assert(near   ~= far)
@@ -199,6 +229,13 @@ function mat4.from_perspective(fovy, aspect, near, far)
 end
 
 -- Adapted from the Oculus SDK.
+--- Create matrix from HMD perspective.
+-- @tparam number tanHalfFov Tangent of half of the field of view
+-- @tparam number zNear Near plane
+-- @tparam number zFar Far plane
+-- @tparam boolean flipZ Z axis is flipped or not
+-- @tparam boolean farAtInfinity Far plane is infinite or not
+-- @treturn mat4 out
 function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity)
 	-- CPML is right-handed and intended for GL, so these don't need to be arguments.
 	local rightHanded = true
@@ -460,10 +497,17 @@ function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	return out:mul(tmp, a)
 end
 
+--- Transform matrix to look at a point.
+-- @tparam mat4 out Matrix to store result
+-- @tparam mat4 a Matrix to transform
+-- @tparam vec3 eye Location of viewer's view plane
+-- @tparam vec3 center Location of object to view
+-- @tparam vec3 up Up direction
+-- @treturn mat4 out
 function mat4.look_at(out, a, eye, center, up)
 	forward:normalize(center - eye)
 	side:cross(forward, up):normalize(side)
-	new_up:cross(side, forward):normalize(new_up)
+	new_up:cross(side, forward)
 
 	identity(tmp)
 	tmp[1]  =  side.x
@@ -475,11 +519,16 @@ function mat4.look_at(out, a, eye, center, up)
 	tmp[3]  = -forward.x
 	tmp[7]  = -forward.y
 	tmp[11] = -forward.z
+	tmp[13] = -side:dot(eye)
+	tmp[14] = -new_up:dot(eye)
+	tmp[15] =  forward:dot(eye)
+	tmp[16] = 1
+
+	for i = 1, 16 do
+		out[i] = tmp[i]
+	end
 
 	return out
-		:translate(-eye - forward)
-		:mul(out, tmp)
-		:mul(out, a)
 end
 
 --- Transpose a matrix.

@@ -98,6 +98,15 @@ describe("mat4:", function()
 		assert.is.equal(1, a[16])
 	end)
 
+	it("creates a matrix from perspective", function()
+		local a = mat4.from_perspective(45, 1, 0.1, 1000)
+		assert.is_true(utils.tolerance( 2.414-a[1],  0.001))
+		assert.is_true(utils.tolerance( 2.414-a[6],  0.001))
+		assert.is_true(utils.tolerance(-1    -a[11], 0.001))
+		assert.is_true(utils.tolerance(-1    -a[12], 0.001))
+		assert.is_true(utils.tolerance(-0.2  -a[15], 0.001))
+	end)
+
 	it("clones a matrix", function()
 		local a = mat4.identity()
 		local b = a:clone()
@@ -263,6 +272,34 @@ describe("mat4:", function()
 		assert.is_true(utils.tolerance(v.z-d.z, 0.001))
 	end)
 
+	it("transforms a matrix to look at a point", function()
+		local a = mat4()
+		local e = vec3(0, 0, 1.55)
+		local c = vec3(4, 7, 1)
+		local u = vec3(0, 0, 1)
+		local b = mat4():look_at(a, e, c, u)
+
+		assert.is_true(utils.tolerance( 0.868-b[1], 0.001))
+		assert.is_true(utils.tolerance( 0.034-b[2], 0.001))
+		assert.is_true(utils.tolerance(-0.495-b[3], 0.001))
+		assert.is_true(utils.tolerance( 0    -b[4], 0.001))
+
+		assert.is_true(utils.tolerance(-0.496-b[5], 0.001))
+		assert.is_true(utils.tolerance( 0.059-b[6], 0.001))
+		assert.is_true(utils.tolerance(-0.866-b[7], 0.001))
+		assert.is_true(utils.tolerance( 0    -b[8], 0.001))
+
+		assert.is_true(utils.tolerance( 0    -b[9],  0.001))
+		assert.is_true(utils.tolerance( 0.998-b[10], 0.001))
+		assert.is_true(utils.tolerance( 0.068-b[11], 0.001))
+		assert.is_true(utils.tolerance( 0    -b[12], 0.001))
+
+		assert.is_true(utils.tolerance( 0    -b[13], 0.001))
+		assert.is_true(utils.tolerance(-1.546-b[14], 0.001))
+		assert.is_true(utils.tolerance(-0.106-b[15], 0.001))
+		assert.is_true(utils.tolerance( 1    -b[16], 0.001))
+	end)
+
 	it("converts a matrix to vec4s", function()
 		local a = mat4()
 		local v = a:to_vec4s()
@@ -367,10 +404,9 @@ end)
 
 --[[
 	from_angle_axis
+	from_quaternion
 	from_direction
 	from_transform
 	from_ortho
-	from_perspective
 	from_hmd_perspective
-	look_at
 --]]
