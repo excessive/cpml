@@ -25,7 +25,7 @@ local function new(m)
 	m._m = m
 	return setmetatable(m, mat4_mt)
 end
-
+ -- Convert matrix into identity
 local function identity(m)
 	m[1],  m[2],  m[3],  m[4]  = 1, 0, 0, 0
 	m[5],  m[6],  m[7],  m[8]  = 0, 1, 0, 0
@@ -48,19 +48,32 @@ end
 local tmp = new()
 local tm4 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 local tv4 = { 0, 0, 0, 0 }
+local forward, side, new_up = vec3(), vec3(), vec3()
 
+--- The public constructor.
+-- @param a Can be of four types: </br>
+-- table Length 16 (4x4 matrix)
+-- table Length 9 (3x3 matrix)
+-- table Length 4 (4 vec4s)
+-- nil
+-- @treturn mat4 out
 function mat4.new(a)
 	local out = new()
 
+	-- 4x4 matrix
 	if type(a) == "table" and #a == 16 then
 		for i = 1, 16 do
 			out[i] = tonumber(a[i])
 		end
+
+	-- 3x3 matrix
 	elseif type(a) == "table" and #a == 9 then
 		out[1], out[2],  out[3]  = a[1], a[2], a[3]
 		out[5], out[6],  out[7]  = a[4], a[5], a[6]
 		out[9], out[10], out[11] = a[7], a[8], a[9]
 		out[16] = 1
+
+	-- 4 vec4s
 	elseif type(a) == "table" and type(a[1]) == "table" then
 		local idx = 1
 		for i = 1, 4 do
@@ -69,6 +82,8 @@ function mat4.new(a)
 				idx = idx + 1
 			end
 		end
+
+	-- nil
 	else
 		out[1]  = 1
 		out[6]  = 1
@@ -79,6 +94,9 @@ function mat4.new(a)
 	return out
 end
 
+--- Create an identity matrix.
+-- @tparam mat4 a Matrix to overwrite
+-- @treturn mat4 out
 function mat4.identity(a)
 	return identity(a or new())
 end
@@ -263,10 +281,18 @@ function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity
 	return projection:transpose(projection)
 end
 
+--- Clone a matrix.
+-- @tparam mat4 a Matrix to clone
+-- @treturn mat4 out
 function mat4.clone(a)
 	return new(a)
 end
 
+--- Multiply two matrices.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Left hand operant
+-- @tparam mat4 b Right hand operant
+-- @treturn mat4 out
 function mat4.mul(out, a, b)
 	tm4[1]  = a[1]  * b[1] + a[2]  * b[5] + a[3]  * b[9]  + a[4]  * b[13]
 	tm4[2]  = a[1]  * b[2] + a[2]  * b[6] + a[3]  * b[10] + a[4]  * b[14]
@@ -292,6 +318,11 @@ function mat4.mul(out, a, b)
 	return out
 end
 
+--- Multiply a matrix and a vec4.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Left hand operant
+-- @tparam table b Right hand operant
+-- @treturn mat4 out
 function mat4.mul_vec4(out, a, b)
 	tv4[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
 	tv4[2] = b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14]
@@ -305,6 +336,10 @@ function mat4.mul_vec4(out, a, b)
 	return out
 end
 
+--- Invert a matrix.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Matrix to invert
+-- @treturn mat4 out
 function mat4.invert(out, a)
 	tm4[1]  =  a[6] * a[11] * a[16] - a[6] * a[12] * a[15] - a[10] * a[7] * a[16] + a[10] * a[8] * a[15] + a[14] * a[7] * a[12] - a[14] * a[8] * a[11]
 	tm4[2]  = -a[2] * a[11] * a[16] + a[2] * a[12] * a[15] + a[10] * a[3] * a[16] - a[10] * a[4] * a[15] - a[14] * a[3] * a[12] + a[14] * a[4] * a[11]
@@ -340,6 +375,11 @@ function mat4.invert(out, a)
 	return out
 end
 
+--- Scale a matrix.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Matrix to scale
+-- @tparam vec3 s Scalar
+-- @treturn mat4 out
 function mat4.scale(out, a, s)
 	identity(tmp)
 	tmp[1]  = s.x
@@ -349,6 +389,12 @@ function mat4.scale(out, a, s)
 	return out:mul(tmp, a)
 end
 
+--- Rotate a matrix.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Matrix to rotate
+-- @tparam number angle Angle to rotate by (in radians)
+-- @tparam vec3 axis Axis to rotate on
+-- @treturn mat4 out
 function mat4.rotate(out, a, angle, axis)
 	if type(angle) == "table" then
 		angle, axis = angle:to_angle_axis()
@@ -378,6 +424,11 @@ function mat4.rotate(out, a, angle, axis)
 	return out:mul(tmp, a)
 end
 
+--- Translate a matrix.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Matrix to translate
+-- @tparam vec3 t Translation vector
+-- @treturn mat4 out
 function mat4.translate(out, a, t)
 	identity(tmp)
 	tmp[13] = t.x
@@ -387,6 +438,16 @@ function mat4.translate(out, a, t)
 	return out:mul(tmp, a)
 end
 
+--- Shear a matrix.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Matrix to translate
+-- @tparam number yx
+-- @tparam number zx
+-- @tparam number xy
+-- @tparam number zy
+-- @tparam number xz
+-- @tparam number yz
+-- @treturn mat4 out
 function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	identity(tmp)
 	tmp[2]  = yx or 0
@@ -399,7 +460,6 @@ function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	return out:mul(tmp, a)
 end
 
-local forward, side, new_up = vec3(), vec3(), vec3()
 function mat4.look_at(out, a, eye, center, up)
 	forward:normalize(center - eye)
 	side:cross(forward, up):normalize(side)
@@ -422,6 +482,10 @@ function mat4.look_at(out, a, eye, center, up)
 		:mul(out, a)
 end
 
+--- Transpose a matrix.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 a Matrix to transpose
+-- @treturn mat4 out
 function mat4.transpose(out, a)
 	tm4[1]  = a[1]
 	tm4[2]  = a[5]
@@ -448,7 +512,12 @@ function mat4.transpose(out, a)
 end
 
 -- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L518
--- Note: GLM calls the view matrix "model"
+--- Project a matrix from world space to screen space.
+-- @tparam vec3 obj Object position in world space
+-- @tparam mat4 view View matrix
+-- @tparam mat4 projection Projection matrix
+-- @tparam table viewport XYWH of viewport
+-- @treturn vec3 win
 function mat4.project(obj, view, projection, viewport)
 	local position = { obj.x, obj.y, obj.z, 1 }
 
@@ -466,7 +535,12 @@ function mat4.project(obj, view, projection, viewport)
 end
 
 -- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L544
--- Note: GLM calls the view matrix "model"
+--- Unproject a matrix from screen space to world space.
+-- @tparam vec3 win Object position in screen space
+-- @tparam mat4 view View matrix
+-- @tparam mat4 projection Projection matrix
+-- @tparam table viewport XYWH of viewport
+-- @treturn vec3 obj
 function mat4.unproject(win, view, projection, viewport)
 	local position = { win.x, win.y, win.z, 1 }
 
@@ -487,6 +561,9 @@ function mat4.unproject(win, view, projection, viewport)
 	return vec3(position[1], position[2], position[3])
 end
 
+--- Return a boolean showing if a table is or is not a mat4.
+-- @tparam mat4 a Matrix to be tested
+-- @treturn boolean is_mat4
 function mat4.is_mat4(a)
 	if type(a) == "cdata" then
 		return ffi.istype("cpml_mat4", a)
@@ -505,6 +582,9 @@ function mat4.is_mat4(a)
 	return true
 end
 
+--- Return a formatted string.
+-- @tparam mat4 a Matrix to be turned into a string
+-- @treturn string formatted
 function mat4.to_string(a)
 	local str = "[ "
 	for i = 1, 16 do
@@ -517,6 +597,9 @@ function mat4.to_string(a)
 	return str
 end
 
+--- Convert a matrix to vec4s.
+-- @tparam mat4 a Matrix to be converted
+-- @treturn table vec4s
 function mat4.to_vec4s(a)
 	return {
 		{ a[1],  a[2],  a[3],  a[4]  },
@@ -527,6 +610,9 @@ function mat4.to_vec4s(a)
 end
 
 -- http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+--- Convert a matrix to a quaternion.
+-- @tparam mat4 a Matrix to be converted
+-- @treturn quat out
 function mat4.to_quat(a)
 	identity(tmp):transpose(a)
 
@@ -542,8 +628,11 @@ function mat4.to_quat(a)
 	return q:normalize(q)
 end
 
--- frustum = (proj * view):to_frustum(infinite)
 -- http://www.crownandcutlass.com/features/technicaldetails/frustum.html
+--- Convert a matrix to a frustum.
+-- @tparam mat4 a Matrix to be converted (projection * view)
+-- @tparam boolean infinite Infinite removes the far plane
+-- @treturn frustum out
 function mat4.to_frustum(a, infinite)
 	local t
 	local frustum = {}

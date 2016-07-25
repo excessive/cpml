@@ -27,6 +27,7 @@ end
 
 -- Statically allocate a temporary variable used in some of our functions.
 local tmp = new(0, 0, 0, 0)
+local uv, uuv = vec3(), vec3()
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
@@ -37,6 +38,13 @@ if type(jit) == "table" and jit.status() then
 		new = ffi.typeof("cpml_quat")
 	end
 end
+
+--- Constants
+-- @table quat
+-- @field unit Unit quaternion
+-- @field zero Empty quaternion
+quat.unit = new(0, 0, 0, 1)
+quat.zero = new(0, 0, 0, 0)
 
 --- The public constructor.
 -- @param x Can be of two types: </br>
@@ -142,7 +150,6 @@ end
 -- @tparam quat a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @treturn quat out
-local uv, uuv = vec3(), vec3()
 function quat.mul_vec3(out, a, b)
 	uv:cross(a, b)
 	uuv:cross(a, uv)
@@ -454,8 +461,5 @@ end
 if status then
 	ffi.metatype(new, quat_mt)
 end
-
-quat.unit = new(0, 0, 0, 1)
-quat.zero = new(0, 0, 0, 0)
 
 return setmetatable({}, quat_mt)
