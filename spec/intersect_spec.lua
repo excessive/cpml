@@ -1,5 +1,6 @@
 local intersect = require "modules.intersect"
 local vec3      = require "modules.vec3"
+local mat4      = require "modules.mat4"
 
 describe("intersect:", function()
 	it("intersects a point with a triangle", function()
@@ -148,11 +149,29 @@ describe("intersect:", function()
 		assert.is_true(intersect.aabb_aabb(a, c))
 		assert.is_not_true(intersect.aabb_aabb(b, c))
 	end)
-	--[[
-	it("intersects an aabb with an obb", function()
 
+	it("intersects an aabb with an obb", function()
+		local r = mat4()
+		r:rotate(r, math.pi / 4, vec3.unit_z)
+
+		local a = {
+			position = vec3(),
+			extent   = vec3(0.5)
+		}
+		local b = {
+			position = vec3(),
+			extent   = vec3(0.5),
+			rotation = r
+		}
+		local c = {
+			position = vec3(0, 0, 2),
+			extent   = vec3(0.5),
+			rotation = r
+		}
+		assert.is_true(vec3.is_vec3(intersect.aabb_obb(a, b)))
+		assert.is_not_true(intersect.aabb_obb(a, c))
 	end)
-	--]]
+
 	it("intersects an aabb with a sphere", function()
 		local a = {
 			min = vec3(-1),

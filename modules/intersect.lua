@@ -341,93 +341,64 @@ function intersect.aabb_obb(aabb, obb)
 	local b    = obb.extent
 	local T    = obb.position - aabb.position
 	local rot  = mat4():transpose(obb.rotation)
-	local reps = 1e-6
 	local B    = {}
+	local t
 
 	for i = 1, 3 do
 		B[i] = {}
 		for j = 1, 3 do
 			assert((i - 1) * 4 + j < 16 and (i - 1) * 4 + j > 0)
-			B[i][j] = abs(rot[(i - 1) * 4 + j]) + reps
+			B[i][j] = abs(rot[(i - 1) * 4 + j]) + 1e-6
 		end
 	end
 
-	local t, s
-	local r = 1
-
 	t = abs(T.x)
 	if not (t <= (b.x + a.x * B[1][1] + b.y * B[1][2] + b.z * B[1][3])) then return false end
-
-	s = T.x * B[1][1] + T.y*B[2][1] + T.z*B[3][1]
-	t = abs(s)
+	t = abs(T.x * B[1][1] + T.y * B[2][1] + T.z * B[3][1])
 	if not (t <= (b.x + a.x * B[1][1] + a.y * B[2][1] + a.z * B[3][1])) then return false end
-
 	t = abs(T.y)
 	if not (t <= (a.y + b.x * B[2][1] + b.y * B[2][2] + b.z * B[2][3])) then return false end
-
 	t = abs(T.z)
 	if not (t <= (a.z + b.x * B[3][1] + b.y * B[3][2] + b.z * B[3][3])) then return false end
-
-	s = T.x * B[1][2] + T.y * B[2][2] + T.z * B[3][2]
-	t = abs(s)
+	t = abs(T.x * B[1][2] + T.y * B[2][2] + T.z * B[3][2])
 	if not (t <= (b.y + a.x * B[1][2] + a.y * B[2][2] + a.z * B[3][2])) then return false end
-
-	s = T.x * B[1][3] + T.y * B[2][3] + T.z * B[3][3]
-	t = abs(s)
+	t = abs(T.x * B[1][3] + T.y * B[2][3] + T.z * B[3][3])
 	if not (t <= (b.z + a.x * B[1][3] + a.y * B[2][3] + a.z * B[3][3])) then return false end
-
-	s = T.z * B[2][1] - T.y * B[3][1]
-	t = abs(s)
+	t = abs(T.z * B[2][1] - T.y * B[3][1])
 	if not (t <= (a.y * B[3][1] + a.z * B[2][1] + b.y * B[1][3] + b.z * B[1][2])) then return false end
-
-	s = T.z * B[2][2] - T.y * B[3][2]
-	t = abs(s)
+	t = abs(T.z * B[2][2] - T.y * B[3][2])
 	if not (t <= (a.y * B[3][2] + a.z * B[2][2] + b.x * B[1][3] + b.z * B[1][1])) then return false end
-
-	s = T.z * B[2][3] - T.y * B[3][3]
-	t = abs(s)
+	t = abs(T.z * B[2][3] - T.y * B[3][3])
 	if not (t <= (a.y * B[3][3] + a.z * B[2][3] + b.x * B[1][2] + b.y * B[1][1])) then return false end
-
-	s = T.x * B[3][1] - T.z * B[1][1]
-	t = abs(s)
+	t = abs(T.x * B[3][1] - T.z * B[1][1])
 	if not (t <= (a.x * B[3][1] + a.z * B[1][1] + b.y * B[2][3] + b.z * B[2][2])) then return false end
-
-	s = T.x * B[3][2] - T.z * B[1][2]
-	t = abs(s)
+	t = abs(T.x * B[3][2] - T.z * B[1][2])
 	if not (t <= (a.x * B[3][2] + a.z * B[1][2] + b.x * B[2][3] + b.z * B[2][1])) then return false end
-
-	s = T.x * B[3][3] - T.z * B[1][3]
-	t = abs(s)
+	t = abs(T.x * B[3][3] - T.z * B[1][3])
 	if not (t <= (a.x * B[3][3] + a.z * B[1][3] + b.x * B[2][2] + b.y * B[2][1])) then return false end
-
-	s = T.y * B[1][1] - T.x * B[2][1]
-	t = abs(s)
+	t = abs(T.y * B[1][1] - T.x * B[2][1])
 	if not (t <= (a.x * B[2][1] + a.y * B[1][1] + b.y * B[3][3] + b.z * B[3][2])) then return false end
-
-	s = T.y * B[1][2] - T.x * B[2][2]
-	t = abs(s)
+	t = abs(T.y * B[1][2] - T.x * B[2][2])
 	if not (t <= (a.x * B[2][2] + a.y * B[1][2] + b.x * B[3][3] + b.z * B[3][1])) then return false end
-
-	s = T.y * B[1][3] - T.x * B[2][3]
-	t = abs(s)
+	t = abs(T.y * B[1][3] - T.x * B[2][3])
 	if not (t <= (a.x * B[2][3] + a.y * B[1][3] + b.x * B[3][2] + b.y * B[3][1])) then return false end
 
 	-- https://gamedev.stackexchange.com/questions/24078/which-side-was-hit
 	-- Minkowski Sum
-	local wy = (aabb.extent * 2  + obb.extent * 2) * (aabb.position.y - obb.position.y)
-	local hx = (aabb.extent * 2  + obb.extent * 2) * (aabb.position.x - obb.position.x)
+	local wy = (aabb.extent * 2 + obb.extent * 2) * (aabb.position.y - obb.position.y)
+	local hx = (aabb.extent * 2 + obb.extent * 2) * (aabb.position.x - obb.position.x)
 
-	if wy > hx then
-		if wy > -hx then
-			return vec3(mat4.mul_mat4x1(obb.rotation, { 0, -1, 0, 1 }))
+	if wy.x > hx.x and wy.y > hx.y and wy.z > hx.z then
+		if wy.x > -hx.x and wy.y > -hx.y and wy.z > -hx.z then
+			return vec3(mat4.mul_vec4({}, obb.rotation, {  0, -1, 0, 1 }))
 		else
-			return vec3(mat4.mul_mat4x1(obb.rotation, { -1, 0, 0, 1 }))
+			return vec3(mat4.mul_vec4({}, obb.rotation, { -1,  0, 0, 1 }))
 		end
 	else
-		if wy > -hx then
-			return vec3(mat4.mul_mat4x1(obb.rotation, { 1, 0, 0, 1 }))
+		if wy.x > -hx.x and wy.y > -hx.y and wy.z > -hx.z then
+			return vec3(mat4.mul_vec4({}, obb.rotation, { 1, 0, 0, 1 }))
 		else
-			return vec3(mat4.mul_mat4x1(obb.rotation, { 0, 1, 0, 1 }))
+			return vec3(mat4.mul_vec4({}, obb.rotation, { 0, 1, 0, 1 }))
 		end
 	end
 end
