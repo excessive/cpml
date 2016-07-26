@@ -6,43 +6,48 @@ local constants   = require(modules .. "constants")
 local vec3        = require(modules .. "vec3")
 local mat4        = require(modules .. "mat4")
 local DBL_EPSILON = constants.DBL_EPSILON
+local FLT_EPSILON = constants.FLT_EPSILON
 local sqrt        = math.sqrt
 local abs         = math.abs
 local min         = math.min
 local max         = math.max
 local intersect   = {}
 
--- http://www.peroxide.dk/papers/collision/collision.pdf
+-- Some temp variables
+local h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3()
+local dir, dirfrac    = vec3(), vec3()
+local p13, p43, p21   = vec3(), vec3(), vec3()
+local axes            = { "x", "y", "z" }
+
+-- https://blogs.msdn.microsoft.com/rezanour/2011/08/07/barycentric-coordinates-and-point-in-triangle-tests/
 -- point       is a vec3
 -- triangle[1] is a vec3
 -- triangle[2] is a vec3
 -- triangle[3] is a vec3
 function intersect.point_triangle(point, triangle)
-	local t21 = triangle[2] - triangle[1]
-	local t31 = triangle[3] - triangle[1]
+	local u = triangle[2] - triangle[1]
+	local v = triangle[3] - triangle[1]
+	local w = point       - triangle[1]
 
-	local a     = t21:dot(t21)
-	local b     = t21:dot(t31)
-	local c     = t31:dot(t31)
-	local ac_bb = a * c - b * b
+	local vw = vec3():cross(v, w)
+	local vu = vec3():cross(v, u)
 
-	local v = vec3(
-		point.x - triangle[1].x,
-		point.y - triangle[1].y,
-		point.z - triangle[1].z
-	)
+	if vw:dot(vu) < 0 then
+		return false
+	end
 
-	local d = v:dot(t21)
-	local e = v:dot(t31)
+	local uw = vec3():cross(u, w)
+	local uv = vec3():cross(u, v)
 
-	local x = d * c - e * b
-	local y = e * a - d * b
-	local z = x + y - ac_bb
+	if uw:dot(uv) < 0 then
+		return false
+	end
 
-	return
-		x >= 0 and
-		y >= 0 and
-		z <  0
+	local d = uv:len()
+	local r = vw:len() / d
+	local t = uw:len() / d
+
+	return r + t <= 1
 end
 
 -- point    is a vec3
@@ -98,7 +103,6 @@ end
 -- triangle[1]   is a vec3
 -- triangle[2]   is a vec3
 -- triangle[3]   is a vec3
-local h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3()
 function intersect.ray_triangle(ray, triangle)
 	e1:sub(triangle[2], triangle[1])
 	e2:sub(triangle[3], triangle[1])
@@ -135,8 +139,8 @@ function intersect.ray_triangle(ray, triangle)
 	-- return position of intersection
 	if t >= DBL_EPSILON then
 		local out = vec3()
-			:mul(ray.direction, t)
-			:add(ray.position, out)
+		out:mul(ray.direction, t)
+		out:add(ray.position, out)
 
 		return out
 	end
@@ -174,18 +178,18 @@ function intersect.ray_sphere(ray, sphere)
 	t = t < 0 and 0 or t
 
 	local out = vec3()
-		:add(ray.position, ray.direction)
-		:mul(out, t)
+	out:mul(ray.direction, t)
+	out:add(out, ray.position)
 
 	-- Return collision point and distance from ray origin
 	return out, t
 end
 
+-- http://gamedev.stackexchange.com/a/18459
 -- ray.position  is a vec3
 -- ray.direction is a vec3
 -- aabb.min      is a vec3
 -- aabb.max      is a vec3
-local dir, dirfrac = vec3(), vec3()
 function intersect.ray_aabb(ray, aabb)
 	dir:normalize(ray.direction)
 	dirfrac.x = 1 / dir.x
@@ -212,8 +216,12 @@ function intersect.ray_aabb(ray, aabb)
 		return false
 	end
 
-	-- return position of intersection
-	return tmin
+	local out = vec3()
+	out:mul(ray.direction, tmin)
+	out:add(out, ray.position)
+
+	-- Return collision point and distance from ray origin
+	return out, tmin
 end
 
 -- https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
@@ -222,23 +230,23 @@ end
 -- plane.position is a vec3
 -- plane.normal   is a vec3
 function intersect.ray_plane(ray, plane)
-	local d = ray.position:dist(plane.position)
 	local r = ray.direction:dot(plane.normal)
 
 	-- ray does not intersect plane
-	if r <= 0 then
+	if r >= 0 then
 		return false
 	end
 
 	-- distance of direction
-	local t = -(ray.position:dot(plane.normal) + d) / r
+	local d   = ray.position:dist(plane.position)
+	local t   = -(ray.position:dot(plane.normal) + d) / r
 	local out = vec3()
-		:mul(ray.direction, t)
-		:add(ray.position, out)
+	out:mul(ray.direction, t)
+	out:add(out, ray.position)
 
-	-- return position of intersection
+	-- Return collision point and distance from ray origin
 	if out:dot(plane.normal) + d < DBL_EPSILON then
-		return out
+		return out, t
 	end
 
 	-- ray does not intersect plane
@@ -250,7 +258,6 @@ end
 -- a[2] is a vec3
 -- b[1] is a vec3
 -- b[2] is a vec3
-local p13, p43, p21, out1, out2 = vec3(), vec3(), vec3(), vec3(), vec3()
 function intersect.line_line(a, b)
 	-- new points
 	p13:sub(a[1], b[1])
@@ -277,13 +284,16 @@ function intersect.line_line(a, b)
 
 	local numer = d1343 * d4321 - d1321 * d4343
 	local mua   = numer / denom
-	local mub   = (d1343 + d4321 * (mua)) / d4343
+	local mub   = (d1343 + d4321 * mua) / d4343
 
 	-- return positions of intersection on each line
-	out1:mul(mua, p21)
-	out1:add(a[1], out1)
-	out2:mul(mub, p43)
-	out2:add(b[1], out2)
+	local out1 = vec3()
+	out1:mul(p21, mua)
+	out1:add(out1, a[1])
+
+	local out2 = vec3()
+	out2:mul(p43, mub)
+	out2:add(out2, b[1])
 
 	return out1, out2
 end
@@ -422,27 +432,27 @@ function intersect.aabb_obb(aabb, obb)
 	end
 end
 
+-- http://stackoverflow.com/a/4579069/1190664
 -- aabb.min        is a vec3
 -- aabb.max        is a vec3
 -- sphere.position is a vec3
 -- sphere.radius   is a number
-local axes = { "x", "y", "z" }
-function intersect.aabb_sphere(aabb, sphere) -- { position, radius }
-	local dmin = 0
+function intersect.aabb_sphere(aabb, sphere)
+	local dist2 = sphere.radius ^ 2
 
 	for _, axis in ipairs(axes) do
-		local pos = sphere.position[axis]
-		local min = box.min[axis]
-		local max = box.max[axis]
+		local pos  = sphere.position[axis]
+		local amin = aabb.min[axis]
+		local amax = aabb.max[axis]
 
-		if pos < min then
-			dmin = dmin + (pos - min) ^ 2
-		elseif pos > max then
-			dmin = dmin + (pos - max) ^ 2
+		if pos < amin then
+			dist2 = dist2 - (pos - amin) ^ 2
+		elseif pos > amax then
+			dist2 = dist2 - (pos - amax) ^ 2
 		end
 	end
 
-	return dmin <= radius ^ 2
+	return dist2 > 0
 end
 
 -- aabb.min       is a vec3
@@ -505,8 +515,12 @@ end
 -- inner.max is a vec3
 function intersect.encapsulate_aabb(outer, inner)
 	return
-		outer.min <= inner.min and
-		outer.max >= inner.max
+		outer.min.x <= inner.min.x and
+		outer.max.x >= inner.max.x and
+		outer.min.y <= inner.min.y and
+		outer.max.y >= inner.max.y and
+		outer.min.z <= inner.min.z and
+		outer.max.z >= inner.max.z
 end
 
 -- a.position is a vec3
