@@ -6,7 +6,6 @@ local constants   = require(modules .. "constants")
 local vec3        = require(modules .. "vec3")
 local mat4        = require(modules .. "mat4")
 local DBL_EPSILON = constants.DBL_EPSILON
-local FLT_EPSILON = constants.FLT_EPSILON
 local sqrt        = math.sqrt
 local abs         = math.abs
 local min         = math.min
@@ -14,10 +13,10 @@ local max         = math.max
 local intersect   = {}
 
 -- Some temp variables
-local h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3()
-local dir, dirfrac    = vec3(), vec3()
-local p13, p43, p21   = vec3(), vec3(), vec3()
-local axes            = { "x", "y", "z" }
+local d, h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3(), vec3()
+local dir, dirfrac       = vec3(), vec3()
+local p13, p43, p21      = vec3(), vec3(), vec3()
+local axes               = { "x", "y", "z" }
 
 -- https://blogs.msdn.microsoft.com/rezanour/2011/08/07/barycentric-coordinates-and-point-in-triangle-tests/
 -- point       is a vec3
@@ -224,33 +223,33 @@ function intersect.ray_aabb(ray, aabb)
 	return out, tmin
 end
 
--- https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld017.htm
+-- http://stackoverflow.com/a/23976134/1190664
 -- ray.position   is a vec3
 -- ray.direction  is a vec3
 -- plane.position is a vec3
 -- plane.normal   is a vec3
 function intersect.ray_plane(ray, plane)
-	local r = ray.direction:dot(plane.normal)
+	local denom = plane.normal:dot(ray.direction)
 
 	-- ray does not intersect plane
-	if r >= 0 then
+	if abs(denom) < DBL_EPSILON then
 		return false
 	end
 
 	-- distance of direction
-	local d   = ray.position:dist(plane.position)
-	local t   = -(ray.position:dot(plane.normal) + d) / r
+	d:sub(plane.position, ray.position)
+	local t = d:dot(plane.normal) / denom
+
+	if t < DBL_EPSILON then
+		return false
+	end
+
 	local out = vec3()
 	out:mul(ray.direction, t)
 	out:add(out, ray.position)
 
 	-- Return collision point and distance from ray origin
-	if out:dot(plane.normal) + d < DBL_EPSILON then
-		return out, t
-	end
-
-	-- ray does not intersect plane
-	return false
+	return out, t
 end
 
 -- https://web.archive.org/web/20120414063459/http://local.wasp.uwa.edu.au/~pbourke//geometry/lineline3d/
@@ -258,7 +257,8 @@ end
 -- a[2] is a vec3
 -- b[1] is a vec3
 -- b[2] is a vec3
-function intersect.line_line(a, b)
+-- e    is a number
+function intersect.line_line(a, b, e)
 	-- new points
 	p13:sub(a[1], b[1])
 	p43:sub(b[2], b[1])
@@ -295,22 +295,54 @@ function intersect.line_line(a, b)
 	out2:mul(p43, mub)
 	out2:add(out2, b[1])
 
-	return out1, out2
+	local dist = out1:dist(out2)
+
+	-- if distance of the shortest segment between lines is less than threshold
+	if e and dist > e then
+		return false
+	end
+
+	return { out1, out2 }, dist
 end
 
 -- a[1] is a vec3
 -- a[2] is a vec3
 -- b[1] is a vec3
 -- b[2] is a vec3
-function intersect.segment_segment(a, b)
-	local c1, c2 = intersect.line_line(a, b)
+-- e    is a number
+function intersect.segment_segment(a, b, e)
+	local c, d = intersect.line_line(a, b, e)
 
-	-- return positions of line intersections if within segment ranges
-	if c1 and c2 then
-		if ((a[1] <= c1 and c1 <= a[2]) or (a[1] >= c1 and c1 >= a[2])) and
-			((b[1] <= c2 and c2 <= b[2]) or (b[1] >= c2 and c2 >= b[2])) then
-			return c1, c2
-		end
+	if c and ((
+		a[1].x <= c[1].x and
+		a[1].y <= c[1].y and
+		a[1].z <= c[1].z and
+		c[1].x <= a[2].x and
+		c[1].y <= a[2].y and
+		c[1].z <= a[2].z
+	) or (
+		a[1].x >= c[1].x and
+		a[1].y >= c[1].y and
+		a[1].z >= c[1].z and
+		c[1].x >= a[2].x and
+		c[1].y >= a[2].y and
+		c[1].z >= a[2].z
+	)) and ((
+		b[1].x <= c[2].x and
+		b[1].y <= c[2].y and
+		b[1].z <= c[2].z and
+		c[2].x <= b[2].x and
+		c[2].y <= b[2].y and
+		c[2].z <= b[2].z
+	) or (
+		b[1].x >= c[2].x and
+		b[1].y >= c[2].y and
+		b[1].z >= c[2].z and
+		c[2].x >= b[2].x and
+		c[2].y >= b[2].y and
+		c[2].z >= b[2].z
+	)) then
+		return c, d
 	end
 
 	-- segments do not intersect
@@ -337,11 +369,11 @@ end
 -- obb.extent    is a vec3 (half-size)
 -- obb.rotation  is a mat4
 function intersect.aabb_obb(aabb, obb)
-	local a    = aabb.extent
-	local b    = obb.extent
-	local T    = obb.position - aabb.position
-	local rot  = mat4():transpose(obb.rotation)
-	local B    = {}
+	local a   = aabb.extent
+	local b   = obb.extent
+	local T   = obb.position - aabb.position
+	local rot = mat4():transpose(obb.rotation)
+	local B   = {}
 	local t
 
 	for i = 1, 3 do

@@ -87,7 +87,7 @@ describe("intersect:", function()
 		assert.is_true(vec3.is_vec3(w))
 		assert.is_not_true(y)
 	end)
-	--[[ THIS IS BROKEN, RETURNING INCORRECT VALUES
+
 	it("intersects a ray with a plane", function()
 		local a = {
 			position  = vec3(0, 0,  1),
@@ -107,8 +107,7 @@ describe("intersect:", function()
 		assert.is_true(vec3.is_vec3(w))
 		assert.is_not_true(y)
 	end)
-	--]]
-	--[[ THIS IS ALSO BROKEN GOD DAMMIT
+
 	it("intersects a line with a line", function()
 		local a = {
 			vec3(0, 0, -1),
@@ -123,16 +122,36 @@ describe("intersect:", function()
 			vec3( 1, 0, 0)
 		}
 
-		local w, x = intersect.line_line(a, c)
-		local y, z = intersect.line_line(b, c)
-		assert.is_true(vec3.is_vec3(w))
-		assert.is_not_true(y)
+		local w, x = intersect.line_line(a, c, 0.001)
+		local y, z = intersect.line_line(b, c, 0.001)
+		local u, v = intersect.line_line(b, c)
+		assert.is_truthy(w)
+		assert.is_not_truthy(y)
+		assert.is_truthy(u)
 	end)
 
 	it("intersects a segment with a segment", function()
+		local a = {
+			vec3(0, 0, -1),
+			vec3(0, 0,  1)
+		}
+		local b = {
+			vec3(0, 0, -1),
+			vec3(0, 1, -1)
+		}
+		local c = {
+			vec3(-1, 0, 0),
+			vec3( 1, 0, 0)
+		}
 
+		local w, x = intersect.segment_segment(a, c, 0.001)
+		local y, z = intersect.segment_segment(b, c, 0.001)
+		local u, v = intersect.segment_segment(b, c)
+		assert.is_truthy(w)
+		assert.is_not_truthy(y)
+		assert.is_truthy(u)
 	end)
-	--]]
+
 	it("intersects an aabb with an aabb", function()
 		local a = {
 			min = vec3(-1),
