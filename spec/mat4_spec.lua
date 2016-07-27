@@ -107,6 +107,22 @@ describe("mat4:", function()
 		assert.is_true(utils.tolerance(-0.2  -a[15], 0.001))
 	end)
 
+	it("creates a matrix from HMD perspective", function()
+		local t = {
+			LeftTan  = 2.3465312,
+			RightTan = 0.9616399,
+			UpTan    = 2.8664987,
+			DownTan  = 2.8664987
+		}
+		local a = mat4.from_hmd_perspective(t, 0.1, 1000, false, false)
+		assert.is_true(utils.tolerance(a[1] -  0.605, 0.001))
+		assert.is_true(utils.tolerance(a[6] -  0.349, 0.001))
+		assert.is_true(utils.tolerance(a[9] - -0.419, 0.001))
+		assert.is_true(utils.tolerance(a[11]- -1.000, 0.001))
+		assert.is_true(utils.tolerance(a[12]- -1.000, 0.001))
+		assert.is_true(utils.tolerance(a[15]- -0.200, 0.001))
+	end)
+
 	it("clones a matrix", function()
 		local a = mat4.identity()
 		local b = a:clone()
@@ -408,5 +424,4 @@ end)
 	from_direction
 	from_transform
 	from_ortho
-	from_hmd_perspective
 --]]
