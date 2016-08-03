@@ -548,16 +548,22 @@ end
 -- triangle[1]     is a vec3
 -- triangle[2]     is a vec3
 -- triangle[3]     is a vec3
-function intersect.sphere_trianlge(sphere, triangle)
+function intersect.sphere_triangle(sphere, triangle)
+	-- Sphere is centered at origin
 	local A  = triangle[1] - sphere.position
 	local B  = triangle[2] - sphere.position
 	local C  = triangle[3] - sphere.position
 
-	local rr = sphere.radius * sphere.radius
+	-- Compute normal of triangle plane
 	local V  = vec3():cross(B - A, C - A)
 
+	-- Test if sphere lies outside triangle plane
+	local rr = sphere.radius * sphere.radius
 	local d  = A:dot(V)
 	local e  = V:dot(V)
+	local s1 = d * d > rr * e
+
+	-- Test if sphere lies outside triangle vertices
 	local aa = A:dot(A)
 	local ab = A:dot(B)
 	local ac = A:dot(C)
@@ -565,6 +571,11 @@ function intersect.sphere_trianlge(sphere, triangle)
 	local bc = B:dot(C)
 	local cc = C:dot(C)
 
+	local s2 = (aa > rr) and (ab > aa) and (ac > aa)
+	local s3 = (bb > rr) and (ab > bb) and (bc > bb)
+	local s4 = (cc > rr) and (ac > cc) and (bc > cc)
+
+	-- Test is sphere lies outside triangle edges
 	local AB = B - A
 	local BC = C - B
 	local CA = A - C
@@ -580,18 +591,16 @@ function intersect.sphere_trianlge(sphere, triangle)
 	local Q1 = A * e1 - d1 * AB
 	local Q2 = B * e2 - d2 * BC
 	local Q3 = C * e3 - d3 * CA
+
 	local QC = C * e1 - Q1
 	local QA = A * e2 - Q2
 	local QB = B * e3 - Q3
 
-	local s1 = d * d > rr * e
-	local s2 = (aa > rr) and (ab > aa) and (ac > aa)
-	local s3 = (bb > rr) and (ab > bb) and (bc > bb)
-	local s4 = (cc > rr) and (ac > cc) and (bc > cc)
 	local s5 = (Q1:dot(Q1) > rr * e1 * e1) and (Q1:dot(QC) > 0)
 	local s6 = (Q2:dot(Q2) > rr * e2 * e2) and (Q2:dot(QA) > 0)
 	local s7 = (Q3:dot(Q3) > rr * e3 * e3) and (Q3:dot(QB) > 0)
 
+	-- Return whether or not any of the tests passed
 	return s1 or s2 or s3 or s4 or s5 or s6 or s7
 end
 
