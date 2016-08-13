@@ -95,16 +95,6 @@ local function color_to_hsv(c)
 	return { h, s, v, a }
 end
 
--- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
-local status, ffi, the_type
-if type(jit) == "table" and jit.status() then
-    status, ffi = pcall(require, "ffi")
-    if status then
-        ffi.cdef "typedef struct { double _c[4]; } cpml_color;"
-        new = ffi.typeof("cpml_color")
-    end
-end
-
 function color.new(r, g, b, a)
 	-- number, number, number, number
 	if r and g and b and a then
@@ -267,10 +257,6 @@ function color.linear_to_gamma(r, g, b, a)
 end
 
 function color.is_color(a)
-	if type(a) == "cdata" then
-		return ffi.istype("cpml_color", a)
-	end
-
 	if type(a) ~= "table" then
 		return false
 	end
@@ -328,10 +314,6 @@ function color_mt.__mul(a, b)
 	else
 		return new(a[1] * b[1], a[2] * b[2], a[3] * b[3], a[4] * b[4])
 	end
-end
-
-if status then
-	ffi.metatype(new, color_mt)
 end
 
 return setmetatable({}, color_mt)
