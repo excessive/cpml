@@ -280,11 +280,10 @@ end
 -- @tparam number s Step value
 -- @treturn quat out
 function quat.lerp(out, a, b, s)
-	return out
-		:sub(b, a)
-		:scale(out, s)
-		:add(a, out)
-		:normalize(out)
+	tmp:sub(b, a)
+	tmp:scale(tmp, s)
+	tmp:add(tmp, a)
+	return out:normalize(tmp)
 end
 
 --- Slerp between two quaternions.
