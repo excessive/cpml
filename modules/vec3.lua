@@ -147,7 +147,7 @@ end
 function vec3.trim(out, a, len)
 	return out
 		:normalize(a)
-		:mul(out, math.min(vec3.len(a), len))
+		:scale(out, math.min(vec3.len(a), len))
 end
 
 --- Get the cross product of two vectors.
@@ -260,7 +260,7 @@ end
 function vec3.lerp(out, a, b, s)
 	return out
 		:sub(b, a)
-		:mul(out, s)
+		:scale(out, s)
 		:add(out, a)
 end
 
@@ -317,8 +317,9 @@ function vec3_mt.__unm(a)
 end
 
 function vec3_mt.__eq(a, b)
-	assert(vec3.is_vec3(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+	if not vec3.is_vec3(a) or not vec3.is_vec3(b) then
+		return false
+	end
 	return a.x == b.x and a.y == b.y and a.z == b.z
 end
 

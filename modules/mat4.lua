@@ -433,7 +433,7 @@ end
 -- @tparam vec3 axis Axis to rotate on
 -- @treturn mat4 out
 function mat4.rotate(out, a, angle, axis)
-	if type(angle) == "table" then
+	if type(angle) == "table" or type(angle) == "cdata" then
 		angle, axis = angle:to_angle_axis()
 	end
 
@@ -804,8 +804,9 @@ function mat4_mt.__unm(a)
 end
 
 function mat4_mt.__eq(a, b)
-	assert(mat4.is_mat4(a), "__eq: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
-	assert(mat4.is_mat4(b), "__eq: Wrong argument type for right hand operant. (<cpml.mat4> expected)")
+	if not mat4.is_mat4(a) or not mat4.is_mat4(b) then
+		return false
+	end
 
 	for i = 1, 16 do
 		if not utils.tolerance(b[i]-a[i], constants.FLT_EPSILON) then

@@ -155,10 +155,10 @@ function quat.mul_vec3(out, a, b)
 	uuv:cross(a, uv)
 
 	return out
-		:mul(uv,  a.w)
+		:scale(uv, a.w)
 		:add(out, uuv)
-		:mul(out, 2  )
-		:add(b,   out)
+		:scale(out, 2)
+		:add(b, out)
 end
 
 --- Multiply a quaternion by an exponent.
@@ -230,6 +230,14 @@ function quat.scale(out, a, s)
 	out.z = a.z * s
 	out.w = a.w * s
 	return out
+end
+
+--- Alias of from_angle_axis.
+-- @tparam number angle Angle (in radians)
+-- @tparam vec3 axis
+-- @treturn quat out
+function quat.rotate(angle, axis)
+	return quat.from_angle_axis(angle, axis)
 end
 
 --- Return the conjugate of a quaternion.
@@ -420,8 +428,9 @@ function quat_mt.__unm(a)
 end
 
 function quat_mt.__eq(a,b)
-	assert(quat.is_quat(a), "__eq: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.is_quat(b), "__eq: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	if not quat.is_quat(a) or not quat.is_quat(b) then
+		return false
+	end
 	return a.x == b.x and a.y == b.y and a.z == b.z and a.w == b.w
 end
 

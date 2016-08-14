@@ -230,6 +230,34 @@ function vec2.perpendicular(out, a)
 	return out
 end
 
+--- Angle from one vector to another.
+-- @tparam vec2 a Vector
+-- @tparam vec2 b Vector
+-- @treturn number angle
+function vec2.angle_to(a, b)
+	if b then
+		return atan2(a.y - b.y, a.x - b.x)
+	end
+
+	return atan2(a.y, a.x)
+end
+
+--- Angle between two vectors.
+-- @tparam vec2 a Vector
+-- @tparam vec2 b Vector
+-- @treturn number angle
+function vec2.angle_between(a, b)
+	if b then
+		if vec2.is_vec2(a) then
+			return acos(vec2.dot(a, b) / (vec2.len(a) * vec2.len(b)))
+		end
+
+		return acos(vec3.dot(a, b) / (vec3.len(a) * vec3.len(b)))
+	end
+
+	return 0
+end
+
 --- Lerp between two vectors.
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Left hand operant
@@ -301,9 +329,10 @@ function vec2_mt.__unm(a)
 	return new(-a.x, -a.y)
 end
 
-function vec2_mt.__eq(a,b)
-	assert(vec2.is_vec2(a), "__eq: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.is_vec2(b), "__eq: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+function vec2_mt.__eq(a, b)
+	if not vec2.is_vec2(a) or not vec2.is_vec2(b) then
+		return false
+	end
 	return a.x == b.x and a.y == b.y
 end
 

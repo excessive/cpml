@@ -187,26 +187,4 @@ function utils.refract(out, i, n, ior)
 	return out
 end
 
--- Originally from vec3
-function utils.angle_to(a, b)
-	if b then
-		return atan2(a.y - b.y, a.x - b.x)
-	end
-
-	return atan2(a.y, a.x)
-end
-
--- Originally from vec3
-function utils.angle_between(a, b)
-	if b then
-		if vec2.is_vec2(a) then
-			return acos(vec2.dot(a, b) / (vec2.len(a) * vec2.len(b)))
-		end
-
-		return acos(vec3.dot(a, b) / (vec3.len(a) * vec3.len(b)))
-	end
-
-	return 0
-end
-
 return utils
