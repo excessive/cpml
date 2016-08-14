@@ -103,27 +103,27 @@ function vec3.sub(out, a, b)
 	return out
 end
 
---- Multiply a vector by a scalar.
+--- Multiply a vector by another vectorr.
 -- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
--- @tparam number b Right hand operant
+-- @tparam vec3 b Right hand operant
 -- @treturn vec3 out
 function vec3.mul(out, a, b)
-	out.x = a.x * b
-	out.y = a.y * b
-	out.z = a.z * b
+	out.x = a.x * b.x
+	out.y = a.y * b.y
+	out.z = a.z * b.z
 	return out
 end
 
 --- Divide a vector by a scalar.
 -- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
--- @tparam number b Right hand operant
+-- @tparam vec3 b Right hand operant
 -- @treturn vec3 out
 function vec3.div(out, a, b)
-	out.x = a.x / b
-	out.y = a.y / b
-	out.z = a.z / b
+	out.x = a.x / b.x
+	out.y = a.y / b.y
+	out.z = a.z / b.z
 	return out
 end
 
@@ -204,6 +204,18 @@ function vec3.dist2(a, b)
 	local dy = a.y - b.y
 	local dz = a.z - b.z
 	return dx * dx + dy * dy + dz * dz
+end
+
+--- Scale a vector by a scalar.
+-- @tparam vec3 out Vector to store the result
+-- @tparam vec3 a Left hand operant
+-- @tparam number b Right hand operant
+-- @treturn vec3 out
+function vec3.scale(out, a, b)
+	out.x = a.x * b
+	out.y = a.y * b
+	out.z = a.z * b
+	return out
 end
 
 --- Rotate vector about an axis.
@@ -324,14 +336,24 @@ end
 
 function vec3_mt.__mul(a, b)
 	assert(vec3.is_vec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
-	return new():mul(a, b)
+	assert(vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
+
+	if vec3.is_vec3(b) then
+		return new():mul(a, b)
+	end
+
+	return new():scale(a, b)
 end
 
 function vec3_mt.__div(a, b)
 	assert(vec3.is_vec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
-	return new():div(a, b)
+	assert(vec3.is_vec3(b) or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
+
+	if vec3.is_vec3(b) then
+		return new():div(a, b)
+	end
+
+	return new():scale(a, 1 / b)
 end
 
 if status then

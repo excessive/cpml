@@ -102,25 +102,25 @@ function vec2.sub(out, a, b)
 	return out
 end
 
---- Multiply a vector by a scalar.
+--- Multiply a vector by another vector.
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
 -- @treturn vec2 out
 function vec2.mul(out, a, b)
-	out.x = a.x * b
-	out.y = a.y * b
+	out.x = a.x * b.x
+	out.y = a.y * b.y
 	return out
 end
 
---- Divide one vector by a scalar.
+--- Divide a vector by another vector.
 -- @tparam vec2 out Vector to store the result
 -- @tparam vec2 a Left hand operant
 -- @tparam vec2 b Right hand operant
 -- @treturn vec2 out
 function vec2.div(out, a, b)
-	out.x = a.x / b
-	out.y = a.y / b
+	out.x = a.x / b.x
+	out.y = a.y / b.y
 	return out
 end
 
@@ -194,6 +194,17 @@ function vec2.dist2(a, b)
 	local dx = a.x - b.x
 	local dy = a.y - b.y
 	return dx * dx + dy * dy
+end
+
+--- Scale a vector by a scalar.
+-- @tparam vec2 out Vector to store the result
+-- @tparam vec2 a Left hand operant
+-- @tparam number b Right hand operant
+-- @treturn vec2 out
+function vec2.scale(out, a, b)
+	out.x = a.x * b
+	out.y = a.y * b
+	return out
 end
 
 --- Rotate a vector.
@@ -310,14 +321,24 @@ end
 
 function vec2_mt.__mul(a, b)
 	assert(vec2.is_vec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(type(b) == "number", "__mul: Wrong argument type for right hand operant. (<number> expected)")
-	return new():mul(a, b)
+	assert(vec2.is_vec2(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
+
+	if vec2.is_vec2(b) then
+		return new():mul(a, b)
+	end
+
+	return new():scale(a, b)
 end
 
 function vec2_mt.__div(a, b)
 	assert(vec2.is_vec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(type(b) == "number", "__div: Wrong argument type for right hand operant. (<number> expected)")
-	return new():div(a, b)
+	assert(vec2.is_vec2(b) or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
+
+	if vec2.is_vec2(b) then
+		return new():div(a, b)
+	end
+
+	return new():scale(a, 1 / b)
 end
 
 if status then
