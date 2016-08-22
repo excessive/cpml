@@ -143,7 +143,7 @@ end
 function vec2.trim(out, a, len)
 	return out
 		:normalize(a)
-		:mul(out, math.min(a:len(), len))
+		:scale(out, math.min(a:len(), len))
 end
 
 --- Get the cross product of two vectors.
@@ -267,7 +267,7 @@ end
 function vec2.lerp(out, a, b, s)
 	return out
 		:sub(b, a)
-		:mul(out, s)
+		:scale(out, s)
 		:add(out, a)
 end
 

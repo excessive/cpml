@@ -23,7 +23,7 @@ OctreeNode.__index = OctreeNode
 -- @param initialWorldSize Size of the sides of the initial node, in metres. The octree will never shrink smaller than this
 -- @param initialWorldPos Position of the centre of the initial node
 -- @param minNodeSize Nodes will stop splitting if the new nodes would be smaller than this (metres)
--- @param loosenessVal Clamped between 1 and 2. Values > 1 let nodes overlap
+-- @param looseness Clamped between 1 and 2. Values > 1 let nodes overlap
 local function new(initialWorldSize, initialWorldPos, minNodeSize, looseness)
 	local tree = setmetatable({}, Octree)
 
@@ -354,6 +354,7 @@ end
 -- @param ray Ray with a position and a direction
 -- @param func Function to execute on any objects within child nodes
 -- @param out Table to store results of func in
+-- @param depth (used internally)
 -- @return boolean True if an intersect is detected
 function OctreeNode:cast_ray(ray, func, out, depth)
 	depth = depth or 1
@@ -597,6 +598,7 @@ end
 
 --- Draws the bounds of all objects in the tree visually for debugging.
 -- @param cube Cube model to draw
+-- @param filter a function returning true or false to determine visibility.
 function OctreeNode:draw_objects(cube, filter)
 	local tint = self.baseLength / 20
 	love.graphics.setColor(0, (1 - tint) * 255, tint * 255, 63)

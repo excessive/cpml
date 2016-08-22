@@ -64,16 +64,16 @@ describe("vec2:", function()
 	it("multiplies a vector by a scale factor", function()
 		local a = vec2(3, 5)
 		local s = 2
-		local c = vec2():mul(a, s)
+		local c = vec2():scale(a, s)
 		local d = a * s
 		assert.is.equal(6,  c.x)
 		assert.is.equal(10, c.y)
 		assert.is.equal(c,  d)
 	end)
 
-	it("divides a vector by a scale factor", function()
+	it("divides a vector by another vector", function()
 		local a = vec2(3, 5)
-		local s = 2
+		local s = vec2(2, 2)
 		local c = vec2():div(a, s)
 		local d = a / s
 		assert.is.equal(1.5, c.x)

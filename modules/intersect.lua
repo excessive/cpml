@@ -138,7 +138,7 @@ function intersect.ray_triangle(ray, triangle)
 	-- return position of intersection
 	if t >= DBL_EPSILON then
 		local out = vec3()
-		out:mul(ray.direction, t)
+		out:scale(ray.direction, t)
 		out:add(ray.position, out)
 
 		return out
@@ -177,7 +177,7 @@ function intersect.ray_sphere(ray, sphere)
 	t = t < 0 and 0 or t
 
 	local out = vec3()
-	out:mul(ray.direction, t)
+	out:scale(ray.direction, t)
 	out:add(out, ray.position)
 
 	-- Return collision point and distance from ray origin
@@ -216,7 +216,7 @@ function intersect.ray_aabb(ray, aabb)
 	end
 
 	local out = vec3()
-	out:mul(ray.direction, tmin)
+	out:scale(ray.direction, tmin)
 	out:add(out, ray.position)
 
 	-- Return collision point and distance from ray origin
@@ -245,7 +245,7 @@ function intersect.ray_plane(ray, plane)
 	end
 
 	local out = vec3()
-	out:mul(ray.direction, t)
+	out:scale(ray.direction, t)
 	out:add(out, ray.position)
 
 	-- Return collision point and distance from ray origin
@@ -288,11 +288,11 @@ function intersect.line_line(a, b, e)
 
 	-- return positions of intersection on each line
 	local out1 = vec3()
-	out1:mul(p21, mua)
+	out1:scale(p21, mua)
 	out1:add(out1, a[1])
 
 	local out2 = vec3()
-	out2:mul(p43, mub)
+	out2:scale(p43, mub)
 	out2:add(out2, b[1])
 
 	local dist = out1:dist(out2)

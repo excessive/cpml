@@ -1,3 +1,4 @@
+--- Various useful constants
 -- @module constants
 
 --- Constants

@@ -71,7 +71,7 @@ describe("vec3:", function()
 	it("multiplies a vector by a scale factor", function()
 		local a = vec3(3, 5, 7)
 		local s = 2
-		local c = vec3():mul(a, s)
+		local c = vec3():scale(a, s)
 		local d = a * s
 		assert.is.equal(6,  c.x)
 		assert.is.equal(10, c.y)
@@ -79,9 +79,9 @@ describe("vec3:", function()
 		assert.is.equal(c,  d)
 	end)
 
-	it("divides a vector by a scale factor", function()
+	it("divides a vector by another vector", function()
 		local a = vec3(3, 5, 7)
-		local s = 2
+		local s = vec3(2, 2, 2)
 		local c = vec3():div(a, s)
 		local d = a / s
 		assert.is.equal(1.5, c.x)
