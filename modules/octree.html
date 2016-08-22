@@ -30,16 +30,20 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
 
 
 <h2>Modules</h2>
 <ul class="$(kind=='Topics' and '' or 'nowrap'">
   <li><a href="../modules/color.html">color</a></li>
+  <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
   <li><a href="../modules/mat4.html">mat4</a></li>
   <li><a href="../modules/mesh.html">mesh</a></li>
   <li><strong>octree</strong></li>
-  <li><a href="../modules/quadtree.html">quadtree</a></li>
   <li><a href="../modules/quat.html">quat</a></li>
   <li><a href="../modules/simplex.html">simplex</a></li>
   <li><a href="../modules/utils.html">utils</a></li>
@@ -52,24 +56,735 @@
 <div id="content">
 
 <h1>Module <code>octree</code></h1>
-<p>Octrees</p>
+<p>Octree</p>
 <p>
 
 </p>
 
 
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Octree:add">Octree:add (obj, objBounds)</a></td>
+	<td class="summary">Add an object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:remove">Octree:remove (obj)</a></td>
+	<td class="summary">Remove an object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:is_colliding">Octree:is_colliding (checkBounds)</a></td>
+	<td class="summary">Check if the specified bounds intersect with anything in the tree.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:get_colliding">Octree:get_colliding (checkBounds)</a></td>
+	<td class="summary">Returns an array of objects that intersect with the specified bounds, if any.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:cast_ray">Octree:cast_ray (ray, func, out)</a></td>
+	<td class="summary">Cast a ray through the node and its children</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:draw_bounds">Octree:draw_bounds (cube)</a></td>
+	<td class="summary">Draws node boundaries visually for debugging.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:draw_objects">Octree:draw_objects (cube, filter)</a></td>
+	<td class="summary">Draws the bounds of all objects in the tree visually for debugging.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:grow">Octree:grow (direction)</a></td>
+	<td class="summary">Grow the octree to fit in all objects.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:shrink">Octree:shrink ()</a></td>
+	<td class="summary">Shrink the octree if possible, else leave it the same.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Octree:get_root_pos_index">Octree:get_root_pos_index (xDir, yDir, zDir)</a></td>
+	<td class="summary">Used when growing the octree.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:add">OctreeNode:add (obj, objBounds)</a></td>
+	<td class="summary">Add an object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:remove">OctreeNode:remove (obj)</a></td>
+	<td class="summary">Remove an object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:is_colliding">OctreeNode:is_colliding (checkBounds)</a></td>
+	<td class="summary">Check if the specified bounds intersect with anything in the tree.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:get_colliding">OctreeNode:get_colliding (checkBounds, results)</a></td>
+	<td class="summary">Returns an array of objects that intersect with the specified bounds, if any.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:cast_ray">OctreeNode:cast_ray (ray, func, out, depth)</a></td>
+	<td class="summary">Cast a ray through the node and its children</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:set_children">OctreeNode:set_children (childOctrees)</a></td>
+	<td class="summary">Set the 8 children of this octree.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:shrink_if_possible">OctreeNode:shrink_if_possible (minLength)</a></td>
+	<td class="summary">We can shrink the octree if:
+ - This node is >= double minLength in length
+ - All objects in the root node are within one octant
+ - This node doesn't have children, or does but 7/8 children are empty
+ We can also shrink it if there are no objects left at all!</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:set_values">OctreeNode:set_values (baseLength, minSize, looseness, center)</a></td>
+	<td class="summary">Set values for this node.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:split">OctreeNode:split ()</a></td>
+	<td class="summary">Splits the octree into eight children.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:merge">OctreeNode:merge ()</a></td>
+	<td class="summary">Merge all children into this node - the opposite of Split.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:best_fit_child">OctreeNode:best_fit_child (objBounds)</a></td>
+	<td class="summary">Find which child node this object would be most likely to fit in.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:should_merge">OctreeNode:should_merge ()</a></td>
+	<td class="summary">Checks if there are few enough objects in this node and its children that the children should all be merged into this.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:has_any_objects">OctreeNode:has_any_objects ()</a></td>
+	<td class="summary">Checks if this node or anything below it has something in it.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:draw_bounds">OctreeNode:draw_bounds (cube, depth)</a></td>
+	<td class="summary">Draws node boundaries visually for debugging.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:draw_objects">OctreeNode:draw_objects (cube, filter)</a></td>
+	<td class="summary">Draws the bounds of all objects in the tree visually for debugging.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "Octree:add"></a>
+    <strong>Octree:add (obj, objBounds)</strong>
+    </dt>
+    <dd>
+    Add an object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+         Object to add
+        </li>
+        <li><span class="parameter">objBounds</span>
+         3D bounding box around the object
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:remove"></a>
+    <strong>Octree:remove (obj)</strong>
+    </dt>
+    <dd>
+    Remove an object.  Makes the assumption that the object only exists once in the tree.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+         Object to remove
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        bool True if the object was removed successfully
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:is_colliding"></a>
+    <strong>Octree:is_colliding (checkBounds)</strong>
+    </dt>
+    <dd>
+    Check if the specified bounds intersect with anything in the tree.  See also: get_colliding.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">checkBounds</span>
+         bounds to check
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        bool True if there was a collision
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:get_colliding"></a>
+    <strong>Octree:get_colliding (checkBounds)</strong>
+    </dt>
+    <dd>
+    Returns an array of objects that intersect with the specified bounds, if any.  Otherwise returns an empty array. See also: is_colliding.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">checkBounds</span>
+         bounds to check
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table Objects that intersect with the specified bounds
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:cast_ray"></a>
+    <strong>Octree:cast_ray (ray, func, out)</strong>
+    </dt>
+    <dd>
+    Cast a ray through the node and its children
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ray</span>
+         Ray with a position and a direction
+        </li>
+        <li><span class="parameter">func</span>
+         Function to execute on any objects within child nodes
+        </li>
+        <li><span class="parameter">out</span>
+         Table to store results of func in
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean True if an intersect detected
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:draw_bounds"></a>
+    <strong>Octree:draw_bounds (cube)</strong>
+    </dt>
+    <dd>
+    Draws node boundaries visually for debugging.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cube</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:draw_objects"></a>
+    <strong>Octree:draw_objects (cube, filter)</strong>
+    </dt>
+    <dd>
+    Draws the bounds of all objects in the tree visually for debugging.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cube</span>
+
+
+
+        </li>
+        <li><span class="parameter">filter</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:grow"></a>
+    <strong>Octree:grow (direction)</strong>
+    </dt>
+    <dd>
+    Grow the octree to fit in all objects.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">direction</span>
+         Direction to grow
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:shrink"></a>
+    <strong>Octree:shrink ()</strong>
+    </dt>
+    <dd>
+    Shrink the octree if possible, else leave it the same.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Octree:get_root_pos_index"></a>
+    <strong>Octree:get_root_pos_index (xDir, yDir, zDir)</strong>
+    </dt>
+    <dd>
+    Used when growing the octree.  Works out where the old root node would fit inside a new, larger root node.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">xDir</span>
+         X direction of growth. 1 or -1
+        </li>
+        <li><span class="parameter">yDir</span>
+         Y direction of growth. 1 or -1
+        </li>
+        <li><span class="parameter">zDir</span>
+         Z direction of growth. 1 or -1
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        Octant where the root node should be
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:add"></a>
+    <strong>OctreeNode:add (obj, objBounds)</strong>
+    </dt>
+    <dd>
+    Add an object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+         Object to add
+        </li>
+        <li><span class="parameter">objBounds</span>
+         3D bounding box around the object
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean True if the object fits entirely within this node
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:remove"></a>
+    <strong>OctreeNode:remove (obj)</strong>
+    </dt>
+    <dd>
+    Remove an object.  Makes the assumption that the object only exists once in the tree.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">obj</span>
+         Object to remove
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean True if the object was removed successfully
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:is_colliding"></a>
+    <strong>OctreeNode:is_colliding (checkBounds)</strong>
+    </dt>
+    <dd>
+    Check if the specified bounds intersect with anything in the tree.  See also: get_colliding.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">checkBounds</span>
+         Bounds to check
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean True if there was a collision
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:get_colliding"></a>
+    <strong>OctreeNode:get_colliding (checkBounds, results)</strong>
+    </dt>
+    <dd>
+    Returns an array of objects that intersect with the specified bounds, if any.  Otherwise returns an empty array. See also: is_colliding.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">checkBounds</span>
+         Bounds to check. Passing by ref as it improve performance with structs
+        </li>
+        <li><span class="parameter">results</span>
+         List results
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table Objects that intersect with the specified bounds
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:cast_ray"></a>
+    <strong>OctreeNode:cast_ray (ray, func, out, depth)</strong>
+    </dt>
+    <dd>
+    Cast a ray through the node and its children
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">ray</span>
+         Ray with a position and a direction
+        </li>
+        <li><span class="parameter">func</span>
+         Function to execute on any objects within child nodes
+        </li>
+        <li><span class="parameter">out</span>
+         Table to store results of func in
+        </li>
+        <li><span class="parameter">depth</span>
+         (used internally)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean True if an intersect is detected
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:set_children"></a>
+    <strong>OctreeNode:set_children (childOctrees)</strong>
+    </dt>
+    <dd>
+    Set the 8 children of this octree.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">childOctrees</span>
+         The 8 new child nodes
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:shrink_if_possible"></a>
+    <strong>OctreeNode:shrink_if_possible (minLength)</strong>
+    </dt>
+    <dd>
+    We can shrink the octree if:
+ - This node is >= double minLength in length
+ - All objects in the root node are within one octant
+ - This node doesn't have children, or does but 7/8 children are empty
+ We can also shrink it if there are no objects left at all!
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">minLength</span>
+         Minimum dimensions of a node in this octree
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table The new root, or the existing one if we didn't shrink
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:set_values"></a>
+    <strong>OctreeNode:set_values (baseLength, minSize, looseness, center)</strong>
+    </dt>
+    <dd>
+    Set values for this node.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">baseLength</span>
+         Length of this node, not taking looseness into account
+        </li>
+        <li><span class="parameter">minSize</span>
+         Minimum size of nodes in this octree
+        </li>
+        <li><span class="parameter">looseness</span>
+         Multiplier for baseLengthVal to get the actual size
+        </li>
+        <li><span class="parameter">center</span>
+         Centre position of this node
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:split"></a>
+    <strong>OctreeNode:split ()</strong>
+    </dt>
+    <dd>
+    Splits the octree into eight children.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:merge"></a>
+    <strong>OctreeNode:merge ()</strong>
+    </dt>
+    <dd>
+    Merge all children into this node - the opposite of Split.
+ Note: We only have to check one level down since a merge will never happen if the children already have children,
+ since THAT won't happen unless there are already too many objects to merge.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:best_fit_child"></a>
+    <strong>OctreeNode:best_fit_child (objBounds)</strong>
+    </dt>
+    <dd>
+    Find which child node this object would be most likely to fit in.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">objBounds</span>
+         The object's bounds
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        number One of the eight child octants
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:should_merge"></a>
+    <strong>OctreeNode:should_merge ()</strong>
+    </dt>
+    <dd>
+    Checks if there are few enough objects in this node and its children that the children should all be merged into this.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean True there are less or the same abount of objects in this and its children than numObjectsAllowed
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:has_any_objects"></a>
+    <strong>OctreeNode:has_any_objects ()</strong>
+    </dt>
+    <dd>
+    Checks if this node or anything below it has something in it.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        boolean True if this node or any of its children, grandchildren etc have something in the
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:draw_bounds"></a>
+    <strong>OctreeNode:draw_bounds (cube, depth)</strong>
+    </dt>
+    <dd>
+    Draws node boundaries visually for debugging.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cube</span>
+         Cube model to draw
+        </li>
+        <li><span class="parameter">depth</span>
+         Used for recurcive calls to this method
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:draw_objects"></a>
+    <strong>OctreeNode:draw_objects (cube, filter)</strong>
+    </dt>
+    <dd>
+    Draws the bounds of all objects in the tree visually for debugging.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cube</span>
+         Cube model to draw
+        </li>
+        <li><span class="parameter">filter</span>
+         a function returning true or false to determine visibility.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
-<i style="float:right;">Last updated 2015-09-13 05:51:35 </i>
+<i style="float:right;">Last updated 2016-08-21 20:32:28 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

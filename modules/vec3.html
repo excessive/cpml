@@ -33,17 +33,18 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
 </ul>
 
 
 <h2>Modules</h2>
 <ul class="$(kind=='Topics' and '' or 'nowrap'">
   <li><a href="../modules/color.html">color</a></li>
+  <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
   <li><a href="../modules/mat4.html">mat4</a></li>
   <li><a href="../modules/mesh.html">mesh</a></li>
   <li><a href="../modules/octree.html">octree</a></li>
-  <li><a href="../modules/quadtree.html">quadtree</a></li>
   <li><a href="../modules/quat.html">quat</a></li>
   <li><a href="../modules/simplex.html">simplex</a></li>
   <li><a href="../modules/utils.html">utils</a></li>
@@ -56,7 +57,7 @@
 <div id="content">
 
 <h1>Module <code>vec3</code></h1>
-<p>3 dimensional vectors.</p>
+<p>A 3 component vector.</p>
 <p>
 
 </p>
@@ -65,44 +66,95 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#clone">clone ()</a></td>
-	<td class="summary">Create a new vector containing the same data.</td>
+	<td class="name" nowrap><a href="#new">new (x, y, z)</a></td>
+	<td class="summary">The public constructor.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#unpack">unpack ()</a></td>
-	<td class="summary">Unpack the vector into its components.</td>
+	<td class="name" nowrap><a href="#clone">clone (a)</a></td>
+	<td class="summary">Clone a vector.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add">add (out, a, b)</a></td>
+	<td class="summary">Add two vectors.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sub">sub (out, a, b)</a></td>
+	<td class="summary">Subtract one vector from another.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mul">mul (out, a, b)</a></td>
+	<td class="summary">Multiply a vector by another vectorr.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#div">div (out, a, b)</a></td>
+	<td class="summary">Divide a vector by a scalar.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize">normalize (out, a)</a></td>
+	<td class="summary">Get the normal of a vector.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#trim">trim (out, a, len)</a></td>
+	<td class="summary">Trim a vector to a given length</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#cross">cross (out, a, b)</a></td>
+	<td class="summary">Get the cross product of two vectors.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#dot">dot (a, b)</a></td>
-	<td class="summary">Dot product.</td>
+	<td class="summary">Get the dot product of two vectors.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#len">len ()</a></td>
-	<td class="summary">Vector length/magnitude.</td>
+	<td class="name" nowrap><a href="#len">len (a)</a></td>
+	<td class="summary">Get the length of a vector.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#len2">len2 (a)</a></td>
+	<td class="summary">Get the squared length of a vector.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#dist">dist (a, b)</a></td>
-	<td class="summary">Distance between two points.</td>
+	<td class="summary">Get the distance between two vectors.</td>
 	</tr>
 	<tr>
 	<td class="name" nowrap><a href="#dist2">dist2 (a, b)</a></td>
-	<td class="summary">Squared distance between two points.</td>
+	<td class="summary">Get the squared distance between two vectors.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize_inplace">normalize_inplace ()</a></td>
-	<td class="summary">Normalize vector.</td>
+	<td class="name" nowrap><a href="#scale">scale (out, a, b)</a></td>
+	<td class="summary">Scale a vector by a scalar.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize">normalize ()</a></td>
-	<td class="summary">Normalize vector.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#rotate">rotate (phi, axis)</a></td>
+	<td class="name" nowrap><a href="#rotate">rotate (out, a, phi, axis)</a></td>
 	<td class="summary">Rotate vector about an axis.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#cross">cross (v)</a></td>
-	<td class="summary">Cross product.</td>
+	<td class="name" nowrap><a href="#lerp">lerp (out, a, b, s)</a></td>
+	<td class="summary">Lerp between two vectors.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unpack">unpack (a)</a></td>
+	<td class="summary">Unpack a vector into individual components.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_vec3">is_vec3 (a)</a></td>
+	<td class="summary">Return a boolean showing if a table is or is not a vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_zero">is_zero (a)</a></td>
+	<td class="summary">Return a boolean showing if a table is or is not a zero vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_string">to_string (a)</a></td>
+	<td class="summary">Return a formatted string.</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#vec3">vec3</a></td>
+	<td class="summary">Constants</td>
 	</tr>
 </table>
 
@@ -114,18 +166,36 @@
 
     <dl class="function">
     <dt>
-    <a name = "clone"></a>
-    <strong>clone ()</strong>
+    <a name = "new"></a>
+    <strong>new (x, y, z)</strong>
     </dt>
     <dd>
-    Create a new vector containing the same data.
+    The public constructor.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+         Can be of three types: </br>
+ number X component
+ table {x, y, z} or {x=x, y=y, z=z}
+ scalar To fill the vector eg. {x, x, x}
+        </li>
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">number</span></span>
+         Y component
+        </li>
+        <li><span class="parameter">z</span>
+            <span class="types"><span class="type">number</span></span>
+         Z component
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        vec3
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
     </ol>
 
 
@@ -133,22 +203,267 @@
 
 </dd>
     <dt>
-    <a name = "unpack"></a>
-    <strong>unpack ()</strong>
+    <a name = "clone"></a>
+    <strong>clone (a)</strong>
     </dt>
     <dd>
-    Unpack the vector into its components.
+    Clone a vector.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to be cloned
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
-        <li>
-        number</li>
-        <li>
-        number</li>
-        <li>
-        number</li>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add"></a>
+    <strong>add (out, a, b)</strong>
+    </dt>
+    <dd>
+    Add two vectors.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sub"></a>
+    <strong>sub (out, a, b)</strong>
+    </dt>
+    <dd>
+    Subtract one vector from another.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mul"></a>
+    <strong>mul (out, a, b)</strong>
+    </dt>
+    <dd>
+    Multiply a vector by another vectorr.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "div"></a>
+    <strong>div (out, a, b)</strong>
+    </dt>
+    <dd>
+    Divide a vector by a scalar.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize"></a>
+    <strong>normalize (out, a)</strong>
+    </dt>
+    <dd>
+    Get the normal of a vector.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to normalize
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "trim"></a>
+    <strong>trim (out, a, len)</strong>
+    </dt>
+    <dd>
+    Trim a vector to a given length
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to be trimmed
+        </li>
+        <li><span class="parameter">len</span>
+            <span class="types"><span class="type">number</span></span>
+         Length to trim the vector to
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "cross"></a>
+    <strong>cross (out, a, b)</strong>
+    </dt>
+    <dd>
+    Get the cross product of two vectors.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
     </ol>
 
 
@@ -160,23 +475,26 @@
     <strong>dot (a, b)</strong>
     </dt>
     <dd>
-    Dot product.
+    Get the dot product of two vectors.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">a</span>
-         first vec3 to dot with
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
         </li>
         <li><span class="parameter">b</span>
-         second vec3 to dot with
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        number
+           <span class="types"><span class="type">number</span></span>
+        dot
     </ol>
 
 
@@ -185,17 +503,52 @@
 </dd>
     <dt>
     <a name = "len"></a>
-    <strong>len ()</strong>
+    <strong>len (a)</strong>
     </dt>
     <dd>
-    Vector length/magnitude.
+    Get the length of a vector.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to get the length of
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        number
+           <span class="types"><span class="type">number</span></span>
+        len
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "len2"></a>
+    <strong>len2 (a)</strong>
+    </dt>
+    <dd>
+    Get the squared length of a vector.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to get the squared length of
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        len
     </ol>
 
 
@@ -207,23 +560,26 @@
     <strong>dist (a, b)</strong>
     </dt>
     <dd>
-    Distance between two points.
+    Get the distance between two vectors.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">a</span>
-         first point
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
         </li>
         <li><span class="parameter">b</span>
-         second point
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        number
+           <span class="types"><span class="type">number</span></span>
+        dist
     </ol>
 
 
@@ -235,23 +591,26 @@
     <strong>dist2 (a, b)</strong>
     </dt>
     <dd>
-    Squared distance between two points.
+    Get the squared distance between two vectors.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">a</span>
-         first point
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
         </li>
         <li><span class="parameter">b</span>
-         second point
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        number
+           <span class="types"><span class="type">number</span></span>
+        dist
     </ol>
 
 
@@ -259,39 +618,34 @@
 
 </dd>
     <dt>
-    <a name = "normalize_inplace"></a>
-    <strong>normalize_inplace ()</strong>
+    <a name = "scale"></a>
+    <strong>scale (out, a, b)</strong>
     </dt>
     <dd>
-    Normalize vector.
- Scales the vector in place such that its length is 1.
+    Scale a vector by a scalar.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><span class="type">number</span></span>
+         Right hand operant
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        vec3
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "normalize"></a>
-    <strong>normalize ()</strong>
-    </dt>
-    <dd>
-    Normalize vector.
- Returns a copy of the vector scaled such that its length is 1.
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-        vec3
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
     </ol>
 
 
@@ -300,7 +654,7 @@
 </dd>
     <dt>
     <a name = "rotate"></a>
-    <strong>rotate (phi, axis)</strong>
+    <strong>rotate (out, a, phi, axis)</strong>
     </dt>
     <dd>
     Rotate vector about an axis.
@@ -308,10 +662,20 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to rotate
+        </li>
         <li><span class="parameter">phi</span>
+            <span class="types"><span class="type">number</span></span>
          Amount to rotate, in radians
         </li>
         <li><span class="parameter">axis</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
          Axis to rotate by
         </li>
     </ul>
@@ -319,7 +683,8 @@
     <h3>Returns:</h3>
     <ol>
 
-        vec3
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
     </ol>
 
 
@@ -327,25 +692,186 @@
 
 </dd>
     <dt>
-    <a name = "cross"></a>
-    <strong>cross (v)</strong>
+    <a name = "lerp"></a>
+    <strong>lerp (out, a, b, s)</strong>
     </dt>
     <dd>
-    Cross product.
+    Lerp between two vectors.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">v</span>
-         vec3 to cross with
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Right hand operant
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><span class="type">number</span></span>
+         Step value
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        vec3
+           <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+        out
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "unpack"></a>
+    <strong>unpack (a)</strong>
+    </dt>
+    <dd>
+    Unpack a vector into individual components.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to unpack
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        x</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        y</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        z</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_vec3"></a>
+    <strong>is_vec3 (a)</strong>
+    </dt>
+    <dd>
+    Return a boolean showing if a table is or is not a vec3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to be tested
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        is_vec3
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_zero"></a>
+    <strong>is_zero (a)</strong>
+    </dt>
+    <dd>
+    Return a boolean showing if a table is or is not a zero vec3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to be tested
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        is_zero
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_string"></a>
+    <strong>to_string (a)</strong>
+    </dt>
+    <dd>
+    Return a formatted string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/vec3.html#vec3">vec3</a></span>
+         Vector to be turned into a string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        formatted
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "vec3"></a>
+    <strong>vec3</strong>
+    </dt>
+    <dd>
+    Constants
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">unit_x</span>
+         X axis of rotation
+        </li>
+        <li><span class="parameter">unit_y</span>
+         Y axis of rotation
+        </li>
+        <li><span class="parameter">unit_z</span>
+         Z axis of rotation
+        </li>
+        <li><span class="parameter">zero</span>
+         Empty vector
+        </li>
+    </ul>
+
 
 
 
@@ -358,7 +884,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
-<i style="float:right;">Last updated 2015-09-13 05:51:35 </i>
+<i style="float:right;">Last updated 2016-08-21 20:32:28 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

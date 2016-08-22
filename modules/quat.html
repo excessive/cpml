@@ -30,16 +30,21 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Tables">Tables</a></li>
+</ul>
 
 
 <h2>Modules</h2>
 <ul class="$(kind=='Topics' and '' or 'nowrap'">
   <li><a href="../modules/color.html">color</a></li>
+  <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
   <li><a href="../modules/mat4.html">mat4</a></li>
   <li><a href="../modules/mesh.html">mesh</a></li>
   <li><a href="../modules/octree.html">octree</a></li>
-  <li><a href="../modules/quadtree.html">quadtree</a></li>
   <li><strong>quat</strong></li>
   <li><a href="../modules/simplex.html">simplex</a></li>
   <li><a href="../modules/utils.html">utils</a></li>
@@ -52,24 +57,1070 @@
 <div id="content">
 
 <h1>Module <code>quat</code></h1>
-<p>Quaternions</p>
+<p>A quaternion and associated utilities.</p>
 <p>
 
 </p>
 
 
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new (x, y, z, w)</a></td>
+	<td class="summary">The public constructor.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_angle_axis">from_angle_axis (angle, axis)</a></td>
+	<td class="summary">Create a quaternion from an angle/axis pair.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_direction">from_direction (normal, up)</a></td>
+	<td class="summary">Create a quaternion from a normal/up vector pair.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#clone">clone (a)</a></td>
+	<td class="summary">Clone a quaternion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#add">add (out, a, b)</a></td>
+	<td class="summary">Add two quaternions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#sub">sub (out, a, b)</a></td>
+	<td class="summary">Subtract a quaternion from another.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mul">mul (out, a, b)</a></td>
+	<td class="summary">Multiply two quaternions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#mul_vec3">mul_vec3 (out, a, b)</a></td>
+	<td class="summary">Multiply a quaternion and a vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#pow">pow (out, a, n)</a></td>
+	<td class="summary">Multiply a quaternion by an exponent.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#normalize">normalize (out, a)</a></td>
+	<td class="summary">Normalize a quaternion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#dot">dot (a, b)</a></td>
+	<td class="summary">Get the dot product of two quaternions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#len">len (a)</a></td>
+	<td class="summary">Return the length of a quaternion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#len2">len2 (a)</a></td>
+	<td class="summary">Return the squared length of a quaternion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#scale">scale (out, a, s)</a></td>
+	<td class="summary">Multiply a quaternion by a scalar.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#rotate">rotate (angle, axis)</a></td>
+	<td class="summary">Alias of from<em>angle</em>axis.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#conjugate">conjugate (out, a)</a></td>
+	<td class="summary">Return the conjugate of a quaternion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#inverse">inverse (out, a)</a></td>
+	<td class="summary">Return the inverse of a quaternion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#reciprocal">reciprocal (out, a)</a></td>
+	<td class="summary">Return the reciprocal of a quaternion.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#lerp">lerp (out, a, b, s)</a></td>
+	<td class="summary">Lerp between two quaternions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#slerp">slerp (out, a, b, s)</a></td>
+	<td class="summary">Slerp between two quaternions.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unpack">unpack (a)</a></td>
+	<td class="summary">Unpack a quaternion into individual components.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_quat">is_quat (a)</a></td>
+	<td class="summary">Return a boolean showing if a table is or is not a quat.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_zero">is_zero (a)</a></td>
+	<td class="summary">Return a boolean showing if a table is or is not a zero quat.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_real">is_real (a)</a></td>
+	<td class="summary">Return a boolean showing if a table is or is not a real quat.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_imaginary">is_imaginary (a)</a></td>
+	<td class="summary">Return a boolean showing if a table is or is not an imaginary quat.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_angle_axis">to_angle_axis (a)</a></td>
+	<td class="summary">Convert a quaternion into an angle/axis pair.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_vec3">to_vec3 (a)</a></td>
+	<td class="summary">Convert a quaternion into a vec3.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_string">to_string (a)</a></td>
+	<td class="summary">Return a formatted string.</td>
+	</tr>
+</table>
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#quat">quat</a></td>
+	<td class="summary">Constants</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new (x, y, z, w)</strong>
+    </dt>
+    <dd>
+    The public constructor.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+         Can be of two types: </br>
+ number x X component
+ table {x, y, z, w} or {x=x, y=y, z=z, w=w}
+        </li>
+        <li><span class="parameter">y</span>
+            <span class="types"><span class="type">number</span></span>
+         Y component
+        </li>
+        <li><span class="parameter">z</span>
+            <span class="types"><span class="type">number</span></span>
+         Z component
+        </li>
+        <li><span class="parameter">w</span>
+            <span class="types"><span class="type">number</span></span>
+         W component
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_angle_axis"></a>
+    <strong>from_angle_axis (angle, axis)</strong>
+    </dt>
+    <dd>
+    Create a quaternion from an angle/axis pair.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">angle</span>
+            <span class="types"><span class="type">number</span></span>
+         Angle (in radians)
+        </li>
+        <li><span class="parameter">axis</span>
+            <span class="types"><span class="type">vec3</span></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_direction"></a>
+    <strong>from_direction (normal, up)</strong>
+    </dt>
+    <dd>
+    Create a quaternion from a normal/up vector pair.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">normal</span>
+            <span class="types"><span class="type">vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">up</span>
+            <span class="types"><span class="type">vec3</span></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "clone"></a>
+    <strong>clone (a)</strong>
+    </dt>
+    <dd>
+    Clone a quaternion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to clone
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "add"></a>
+    <strong>add (out, a, b)</strong>
+    </dt>
+    <dd>
+    Add two quaternions.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "sub"></a>
+    <strong>sub (out, a, b)</strong>
+    </dt>
+    <dd>
+    Subtract a quaternion from another.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mul"></a>
+    <strong>mul (out, a, b)</strong>
+    </dt>
+    <dd>
+    Multiply two quaternions.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "mul_vec3"></a>
+    <strong>mul_vec3 (out, a, b)</strong>
+    </dt>
+    <dd>
+    Multiply a quaternion and a vec3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><span class="type">vec3</span></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pow"></a>
+    <strong>pow (out, a, n)</strong>
+    </dt>
+    <dd>
+    Multiply a quaternion by an exponent.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">n</span>
+            <span class="types"><span class="type">number</span></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "normalize"></a>
+    <strong>normalize (out, a)</strong>
+    </dt>
+    <dd>
+    Normalize a quaternion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to normalize
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "dot"></a>
+    <strong>dot (a, b)</strong>
+    </dt>
+    <dd>
+    Get the dot product of two quaternions.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        dot
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "len"></a>
+    <strong>len (a)</strong>
+    </dt>
+    <dd>
+    Return the length of a quaternion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to get length of
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        len
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "len2"></a>
+    <strong>len2 (a)</strong>
+    </dt>
+    <dd>
+    Return the squared length of a quaternion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to get length of
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        len
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "scale"></a>
+    <strong>scale (out, a, s)</strong>
+    </dt>
+    <dd>
+    Multiply a quaternion by a scalar.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><span class="type">number</span></span>
+         Right hand operant
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotate"></a>
+    <strong>rotate (angle, axis)</strong>
+    </dt>
+    <dd>
+    Alias of from<em>angle</em>axis.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">angle</span>
+            <span class="types"><span class="type">number</span></span>
+         Angle (in radians)
+        </li>
+        <li><span class="parameter">axis</span>
+            <span class="types"><span class="type">vec3</span></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "conjugate"></a>
+    <strong>conjugate (out, a)</strong>
+    </dt>
+    <dd>
+    Return the conjugate of a quaternion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to conjugate
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "inverse"></a>
+    <strong>inverse (out, a)</strong>
+    </dt>
+    <dd>
+    Return the inverse of a quaternion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to invert
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "reciprocal"></a>
+    <strong>reciprocal (out, a)</strong>
+    </dt>
+    <dd>
+    Return the reciprocal of a quaternion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to reciprocate
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "lerp"></a>
+    <strong>lerp (out, a, b, s)</strong>
+    </dt>
+    <dd>
+    Lerp between two quaternions.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Right hand operant
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><span class="type">number</span></span>
+         Step value
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "slerp"></a>
+    <strong>slerp (out, a, b, s)</strong>
+    </dt>
+    <dd>
+    Slerp between two quaternions.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to store the result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Left hand operant
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Right hand operant
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><span class="type">number</span></span>
+         Step value
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "unpack"></a>
+    <strong>unpack (a)</strong>
+    </dt>
+    <dd>
+    Unpack a quaternion into individual components.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to unpack
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        x</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        y</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        z</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        w</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_quat"></a>
+    <strong>is_quat (a)</strong>
+    </dt>
+    <dd>
+    Return a boolean showing if a table is or is not a quat.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to be tested
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        is_quat
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_zero"></a>
+    <strong>is_zero (a)</strong>
+    </dt>
+    <dd>
+    Return a boolean showing if a table is or is not a zero quat.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to be tested
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        is_zero
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_real"></a>
+    <strong>is_real (a)</strong>
+    </dt>
+    <dd>
+    Return a boolean showing if a table is or is not a real quat.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to be tested
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        is_real
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_imaginary"></a>
+    <strong>is_imaginary (a)</strong>
+    </dt>
+    <dd>
+    Return a boolean showing if a table is or is not an imaginary quat.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to be tested
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        is_imaginary
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_angle_axis"></a>
+    <strong>to_angle_axis (a)</strong>
+    </dt>
+    <dd>
+    Convert a quaternion into an angle/axis pair.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to convert
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        angle</li>
+        <li>
+           <span class="types"><span class="type">vec3</span></span>
+        axis</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_vec3"></a>
+    <strong>to_vec3 (a)</strong>
+    </dt>
+    <dd>
+    Convert a quaternion into a vec3.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to convert
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">vec3</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_string"></a>
+    <strong>to_string (a)</strong>
+    </dt>
+    <dd>
+    Return a formatted string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to be turned into a string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        formatted
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "quat"></a>
+    <strong>quat</strong>
+    </dt>
+    <dd>
+    Constants
+
+
+    <h3>Fields:</h3>
+    <ul>
+        <li><span class="parameter">unit</span>
+         Unit quaternion
+        </li>
+        <li><span class="parameter">zero</span>
+         Empty quaternion
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
-<i style="float:right;">Last updated 2015-09-13 05:51:35 </i>
+<i style="float:right;">Last updated 2016-08-21 20:32:28 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
