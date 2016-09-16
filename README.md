@@ -9,3 +9,6 @@ Various useful bits of game math. 3D line intersections, ray casting, vectors, m
 Intended to be used with LuaJIT and LÖVE (this is the backbone of LÖVE3D).
 
 Online documentation can be found [here](http://excessive.github.io/cpml/) or you can generate them yourself using `ldoc -c doc/config.ld -o index .`
+
+# Installation
+Clone the repository and require it, or if you prefer luarocks: `$ luarocks install --server=http://luarocks.org/dev cpml`. Add `--tree=whatever` for a local install.
