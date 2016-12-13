@@ -5,6 +5,7 @@ local modules     = (...):gsub('%.[^%.]+$', '') .. "."
 local constants   = require(modules .. "constants")
 local vec3        = require(modules .. "vec3")
 local mat4        = require(modules .. "mat4")
+local utils       = require(modules .. "utils")
 local DBL_EPSILON = constants.DBL_EPSILON
 local sqrt        = math.sqrt
 local abs         = math.abs
@@ -638,6 +639,78 @@ function intersect.sphere_frustum(sphere, frustum)
 	-- dot + radius is the distance of the object from the near plane.
 	-- make sure that the near plane is the last test!
 	return dot + radius
+end
+
+function intersect.capsule_capsule(c1, c2)
+	local dist2, p1, p2 = intersect.closest_point_segment_segment(c1.a, c1.b, c2.a, c2.b)
+	local radius = c1.radius + c2.radius
+
+	if dist2 <= radius * radius then
+		return true, p1, p2
+	end
+
+	return false
+end
+
+function intersect.closest_point_segment_segment(p1, p2, p3, p4)
+	local s  -- Distance of intersection along segment 1
+	local t  -- Distance of intersection along segment 2
+	local c1 -- Collision point on segment 1
+	local c2 -- Collision point on segment 2
+
+	local d1 = p2 - p1 -- Direction of segment 1
+	local d2 = p4 - p3 -- Direction of segment 2
+	local r  = p1 - p3
+	local a  = d1:dot(d1)
+	local e  = d2:dot(d2)
+	local f  = d2:dot(r)
+
+	-- Check if both segments degenerate into points
+	if a <= DBL_EPSILON and e <= DBL_EPSILON then
+		s  = 0
+		t  = 0
+		c1 = p1
+		c2 = p3
+		return (c1 - c2):dot(c1 - c2), s, t, c1, c2
+	end
+
+	-- Check if segment 1 degenerates into a point
+	if a <= DBL_EPSILON then
+		s = 0
+		t = utils.clamp(f / e, 0, 1)
+	else
+		local c = d1:dot(r)
+
+		-- Check is segment 2 degenerates into a point
+		if e <= DBL_EPSILON then
+			t = 0
+			s = utils.clamp(-c / a, 0, 1)
+		else
+			local b     = d1:dot(d2)
+			local denom = a * e - b * b
+
+			if math.abs(denom) > 0 then
+				s = utils.clamp((b * f - c * e) / denom, 0, 1)
+			else
+				s = 0
+			end
+
+			t = (b * s + f) / e
+
+			if t < 0 then
+				t = 0
+				s = utils.clamp(-c / a, 0, 1)
+			elseif t > 1 then
+				t = 1
+				s = utils.clamp((b - c) / a, 0, 1)
+			end
+		end
+	end
+
+	c1 = p1 + d1 * s
+	c2 = p3 + d2 * t
+
+	return (c1 - c2):dot(c1 - c2), c1, c2, s, t
 end
 
 return intersect
