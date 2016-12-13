@@ -91,11 +91,15 @@ end
 
 --- Create a quaternion from a normal/up vector pair.
 -- @tparam vec3 normal
--- @tparam vec3 up
+-- @tparam vec3 up (optional)
 -- @treturn quat out
 function quat.from_direction(normal, up)
-	local a = vec3():cross(up, normal)
-	local d = up:dot(normal)
+	local u = up or vec3.unit_z
+	local n = vec3()
+	n:normalize(normal)
+
+	local a = vec3():cross(u, n)
+	local d = u:dot(n)
 	return new(a.x, a.y, a.z, d + 1)
 end
 
