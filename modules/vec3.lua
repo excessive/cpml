@@ -133,6 +133,9 @@ end
 -- @treturn vec3 out
 function vec3.normalize(out, a)
 	local l = vec3.len(a)
+	if l == 0 then
+		return out
+	end
 	out.x = a.x / l
 	out.y = a.y / l
 	out.z = a.z / l
