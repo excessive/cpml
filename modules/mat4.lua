@@ -819,6 +819,11 @@ end
 
 function mat4_mt.__mul(a, b)
 	assert(mat4.is_mat4(a), "__mul: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
+
+	if vec3.is_vec3(b) then
+		return vec3(mat4.mul_vec4({}, a, { b.x, b.y, b.z, 1 }))
+	end
+
 	assert(mat4.is_mat4(b) or #b == 4, "__mul: Wrong argument type for right hand operant. (<cpml.mat4> or table #4 expected)")
 
 	if mat4.is_mat4(b) then
