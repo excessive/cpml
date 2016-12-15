@@ -29,15 +29,12 @@
 -- [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 --
 
--- Bail out with dummy module if FFI is missing.
-local has_ffi, ffi = pcall(require, "ffi")
-
-
-if love and love.math then
+if _G.love and _G.love.math then
 	return love.math.noise
 end
 
-local M = {}
+-- Bail out with dummy module if FFI is missing.
+local has_ffi, ffi = pcall(require, "ffi")
 if not has_ffi then
 	return function()
 		return 0
@@ -45,12 +42,11 @@ if not has_ffi then
 end
 
 -- Modules --
--- local bit = require("bit")
+local bit = require("bit")
 
 -- Imports --
 local band   = bit.band
 local bor    = bit.bor
-local bxor   = bit.bxor
 local floor  = math.floor
 local lshift = bit.lshift
 local max    = math.max
