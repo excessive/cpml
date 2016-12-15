@@ -130,15 +130,10 @@ end
 -- @tparam vec3 a Vector to normalize
 -- @treturn vec3 out
 function vec3.normalize(a)
-	local l = a:len()
-	if l == 0 then
+	if a:is_zero() then
 		return new()
 	end
-	return new(
-		a.x / l,
-		a.y / l,
-		a.z / l
-	)
+	return a:scale(1 / a:len())
 end
 
 --- Trim a vector to a given length
@@ -223,7 +218,7 @@ end
 -- @tparam vec3 axis Axis to rotate by
 -- @treturn vec3 out
 function vec3.rotate(a, phi, axis)
-	if not axis:is_vec3() then
+	if not vec3.is_vec3(axis) then
 		return a
 	end
 
@@ -309,29 +304,29 @@ function vec3_mt.__unm(a)
 end
 
 function vec3_mt.__eq(a, b)
-	if not a:is_vec3() or not b:is_vec3() then
+	if not vec3.is_vec3(a) or not vec3.is_vec3(b) then
 		return false
 	end
 	return a.x == b.x and a.y == b.y and a.z == b.z
 end
 
 function vec3_mt.__add(a, b)
-	assert(a:is_vec3(), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(b:is_vec3(), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 	return a:add(b)
 end
 
 function vec3_mt.__sub(a, b)
-	assert(a:is_vec3(), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(b:is_vec3(), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
 	return a:sub(b)
 end
 
 function vec3_mt.__mul(a, b)
-	assert(a:is_vec3(), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(b:is_vec3() or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
+	assert(vec3.is_vec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
 
-	if b:is_vec3() then
+	if vec3.is_vec3(b) then
 		return a:mul(b)
 	end
 
@@ -339,10 +334,10 @@ function vec3_mt.__mul(a, b)
 end
 
 function vec3_mt.__div(a, b)
-	assert(a:is_vec3(), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(b:is_vec3() or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
+	assert(vec3.is_vec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b) or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
 
-	if b:is_vec3() then
+	if vec3.is_vec3(b) then
 		return a:div(b)
 	end
 

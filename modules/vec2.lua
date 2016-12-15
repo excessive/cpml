@@ -132,14 +132,10 @@ end
 -- @tparam vec2 a Vector to normalize
 -- @treturn vec2 out
 function vec2.normalize(a)
-	local l = a:len()
-	if l == 0 then
+	if a:is_zero() then
 		return new()
 	end
-	return new(
-		a.x / l,
-		a.y / l
-	)
+	return a:scale(1 / a:len())
 end
 
 --- Trim a vector to a given length.
@@ -327,29 +323,29 @@ function vec2_mt.__unm(a)
 end
 
 function vec2_mt.__eq(a, b)
-	if not a:is_vec2() or not b:is_vec2() then
+	if not vec2.is_vec2(a) or not vec2.is_vec2(b) then
 		return false
 	end
 	return a.x == b.x and a.y == b.y
 end
 
 function vec2_mt.__add(a, b)
-	assert(a:is_vec2(), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(b:is_vec2(), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 	return a:add(b)
 end
 
 function vec2_mt.__sub(a, b)
-	assert(a:is_vec2(), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(b:is_vec2(), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
 	return a:sub(b)
 end
 
 function vec2_mt.__mul(a, b)
-	assert(a:is_vec2(), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(b:is_vec2() or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
+	assert(vec2.is_vec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
 
-	if b:is_vec2() then
+	if vec2.is_vec2(b) then
 		return a:mul(b)
 	end
 
@@ -357,10 +353,10 @@ function vec2_mt.__mul(a, b)
 end
 
 function vec2_mt.__div(a, b)
-	assert(a:is_vec2(), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(b:is_vec2() or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
+	assert(vec2.is_vec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b) or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
 
-	if b:is_vec2() then
+	if vec2.is_vec2(b) then
 		return a:div(b)
 	end
 
