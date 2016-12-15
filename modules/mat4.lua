@@ -7,7 +7,7 @@ local vec2        = require(modules .. "vec2")
 local vec3        = require(modules .. "vec3")
 local quat        = require(modules .. "quat")
 local utils       = require(modules .. "utils")
-local DBL_EPSILON = constants.DBL.EPSILON
+local DBL_EPSILON = constants.DBL_EPSILON
 local sqrt        = math.sqrt
 local cos         = math.cos
 local sin         = math.sin
@@ -602,7 +602,7 @@ end
 -- @tparam mat4 a Matrix to be converted
 -- @treturn quat out
 function mat4.to_quat(a)
-	tmp = identity(tmp):transpose(a)
+	tmp = a:transpose()
 
 	local w     = sqrt(1 + tmp[1] + tmp[6] + tmp[11]) / 2
 	local scale = w * 4

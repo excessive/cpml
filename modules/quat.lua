@@ -25,10 +25,6 @@ local function new(x, y, z, w)
 	}, quat_mt)
 end
 
--- Statically allocate a temporary variable used in some of our functions.
-local tmp = new()
-local qv, uv, uuv = vec3(), vec3(), vec3()
-
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
 if type(jit) == "table" and jit.status() then
@@ -38,6 +34,10 @@ if type(jit) == "table" and jit.status() then
 		new = ffi.typeof("cpml_quat")
 	end
 end
+
+-- Statically allocate a temporary variable used in some of our functions.
+local tmp = new()
+local qv, uv, uuv = vec3(), vec3(), vec3()
 
 --- Constants
 -- @table quat
@@ -75,7 +75,7 @@ function quat.new(x, y, z, w)
 		return new(xx, yy, zz, ww)
 	end
 
-	return new()
+	return new(0, 0, 0, 1)
 end
 
 --- Create a quaternion from an angle/axis pair.
@@ -165,7 +165,7 @@ end
 -- @treturn quat out
 function quat.pow(a, n)
 	if n == 0 then
-		return new()
+		return new(0, 0, 0, 1)
 	end
 
 	if n > 0 then

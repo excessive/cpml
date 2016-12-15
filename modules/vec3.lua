@@ -61,7 +61,7 @@ function vec3.new(x, y, z)
 		assert(type(yy) == "number", "new: Wrong argument type for y (<number> expected)")
 		assert(type(zz) == "number", "new: Wrong argument type for z (<number> expected)")
 
-		return new(x, y, z)
+		return new(xx, yy, zz)
 
 	-- number
 	elseif type(x) == "number" then
