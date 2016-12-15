@@ -19,7 +19,6 @@ end
 local function hsv_to_color(hsv)
 	local i
 	local f, q, p, t
-	local r, g, b
 	local h, s, v
 	local a = hsv[4] or 255
 	s = hsv[2]
@@ -53,10 +52,7 @@ local function color_to_hsv(c)
 	local g = c[2]
 	local b = c[3]
 	local a = c[4] or 255
-
-	local h = 0
-	local s = 0
-	local v = 0
+	local h, s, v
 
 	local min = math.min(r, g, b)
 	local max = math.max(r, g, b)
@@ -105,15 +101,15 @@ function color.new(r, g, b, a)
 
 		return new(r, g, b, a)
 
-	-- {x, y, z, w}
-	elseif type(x) == "table" then
-		local r, g, b, a = r[1], r[2], r[3], r[4]
-		assert(type(r) == "number", "new: Wrong argument type for r (<number> expected)")
-		assert(type(g) == "number", "new: Wrong argument type for g (<number> expected)")
-		assert(type(b) == "number", "new: Wrong argument type for b (<number> expected)")
-		assert(type(a) == "number", "new: Wrong argument type for a (<number> expected)")
+	-- {r, g, b, a}
+	elseif type(r) == "table" then
+		local rr, gg, bb, aa = r[1], r[2], r[3], r[4]
+		assert(type(rr) == "number", "new: Wrong argument type for r (<number> expected)")
+		assert(type(gg) == "number", "new: Wrong argument type for g (<number> expected)")
+		assert(type(bb) == "number", "new: Wrong argument type for b (<number> expected)")
+		assert(type(aa) == "number", "new: Wrong argument type for a (<number> expected)")
 
-		return new(r, g, b, a)
+		return new(rr, gg, bb, aa)
 	end
 
 	new(0, 0, 0, 0)
@@ -184,20 +180,20 @@ function color.opacity(c, v)
 	return t
 end
 
-function color.hue(color, hue)
-	local c = color_to_hsv(color)
+function color.hue(col, hue)
+	local c = color_to_hsv(col)
 	c[1] = (hue + 360) % 360
 	return hsv_to_color(c)
 end
 
-function color.saturation(color, percent)
-	local c = color_to_hsv(color)
+function color.saturation(col, percent)
+	local c = color_to_hsv(col)
 	c[2] = utils.clamp(percent, 0, 1)
 	return hsv_to_color(c)
 end
 
-function color.value(color, percent)
-	local c = color_to_hsv(color)
+function color.value(col, percent)
+	local c = color_to_hsv(col)
 	c[3] = utils.clamp(percent, 0, 1)
 	return hsv_to_color(c)
 end
