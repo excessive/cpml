@@ -25,11 +25,11 @@ describe("intersect:", function()
 		assert.is_true(intersect.point_aabb(a, c))
 		assert.is_not_true(intersect.point_aabb(b, c))
 	end)
-	--[[
-	it("intersects a point with a frustum", function()
 
+	it("intersects a point with a frustum", function()
+		pending("TODO")
 	end)
-	--]]
+
 	it("intersects a ray with a triangle", function()
 		local a = {
 			position  = vec3(0.5, 0.5, -1),
@@ -170,8 +170,7 @@ describe("intersect:", function()
 	end)
 
 	it("intersects an aabb with an obb", function()
-		local r = mat4()
-		r:rotate(r, math.pi / 4, vec3.unit_z)
+		local r = mat4():rotate(math.pi / 4, vec3.unit_z)
 
 		local a = {
 			position = vec3(),
@@ -207,11 +206,11 @@ describe("intersect:", function()
 		assert.is_true(intersect.aabb_sphere(a, c))
 		assert.is_not_true(intersect.aabb_sphere(b, c))
 	end)
-	--[[
-	it("intersects an aabb with a frustum", function()
 
+	it("intersects an aabb with a frustum", function()
+		pending("TODO")
 	end)
-	--]]
+
 	it("encapsulates an aabb", function()
 		local a = {
 			min = vec3(-1),
@@ -267,9 +266,12 @@ describe("intersect:", function()
 		assert.is_true(intersect.sphere_sphere(a, c))
 		assert.is_not_true(intersect.sphere_sphere(b, c))
 	end)
-	--[[
-	it("intersects a sphere with a frustum", function()
 
+	it("intersects a sphere with a frustum", function()
+		pending("TODO")
 	end)
-	--]]
+
+	it("intersects a capsule with another capsule", function()
+		pending("TODO")
+	end)
 end)

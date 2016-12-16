@@ -5,6 +5,7 @@
 
 --- Octree
 -- @module octree
+
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local intersect  = require(modules .. "intersect")
 local mat4       = require(modules .. "mat4")
@@ -49,6 +50,17 @@ local function new(initialWorldSize, initialWorldPos, minNodeSize, looseness)
 	tree.rootNode = Node(tree.initialSize, tree.minSize, tree.looseness, initialWorldPos)
 
 	return tree
+end
+
+--- Used when growing the octree. Works out where the old root node would fit inside a new, larger root node.
+-- @param xDir X direction of growth. 1 or -1
+-- @param yDir Y direction of growth. 1 or -1
+-- @param zDir Z direction of growth. 1 or -1
+-- @return Octant where the root node should be
+local function get_root_pos_index(xDir, yDir, zDir)
+	local result = xDir > 0 and 1 or 0
+	if yDir < 0 then return result + 4 end
+	if zDir > 0 then return result + 2 end
 end
 
 --- Add an object.
@@ -136,7 +148,7 @@ function Octree:grow(direction)
 	self.rootNode = Node(newLength, self.minSize, self.looseness, newCenter)
 
 	-- Create 7 new octree children to go with the old root as children of the new root
-	local rootPos  = self:get_root_pos_index(xDirection, yDirection, zDirection)
+	local rootPos  = get_root_pos_index(xDirection, yDirection, zDirection)
 	local children = {}
 
 	for i = 0, 7 do
@@ -156,19 +168,7 @@ end
 
 --- Shrink the octree if possible, else leave it the same.
 function Octree:shrink()
-	self.rootNode = self.rootNode:shrink_if_possible(initialSize)
-end
-
---- Used when growing the octree. Works out where the old root node would fit inside a new, larger root node.
--- @param xDir X direction of growth. 1 or -1
--- @param yDir Y direction of growth. 1 or -1
--- @param zDir Z direction of growth. 1 or -1
--- @return Octant where the root node should be
-function Octree:get_root_pos_index(xDir, yDir, zDir)
-	local result = xDir > 0 and 1 or 0
-
-	if yDir < 0 then return result + 4 end
-	if zDir > 0 then return result + 2 end
+	self.rootNode = self.rootNode:shrink_if_possible(self.initialSize)
 end
 
 --== Octree Node ==--
@@ -328,7 +328,7 @@ end
 -- @param results List results
 -- @return table Objects that intersect with the specified bounds
 function OctreeNode:get_colliding(checkBounds, results)
-	local results = results or {}
+	results = results or {}
 
 	-- Are the input bounds at least partially in this node?
 	if not intersect.aabb_aabb(self.bounds, checkBounds) then
@@ -581,8 +581,8 @@ function OctreeNode:draw_bounds(cube, depth)
 
 	love.graphics.setColor(tint * 255, 0, (1 - tint) * 255)
 	local m = mat4()
-		:translate(m, self.center)
-		:scale(m, vec3(self.adjLength, self.adjLength, self.adjLength))
+		:translate(self.center)
+		:scale(vec3(self.adjLength, self.adjLength, self.adjLength))
 
 	love.graphics.updateMatrix("transform", m)
 	love.graphics.setWireframe(true)
@@ -606,8 +606,8 @@ function OctreeNode:draw_objects(cube, filter)
 	for _, object in ipairs(self.objects) do
 		if filter and filter(object.data) or not filter then
 			local m = mat4()
-				:translate(m, object.bounds.center)
-				:scale(m, object.bounds.size)
+				:translate(object.bounds.center)
+				:scale(object.bounds.size)
 
 			love.graphics.updateMatrix("transform", m)
 			love.graphics.draw(cube)

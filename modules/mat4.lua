@@ -1,18 +1,20 @@
 --- double 4x4, 1-based, column major matrices
 -- @module mat4
-local modules   = (...):gsub('%.[^%.]+$', '') .. "."
-local constants = require(modules .. "constants")
-local vec2      = require(modules .. "vec2")
-local vec3      = require(modules .. "vec3")
-local quat      = require(modules .. "quat")
-local utils     = require(modules .. "utils")
-local sqrt      = math.sqrt
-local cos       = math.cos
-local sin       = math.sin
-local tan       = math.tan
-local rad       = math.rad
-local mat4      = {}
-local mat4_mt   = {}
+
+local modules     = (...): gsub('%.[^%.]+$', '') .. "."
+local constants   = require(modules .. "constants")
+local vec2        = require(modules .. "vec2")
+local vec3        = require(modules .. "vec3")
+local quat        = require(modules .. "quat")
+local utils       = require(modules .. "utils")
+local DBL_EPSILON = constants.DBL_EPSILON
+local sqrt        = math.sqrt
+local cos         = math.cos
+local sin         = math.sin
+local tan         = math.tan
+local rad         = math.rad
+local mat4        = {}
+local mat4_mt     = {}
 
 -- Private constructor.
 local function new(m)
@@ -35,20 +37,17 @@ local function identity(m)
 end
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
-local status, ffi, the_type
+local status, ffi
 if type(jit) == "table" and jit.status() then
-    status, ffi = pcall(require, "ffi")
-    if status then
-        ffi.cdef "typedef struct { double _m[16]; } cpml_mat4;"
-        new = ffi.typeof("cpml_mat4")
-    end
+	status, ffi = pcall(require, "ffi")
+	if status then
+		ffi.cdef "typedef struct { double _m[16]; } cpml_mat4;"
+		new = ffi.typeof("cpml_mat4")
+	end
 end
 
 -- Statically allocate a temporary variable used in some of our functions.
 local tmp = new()
-local tm4 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
-local tv4 = { 0, 0, 0, 0 }
-local forward, side, new_up = vec3(), vec3(), vec3()
 
 --- The public constructor.
 -- @param a Can be of four types: </br>
@@ -135,15 +134,9 @@ end
 -- @tparam vec3 up Up direction
 -- @treturn mat4 out
 function mat4.from_direction(direction, up)
-	local forward = vec3():normalize(direction)
-
-	local side = vec3()
-		:cross(forward, up)
-		:normalize(side)
-
-	local new_up = vec3()
-		:cross(side, forward)
-		:normalize(new_up)
+	local forward = direction:normalize()
+	local side    = forward:cross(up):normalize()
+	local new_up  = side:cross(forward):normalize()
 
 	local out = new()
 	out[1]    = side.x
@@ -158,31 +151,6 @@ function mat4.from_direction(direction, up)
 	out[16]   = 1
 
 	return out
-end
-
---- Create a matrix from a transform.
--- @tparam vec3 trans Translation vector
--- @tparam quat rot Rotation quaternion
--- @tparam vec3 scale Scale vector
--- @treturn mat4 out
-function mat4.from_transform(trans, rot, scale)
-	local angle, axis = rot:to_angle_axis()
-	local l = axis:len()
-
-	if l == 0 then
-		return new()
-	end
-
-	local x, y, z = axis.x / l, axis.y / l, axis.z / l
-	local c = cos(angle)
-	local s = sin(angle)
-
-	return new {
-		x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
-		x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0,
-		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0,
-		trans.x, trans.y, trans.z, 1
-	}
 end
 
 --- Create matrix from orthogonal.
@@ -241,11 +209,11 @@ function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity
 	local rightHanded = true
 	local isOpenGL    = true
 
-	local function CreateNDCScaleAndOffsetFromFov(tanHalfFov)
-		x_scale  = 2 / (tanHalfFov.LeftTan + tanHalfFov.RightTan)
-		x_offset =     (tanHalfFov.LeftTan - tanHalfFov.RightTan) * x_scale * 0.5
-		y_scale  = 2 / (tanHalfFov.UpTan   + tanHalfFov.DownTan )
-		y_offset =     (tanHalfFov.UpTan   - tanHalfFov.DownTan ) * y_scale * 0.5
+	local function CreateNDCScaleAndOffsetFromFov()
+		local x_scale  = 2 / (tanHalfFov.LeftTan + tanHalfFov.RightTan)
+		local x_offset =     (tanHalfFov.LeftTan - tanHalfFov.RightTan) * x_scale * 0.5
+		local y_scale  = 2 / (tanHalfFov.UpTan   + tanHalfFov.DownTan )
+		local y_offset =     (tanHalfFov.UpTan   - tanHalfFov.DownTan ) * y_scale * 0.5
 
 		local result = {
 			Scale  = vec2(x_scale, y_scale),
@@ -318,6 +286,35 @@ function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity
 	return projection:transpose(projection)
 end
 
+--- Transform matrix to look at a point.
+-- @tparam mat4 out Matrix to store result
+-- @tparam vec3 eye Location of viewer's view plane
+-- @tparam vec3 center Location of object to view
+-- @tparam vec3 up Up direction
+-- @treturn mat4 out
+function mat4.look_at(eye, center, up)
+	local out     = new()
+	local forward = (center - eye):normalize()
+	local side    = forward:cross(up):normalize()
+	local new_up  = side:cross(forward)
+
+	out[1]  =  side.x
+	out[5]  =  side.y
+	out[9]  =  side.z
+	out[2]  =  new_up.x
+	out[6]  =  new_up.y
+	out[10] =  new_up.z
+	out[3]  = -forward.x
+	out[7]  = -forward.y
+	out[11] = -forward.z
+	out[13] = -side:dot(eye)
+	out[14] = -new_up:dot(eye)
+	out[15] =  forward:dot(eye)
+	out[16] = 1
+
+	return out
+end
+
 --- Clone a matrix.
 -- @tparam mat4 a Matrix to clone
 -- @treturn mat4 out
@@ -326,78 +323,65 @@ function mat4.clone(a)
 end
 
 --- Multiply two matrices.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Left hand operant
 -- @tparam mat4 b Right hand operant
 -- @treturn mat4 out
-function mat4.mul(out, a, b)
-	tm4[1]  = a[1]  * b[1] + a[2]  * b[5] + a[3]  * b[9]  + a[4]  * b[13]
-	tm4[2]  = a[1]  * b[2] + a[2]  * b[6] + a[3]  * b[10] + a[4]  * b[14]
-	tm4[3]  = a[1]  * b[3] + a[2]  * b[7] + a[3]  * b[11] + a[4]  * b[15]
-	tm4[4]  = a[1]  * b[4] + a[2]  * b[8] + a[3]  * b[12] + a[4]  * b[16]
-	tm4[5]  = a[5]  * b[1] + a[6]  * b[5] + a[7]  * b[9]  + a[8]  * b[13]
-	tm4[6]  = a[5]  * b[2] + a[6]  * b[6] + a[7]  * b[10] + a[8]  * b[14]
-	tm4[7]  = a[5]  * b[3] + a[6]  * b[7] + a[7]  * b[11] + a[8]  * b[15]
-	tm4[8]  = a[5]  * b[4] + a[6]  * b[8] + a[7]  * b[12] + a[8]  * b[16]
-	tm4[9]  = a[9]  * b[1] + a[10] * b[5] + a[11] * b[9]  + a[12] * b[13]
-	tm4[10] = a[9]  * b[2] + a[10] * b[6] + a[11] * b[10] + a[12] * b[14]
-	tm4[11] = a[9]  * b[3] + a[10] * b[7] + a[11] * b[11] + a[12] * b[15]
-	tm4[12] = a[9]  * b[4] + a[10] * b[8] + a[11] * b[12] + a[12] * b[16]
-	tm4[13] = a[13] * b[1] + a[14] * b[5] + a[15] * b[9]  + a[16] * b[13]
-	tm4[14] = a[13] * b[2] + a[14] * b[6] + a[15] * b[10] + a[16] * b[14]
-	tm4[15] = a[13] * b[3] + a[14] * b[7] + a[15] * b[11] + a[16] * b[15]
-	tm4[16] = a[13] * b[4] + a[14] * b[8] + a[15] * b[12] + a[16] * b[16]
-
-	for i=1, 16 do
-		out[i] = tm4[i]
-	end
+function mat4.mul(a, b)
+	local out = new()
+	out[1]    = a[1]  * b[1] + a[2]  * b[5] + a[3]  * b[9]  + a[4]  * b[13]
+	out[2]    = a[1]  * b[2] + a[2]  * b[6] + a[3]  * b[10] + a[4]  * b[14]
+	out[3]    = a[1]  * b[3] + a[2]  * b[7] + a[3]  * b[11] + a[4]  * b[15]
+	out[4]    = a[1]  * b[4] + a[2]  * b[8] + a[3]  * b[12] + a[4]  * b[16]
+	out[5]    = a[5]  * b[1] + a[6]  * b[5] + a[7]  * b[9]  + a[8]  * b[13]
+	out[6]    = a[5]  * b[2] + a[6]  * b[6] + a[7]  * b[10] + a[8]  * b[14]
+	out[7]    = a[5]  * b[3] + a[6]  * b[7] + a[7]  * b[11] + a[8]  * b[15]
+	out[8]    = a[5]  * b[4] + a[6]  * b[8] + a[7]  * b[12] + a[8]  * b[16]
+	out[9]    = a[9]  * b[1] + a[10] * b[5] + a[11] * b[9]  + a[12] * b[13]
+	out[10]   = a[9]  * b[2] + a[10] * b[6] + a[11] * b[10] + a[12] * b[14]
+	out[11]   = a[9]  * b[3] + a[10] * b[7] + a[11] * b[11] + a[12] * b[15]
+	out[12]   = a[9]  * b[4] + a[10] * b[8] + a[11] * b[12] + a[12] * b[16]
+	out[13]   = a[13] * b[1] + a[14] * b[5] + a[15] * b[9]  + a[16] * b[13]
+	out[14]   = a[13] * b[2] + a[14] * b[6] + a[15] * b[10] + a[16] * b[14]
+	out[15]   = a[13] * b[3] + a[14] * b[7] + a[15] * b[11] + a[16] * b[15]
+	out[16]   = a[13] * b[4] + a[14] * b[8] + a[15] * b[12] + a[16] * b[16]
 
 	return out
 end
 
 --- Multiply a matrix and a vec4.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Left hand operant
 -- @tparam table b Right hand operant
--- @treturn mat4 out
-function mat4.mul_vec4(out, a, b)
-	tv4[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
-	tv4[2] = b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14]
-	tv4[3] = b[1] * a[3] + b[2] * a[7] + b [3] * a[11] + b[4] * a[15]
-	tv4[4] = b[1] * a[4] + b[2] * a[8] + b [3] * a[12] + b[4] * a[16]
-
-	for i=1, 4 do
-		out[i] = tv4[i]
-	end
-
-	return out
+-- @treturn table out
+function mat4.mul_vec4(a, b)
+	return {
+		b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13],
+		b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14],
+		b[1] * a[3] + b[2] * a[7] + b [3] * a[11] + b[4] * a[15],
+		b[1] * a[4] + b[2] * a[8] + b [3] * a[12] + b[4] * a[16]
+	}
 end
 
 --- Invert a matrix.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Matrix to invert
 -- @treturn mat4 out
-function mat4.invert(out, a)
-	tm4[1]  =  a[6] * a[11] * a[16] - a[6] * a[12] * a[15] - a[10] * a[7] * a[16] + a[10] * a[8] * a[15] + a[14] * a[7] * a[12] - a[14] * a[8] * a[11]
-	tm4[2]  = -a[2] * a[11] * a[16] + a[2] * a[12] * a[15] + a[10] * a[3] * a[16] - a[10] * a[4] * a[15] - a[14] * a[3] * a[12] + a[14] * a[4] * a[11]
-	tm4[3]  =  a[2] * a[7]  * a[16] - a[2] * a[8]  * a[15] - a[6]  * a[3] * a[16] + a[6]  * a[4] * a[15] + a[14] * a[3] * a[8]  - a[14] * a[4] * a[7]
-	tm4[4]  = -a[2] * a[7]  * a[12] + a[2] * a[8]  * a[11] + a[6]  * a[3] * a[12] - a[6]  * a[4] * a[11] - a[10] * a[3] * a[8]  + a[10] * a[4] * a[7]
-	tm4[5]  = -a[5] * a[11] * a[16] + a[5] * a[12] * a[15] + a[9]  * a[7] * a[16] - a[9]  * a[8] * a[15] - a[13] * a[7] * a[12] + a[13] * a[8] * a[11]
-	tm4[6]  =  a[1] * a[11] * a[16] - a[1] * a[12] * a[15] - a[9]  * a[3] * a[16] + a[9]  * a[4] * a[15] + a[13] * a[3] * a[12] - a[13] * a[4] * a[11]
-	tm4[7]  = -a[1] * a[7]  * a[16] + a[1] * a[8]  * a[15] + a[5]  * a[3] * a[16] - a[5]  * a[4] * a[15] - a[13] * a[3] * a[8]  + a[13] * a[4] * a[7]
-	tm4[8]  =  a[1] * a[7]  * a[12] - a[1] * a[8]  * a[11] - a[5]  * a[3] * a[12] + a[5]  * a[4] * a[11] + a[9]  * a[3] * a[8]  - a[9]  * a[4] * a[7]
-	tm4[9]  =  a[5] * a[10] * a[16] - a[5] * a[12] * a[14] - a[9]  * a[6] * a[16] + a[9]  * a[8] * a[14] + a[13] * a[6] * a[12] - a[13] * a[8] * a[10]
-	tm4[10] = -a[1] * a[10] * a[16] + a[1] * a[12] * a[14] + a[9]  * a[2] * a[16] - a[9]  * a[4] * a[14] - a[13] * a[2] * a[12] + a[13] * a[4] * a[10]
-	tm4[11] =  a[1] * a[6]  * a[16] - a[1] * a[8]  * a[14] - a[5]  * a[2] * a[16] + a[5]  * a[4] * a[14] + a[13] * a[2] * a[8]  - a[13] * a[4] * a[6]
-	tm4[12] = -a[1] * a[6]  * a[12] + a[1] * a[8]  * a[10] + a[5]  * a[2] * a[12] - a[5]  * a[4] * a[10] - a[9]  * a[2] * a[8]  + a[9]  * a[4] * a[6]
-	tm4[13] = -a[5] * a[10] * a[15] + a[5] * a[11] * a[14] + a[9]  * a[6] * a[15] - a[9]  * a[7] * a[14] - a[13] * a[6] * a[11] + a[13] * a[7] * a[10]
-	tm4[14] =  a[1] * a[10] * a[15] - a[1] * a[11] * a[14] - a[9]  * a[2] * a[15] + a[9]  * a[3] * a[14] + a[13] * a[2] * a[11] - a[13] * a[3] * a[10]
-	tm4[15] = -a[1] * a[6]  * a[15] + a[1] * a[7]  * a[14] + a[5]  * a[2] * a[15] - a[5]  * a[3] * a[14] - a[13] * a[2] * a[7]  + a[13] * a[3] * a[6]
-	tm4[16] =  a[1] * a[6]  * a[11] - a[1] * a[7]  * a[10] - a[5]  * a[2] * a[11] + a[5]  * a[3] * a[10] + a[9]  * a[2] * a[7]  - a[9]  * a[3] * a[6]
-
-	for i=1, 16 do
-		out[i] = tm4[i]
-	end
+function mat4.invert(a)
+	local out = new()
+	out[1]  =  a[6] * a[11] * a[16] - a[6] * a[12] * a[15] - a[10] * a[7] * a[16] + a[10] * a[8] * a[15] + a[14] * a[7] * a[12] - a[14] * a[8] * a[11]
+	out[2]  = -a[2] * a[11] * a[16] + a[2] * a[12] * a[15] + a[10] * a[3] * a[16] - a[10] * a[4] * a[15] - a[14] * a[3] * a[12] + a[14] * a[4] * a[11]
+	out[3]  =  a[2] * a[7]  * a[16] - a[2] * a[8]  * a[15] - a[6]  * a[3] * a[16] + a[6]  * a[4] * a[15] + a[14] * a[3] * a[8]  - a[14] * a[4] * a[7]
+	out[4]  = -a[2] * a[7]  * a[12] + a[2] * a[8]  * a[11] + a[6]  * a[3] * a[12] - a[6]  * a[4] * a[11] - a[10] * a[3] * a[8]  + a[10] * a[4] * a[7]
+	out[5]  = -a[5] * a[11] * a[16] + a[5] * a[12] * a[15] + a[9]  * a[7] * a[16] - a[9]  * a[8] * a[15] - a[13] * a[7] * a[12] + a[13] * a[8] * a[11]
+	out[6]  =  a[1] * a[11] * a[16] - a[1] * a[12] * a[15] - a[9]  * a[3] * a[16] + a[9]  * a[4] * a[15] + a[13] * a[3] * a[12] - a[13] * a[4] * a[11]
+	out[7]  = -a[1] * a[7]  * a[16] + a[1] * a[8]  * a[15] + a[5]  * a[3] * a[16] - a[5]  * a[4] * a[15] - a[13] * a[3] * a[8]  + a[13] * a[4] * a[7]
+	out[8]  =  a[1] * a[7]  * a[12] - a[1] * a[8]  * a[11] - a[5]  * a[3] * a[12] + a[5]  * a[4] * a[11] + a[9]  * a[3] * a[8]  - a[9]  * a[4] * a[7]
+	out[9]  =  a[5] * a[10] * a[16] - a[5] * a[12] * a[14] - a[9]  * a[6] * a[16] + a[9]  * a[8] * a[14] + a[13] * a[6] * a[12] - a[13] * a[8] * a[10]
+	out[10] = -a[1] * a[10] * a[16] + a[1] * a[12] * a[14] + a[9]  * a[2] * a[16] - a[9]  * a[4] * a[14] - a[13] * a[2] * a[12] + a[13] * a[4] * a[10]
+	out[11] =  a[1] * a[6]  * a[16] - a[1] * a[8]  * a[14] - a[5]  * a[2] * a[16] + a[5]  * a[4] * a[14] + a[13] * a[2] * a[8]  - a[13] * a[4] * a[6]
+	out[12] = -a[1] * a[6]  * a[12] + a[1] * a[8]  * a[10] + a[5]  * a[2] * a[12] - a[5]  * a[4] * a[10] - a[9]  * a[2] * a[8]  + a[9]  * a[4] * a[6]
+	out[13] = -a[5] * a[10] * a[15] + a[5] * a[11] * a[14] + a[9]  * a[6] * a[15] - a[9]  * a[7] * a[14] - a[13] * a[6] * a[11] + a[13] * a[7] * a[10]
+	out[14] =  a[1] * a[10] * a[15] - a[1] * a[11] * a[14] - a[9]  * a[2] * a[15] + a[9]  * a[3] * a[14] + a[13] * a[2] * a[11] - a[13] * a[3] * a[10]
+	out[15] = -a[1] * a[6]  * a[15] + a[1] * a[7]  * a[14] + a[5]  * a[2] * a[15] - a[5]  * a[3] * a[14] - a[13] * a[2] * a[7]  + a[13] * a[3] * a[6]
+	out[16] =  a[1] * a[6]  * a[11] - a[1] * a[7]  * a[10] - a[5]  * a[2] * a[11] + a[5]  * a[3] * a[10] + a[9]  * a[2] * a[7]  - a[9]  * a[3] * a[6]
 
 	local det = a[1] * out[1] + a[2] * out[5] + a[3] * out[9] + a[4] * out[13]
 
@@ -413,26 +397,24 @@ function mat4.invert(out, a)
 end
 
 --- Scale a matrix.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Matrix to scale
 -- @tparam vec3 s Scalar
 -- @treturn mat4 out
-function mat4.scale(out, a, s)
+function mat4.scale(a, s)
 	identity(tmp)
 	tmp[1]  = s.x
 	tmp[6]  = s.y
 	tmp[11] = s.z
 
-	return out:mul(tmp, a)
+	return tmp:mul(a)
 end
 
 --- Rotate a matrix.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Matrix to rotate
 -- @tparam number angle Angle to rotate by (in radians)
 -- @tparam vec3 axis Axis to rotate on
 -- @treturn mat4 out
-function mat4.rotate(out, a, angle, axis)
+function mat4.rotate(a, angle, axis)
 	if type(angle) == "table" or type(angle) == "cdata" then
 		angle, axis = angle:to_angle_axis()
 	end
@@ -458,25 +440,23 @@ function mat4.rotate(out, a, angle, axis)
 	tmp[10] = y * z * (1 - c) - x * s
 	tmp[11] = z * z * (1 - c) + c
 
-	return out:mul(tmp, a)
+	return tmp:mul(a)
 end
 
 --- Translate a matrix.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Matrix to translate
 -- @tparam vec3 t Translation vector
 -- @treturn mat4 out
-function mat4.translate(out, a, t)
+function mat4.translate(a, t)
 	identity(tmp)
 	tmp[13] = t.x
 	tmp[14] = t.y
 	tmp[15] = t.z
 
-	return out:mul(tmp, a)
+	return tmp:mul(a)
 end
 
 --- Shear a matrix.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Matrix to translate
 -- @tparam number yx
 -- @tparam number zx
@@ -485,7 +465,7 @@ end
 -- @tparam number xz
 -- @tparam number yz
 -- @treturn mat4 out
-function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
+function mat4.shear(a, yx, zx, xy, zy, xz, yz)
 	identity(tmp)
 	tmp[2]  = yx or 0
 	tmp[3]  = zx or 0
@@ -494,69 +474,30 @@ function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	tmp[9]  = xz or 0
 	tmp[10] = yz or 0
 
-	return out:mul(tmp, a)
-end
-
---- Transform matrix to look at a point.
--- @tparam mat4 out Matrix to store result
--- @tparam mat4 a Matrix to transform
--- @tparam vec3 eye Location of viewer's view plane
--- @tparam vec3 center Location of object to view
--- @tparam vec3 up Up direction
--- @treturn mat4 out
-function mat4.look_at(out, a, eye, center, up)
-	forward:normalize(center - eye)
-	side:cross(forward, up):normalize(side)
-	new_up:cross(side, forward)
-
-	identity(tmp)
-	tmp[1]  =  side.x
-	tmp[5]  =  side.y
-	tmp[9]  =  side.z
-	tmp[2]  =  new_up.x
-	tmp[6]  =  new_up.y
-	tmp[10] =  new_up.z
-	tmp[3]  = -forward.x
-	tmp[7]  = -forward.y
-	tmp[11] = -forward.z
-	tmp[13] = -side:dot(eye)
-	tmp[14] = -new_up:dot(eye)
-	tmp[15] =  forward:dot(eye)
-	tmp[16] = 1
-
-	for i = 1, 16 do
-		out[i] = tmp[i]
-	end
-
-	return out
+	return tmp:mul(a)
 end
 
 --- Transpose a matrix.
--- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Matrix to transpose
 -- @treturn mat4 out
-function mat4.transpose(out, a)
-	tm4[1]  = a[1]
-	tm4[2]  = a[5]
-	tm4[3]  = a[9]
-	tm4[4]  = a[13]
-	tm4[5]  = a[2]
-	tm4[6]  = a[6]
-	tm4[7]  = a[10]
-	tm4[8]  = a[14]
-	tm4[9]  = a[3]
-	tm4[10] = a[7]
-	tm4[11] = a[11]
-	tm4[12] = a[15]
-	tm4[13] = a[4]
-	tm4[14] = a[8]
-	tm4[15] = a[12]
-	tm4[16] = a[16]
-
-	for i=1, 16 do
-		out[i] = tm4[i]
-	end
-
+function mat4.transpose(a)
+	local out = new()
+	out[1]    = a[1]
+	out[2]    = a[5]
+	out[3]    = a[9]
+	out[4]    = a[13]
+	out[5]    = a[2]
+	out[6]    = a[6]
+	out[7]    = a[10]
+	out[8]    = a[14]
+	out[9]    = a[3]
+	out[10]   = a[7]
+	out[11]   = a[11]
+	out[12]   = a[15]
+	out[13]   = a[4]
+	out[14]   = a[8]
+	out[15]   = a[12]
+	out[16]   = a[16]
 	return out
 end
 
@@ -569,9 +510,7 @@ end
 -- @treturn vec3 win
 function mat4.project(obj, view, projection, viewport)
 	local position = { obj.x, obj.y, obj.z, 1 }
-
-	mat4.mul_vec4(position, view,       position)
-	mat4.mul_vec4(position, projection, position)
+	position       = projection * (view * position)
 
 	position[1] = position[1] / position[4] * 0.5 + 0.5
 	position[2] = position[2] / position[4] * 0.5 + 0.5
@@ -600,8 +539,8 @@ function mat4.unproject(win, view, projection, viewport)
 	position[2] = position[2] * 2 - 1
 	position[3] = position[3] * 2 - 1
 
-	tmp:mul(projection, view):invert(tmp)
-	mat4.mul_vec4(position, tmp, position)
+	-- position = (projection * view):invert() * position
+	position = (view * projection):invert() * position
 
 	position[1] = position[1] / position[4]
 	position[2] = position[2] / position[4]
@@ -663,7 +602,7 @@ end
 -- @tparam mat4 a Matrix to be converted
 -- @treturn quat out
 function mat4.to_quat(a)
-	identity(tmp):transpose(a)
+	tmp = a:transpose()
 
 	local w     = sqrt(1 + tmp[1] + tmp[6] + tmp[11]) / 2
 	local scale = w * 4
@@ -674,7 +613,7 @@ function mat4.to_quat(a)
 		w
 	)
 
-	return q:normalize(q)
+	return q:normalize()
 end
 
 -- http://www.crownandcutlass.com/features/technicaldetails/frustum.html
@@ -800,7 +739,7 @@ function mat4_mt.__call(_, a)
 end
 
 function mat4_mt.__unm(a)
-	return new():invert(a)
+	return a:invert()
 end
 
 function mat4_mt.__eq(a, b)
@@ -809,7 +748,7 @@ function mat4_mt.__eq(a, b)
 	end
 
 	for i = 1, 16 do
-		if not utils.tolerance(b[i]-a[i], constants.FLT_EPSILON) then
+		if not utils.tolerance(b[i]-a[i], DBL_EPSILON) then
 			return false
 		end
 	end
@@ -821,16 +760,16 @@ function mat4_mt.__mul(a, b)
 	assert(mat4.is_mat4(a), "__mul: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
 
 	if vec3.is_vec3(b) then
-		return vec3(mat4.mul_vec4({}, a, { b.x, b.y, b.z, 1 }))
+		return vec3(a:mul_vec4({ b.x, b.y, b.z, 1 }))
 	end
 
 	assert(mat4.is_mat4(b) or #b == 4, "__mul: Wrong argument type for right hand operant. (<cpml.mat4> or table #4 expected)")
 
 	if mat4.is_mat4(b) then
-		return new():mul(a, b)
+		return a:mul(b)
 	end
 
-	return mat4.mul_vec4({}, a, b)
+	return a:mul_vec4(b)
 end
 
 if status then

@@ -9,21 +9,18 @@ local mesh    = {}
 function mesh.average(vertices)
 	local out = vec3()
 	for _, v in ipairs(vertices) do
-		out:add(out, v)
+		out = out + v
 	end
-	return out:div(out, #vertices)
+	return out / #vertices
 end
 
 -- triangle[1] is a vec3
 -- triangle[2] is a vec3
 -- triangle[3] is a vec3
 function mesh.normal(triangle)
-	local ba  = vec3():sub(triangle[2], triangle[1])
-	local ca  = vec3():sub(triangle[3], triangle[1])
-	local out = vec3()
-	return out
-		:cross(ba, ca)
-		:normalize(out)
+	local ba = triangle[2] - triangle[1]
+	local ca = triangle[3] - triangle[1]
+	return ba:cross(ca):normalize()
 end
 
 -- triangle[1] is a vec3

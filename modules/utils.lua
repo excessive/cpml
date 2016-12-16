@@ -4,8 +4,6 @@
 local modules = (...): gsub('%.[^%.]+$', '') .. "."
 local vec2    = require(modules .. "vec2")
 local vec3    = require(modules .. "vec3")
-local atan2   = math.atan2
-local acos    = math.acos
 local sqrt    = math.sqrt
 local abs     = math.abs
 local ceil    = math.ceil
@@ -124,67 +122,80 @@ function utils.is_pot(value)
 end
 
 -- Originally from vec3
-function utils.project_on(out, a, b)
-	local isvec3 = vec3.is_vec3(out)
+function utils.project_on(a, b)
 	local s =
-		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0) /
-		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0)
+		(a.x * b.x + a.y * b.y + a.z or 0 * b.z or 0) /
+		(b.x * b.x + b.y * b.y + b.z or 0 * b.z or 0)
 
-	out.x = b.x * s
-	out.y = b.y * s
-	out.z = isvec3 and b.z * s or nil
+	if a.z and b.z then
+		return vec3(
+			b.x * s,
+			b.y * s,
+			b.z * s
+		)
+	end
 
-	return out
+	return vec2(
+		b.x * s,
+		b.y * s
+	)
 end
 
 -- Originally from vec3
-function utils.project_from(out, a, b)
-	local isvec3 = vec3.is_vec3(out)
+function utils.project_from(a, b)
 	local s =
-		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0) /
-		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0)
+		(b.x * b.x + b.y * b.y + b.z or 0 * b.z or 0) /
+		(a.x * b.x + a.y * b.y + a.z or 0 * b.z or 0)
 
-	out.x = b.x * s
-	out.y = b.y * s
-	out.z = isvec3 and b.z * s or nil
+	if a.z and b.z then
+		return vec3(
+			b.x * s,
+			b.y * s,
+			b.z * s
+		)
+	end
 
-	return out
+	return vec2(
+		b.x * s,
+		b.y * s
+	)
 end
 
 -- Originally from vec3
-function utils.mirror_on(out, a, b)
-	local isvec3 = vec3.is_vec3(out)
+function utils.mirror_on(a, b)
 	local s =
-		(a.x * b.x + a.y * b.y + isvec3 and a.z * b.z or 0) /
-		(b.x * b.x + b.y * b.y + isvec3 and b.z * b.z or 0) * 2
+		(a.x * b.x + a.y * b.y + a.z or 0 * b.z or 0) /
+		(b.x * b.x + b.y * b.y + b.z or 0 * b.z or 0) * 2
 
-	out.x = b.x * s - a.x
-	out.y = b.y * s - a.y
-	out.z = isvec3 and b.z * s - a.z or nil
+	if a.z and b.z then
+		return vec3(
+			b.x * s - a.x,
+			b.y * s - a.y,
+			b.z * s - a.z
+		)
+	end
 
-	return out
+	return vec2(
+		b.x * s - a.x,
+		b.y * s - a.y
+	)
 end
 
 -- Originally from vec3
-function utils.reflect(out, i, n)
-	return out
-		:mul(n, n:dot(i) * 2)
-		:sub(i, out)
+function utils.reflect(i, n)
+	return i - (n * (2 * n:dot(i)))
 end
 
 -- Originally from vec3
-local tmp = vec3()
-function utils.refract(out, i, n, ior)
+function utils.refract(i, n, ior)
 	local d = n:dot(i)
 	local k = 1 - ior * ior * (1 - d * d)
 
 	if k >= 0 then
-		tmp:mul(n, ior * d + sqrt(k))
-		out:mul(i, ior)
-		out:sub(out, tmp)
+		return (i * ior) - (n * (ior * d + sqrt(k)))
 	end
 
-	return out
+	return vec3()
 end
 
 return utils

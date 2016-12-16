@@ -9,9 +9,11 @@ local vec3_mt = {}
 
 -- Private constructor.
 local function new(x, y, z)
-	local v       = {}
-	v.x, v.y, v.z = x, y, z
-	return setmetatable(v, vec3_mt)
+	return setmetatable({
+		x = x or 0,
+		y = y or 0,
+		z = z or 0
+	}, vec3_mt)
 end
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
@@ -35,9 +37,6 @@ vec3.unit_y = new(0, 1, 0)
 vec3.unit_z = new(0, 0, 1)
 vec3.zero   = new(0, 0, 0)
 
--- Statically allocate a temporary variable used in some of our functions.
-local tmp = new(0, 0, 0)
-
 --- The public constructor.
 -- @param x Can be of three types: </br>
 -- number X component
@@ -57,18 +56,18 @@ function vec3.new(x, y, z)
 
 	-- {x, y, z} or {x=x, y=y, z=z}
 	elseif type(x) == "table" then
-		local x, y, z = x.x or x[1], x.y or x[2], x.z or x[3]
-		assert(type(x) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
-		assert(type(z) == "number", "new: Wrong argument type for z (<number> expected)")
+		local xx, yy, zz = x.x or x[1], x.y or x[2], x.z or x[3]
+		assert(type(xx) == "number", "new: Wrong argument type for x (<number> expected)")
+		assert(type(yy) == "number", "new: Wrong argument type for y (<number> expected)")
+		assert(type(zz) == "number", "new: Wrong argument type for z (<number> expected)")
 
-		return new(x, y, z)
+		return new(xx, yy, zz)
 
 	-- number
 	elseif type(x) == "number" then
 		return new(x, x, x)
 	else
-		return new(0, 0, 0)
+		return new()
 	end
 end
 
@@ -80,89 +79,81 @@ function vec3.clone(a)
 end
 
 --- Add two vectors.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @treturn vec3 out
-function vec3.add(out, a, b)
-	out.x = a.x + b.x
-	out.y = a.y + b.y
-	out.z = a.z + b.z
-	return out
+function vec3.add(a, b)
+	return new(
+		a.x + b.x,
+		a.y + b.y,
+		a.z + b.z
+	)
 end
 
 --- Subtract one vector from another.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @treturn vec3 out
-function vec3.sub(out, a, b)
-	out.x = a.x - b.x
-	out.y = a.y - b.y
-	out.z = a.z - b.z
-	return out
+function vec3.sub(a, b)
+	return new(
+		a.x - b.x,
+		a.y - b.y,
+		a.z - b.z
+	)
 end
 
 --- Multiply a vector by another vectorr.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @treturn vec3 out
-function vec3.mul(out, a, b)
-	out.x = a.x * b.x
-	out.y = a.y * b.y
-	out.z = a.z * b.z
-	return out
+function vec3.mul(a, b)
+	return new(
+		a.x * b.x,
+		a.y * b.y,
+		a.z * b.z
+	)
 end
 
 --- Divide a vector by a scalar.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @treturn vec3 out
-function vec3.div(out, a, b)
-	out.x = a.x / b.x
-	out.y = a.y / b.y
-	out.z = a.z / b.z
-	return out
+function vec3.div(a, b)
+	return new(
+		a.x / b.x,
+		a.y / b.y,
+		a.z / b.z
+	)
 end
 
 --- Get the normal of a vector.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Vector to normalize
 -- @treturn vec3 out
-function vec3.normalize(out, a)
-	local l = vec3.len(a)
-	if l == 0 then
-		return out
+function vec3.normalize(a)
+	if a:is_zero() then
+		return new()
 	end
-	out.x = a.x / l
-	out.y = a.y / l
-	out.z = a.z / l
-	return out
+	return a:scale(1 / a:len())
 end
 
 --- Trim a vector to a given length
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Vector to be trimmed
 -- @tparam number len Length to trim the vector to
 -- @treturn vec3 out
-function vec3.trim(out, a, len)
-	return out
-		:normalize(a)
-		:scale(out, math.min(vec3.len(a), len))
+function vec3.trim(a, len)
+	return a:normalize():scale(math.min(a:len(), len))
 end
 
 --- Get the cross product of two vectors.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @treturn vec3 out
-function vec3.cross(out, a, b)
-	out.x = a.y * b.z - a.z * b.y
-	out.y = a.z * b.x - a.x * b.z
-	out.z = a.x * b.y - a.y * b.x
-	return out
+function vec3.cross(a, b)
+	return new(
+		a.y * b.z - a.z * b.y,
+		a.z * b.x - a.x * b.z,
+		a.x * b.y - a.y * b.x
+	)
 end
 
 --- Get the dot product of two vectors.
@@ -210,29 +201,28 @@ function vec3.dist2(a, b)
 end
 
 --- Scale a vector by a scalar.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
 -- @tparam number b Right hand operant
 -- @treturn vec3 out
-function vec3.scale(out, a, b)
-	out.x = a.x * b
-	out.y = a.y * b
-	out.z = a.z * b
-	return out
+function vec3.scale(a, b)
+	return new(
+		a.x * b,
+		a.y * b,
+		a.z * b
+	)
 end
 
 --- Rotate vector about an axis.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Vector to rotate
--- @tparam number phi Amount to rotate, in radians
+-- @tparam number phi Angle to rotate vector by (in radians)
 -- @tparam vec3 axis Axis to rotate by
 -- @treturn vec3 out
-function vec3.rotate(out, a, phi, axis)
+function vec3.rotate(a, phi, axis)
 	if not vec3.is_vec3(axis) then
 		return a
 	end
 
-	local u = new():normalize(axis)
+	local u = axis:normalize()
 	local c = cos(phi)
 	local s = sin(phi)
 
@@ -241,30 +231,27 @@ function vec3.rotate(out, a, phi, axis)
 	local m2 = new((u.y * u.x * (1 - c) + u.z * s), (c + u.y * u.y * (1 - c)),       (u.y * u.z * (1 - c) - u.x * s))
 	local m3 = new((u.z * u.x * (1 - c) - u.y * s), (u.z * u.y * (1 - c) + u.x * s), (c + u.z * u.z * (1 - c))      )
 
-	out.x = a:dot(m1)
-	out.y = a:dot(m2)
-	out.z = a:dot(m3)
-	return out
+	return new(
+		a:dot(m1),
+		a:dot(m2),
+		a:dot(m3)
+	)
 end
 
-function vec3.perpendicular(out, a)
-	out.x = -a.y
-	out.y =  a.x
-	out.z =  0
-	return out
+--- Get the perpendicular vector of a vector.
+-- @tparam vec3 a Vector to get perpendicular axes from
+-- @treturn vec3 out
+function vec3.perpendicular(a)
+	return new(-a.y, a.x, 0)
 end
 
 --- Lerp between two vectors.
--- @tparam vec3 out Vector to store the result
 -- @tparam vec3 a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @tparam number s Step value
 -- @treturn vec3 out
-function vec3.lerp(out, a, b, s)
-	return out
-		:sub(b, a)
-		:scale(out, s)
-		:add(out, a)
+function vec3.lerp(a, b, s)
+	return a + (b - a) * s
 end
 
 --- Unpack a vector into individual components.
@@ -295,10 +282,7 @@ end
 -- @tparam vec3 a Vector to be tested
 -- @treturn boolean is_zero
 function vec3.is_zero(a)
-	return
-		a.x == 0 and
-		a.y == 0 and
-		a.z == 0
+	return a.x == 0 and a.y == 0 and a.z == 0
 end
 
 --- Return a formatted string.
@@ -329,13 +313,13 @@ end
 function vec3_mt.__add(a, b)
 	assert(vec3.is_vec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(vec3.is_vec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
-	return new():add(a, b)
+	return a:add(b)
 end
 
 function vec3_mt.__sub(a, b)
 	assert(vec3.is_vec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
 	assert(vec3.is_vec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
-	return new():sub(a, b)
+	return a:sub(b)
 end
 
 function vec3_mt.__mul(a, b)
@@ -343,10 +327,10 @@ function vec3_mt.__mul(a, b)
 	assert(vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
 
 	if vec3.is_vec3(b) then
-		return new():mul(a, b)
+		return a:mul(b)
 	end
 
-	return new():scale(a, b)
+	return a:scale(b)
 end
 
 function vec3_mt.__div(a, b)
@@ -354,10 +338,10 @@ function vec3_mt.__div(a, b)
 	assert(vec3.is_vec3(b) or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
 
 	if vec3.is_vec3(b) then
-		return new():div(a, b)
+		return a:div(b)
 	end
 
-	return new():scale(a, 1 / b)
+	return a:scale(1 / b)
 end
 
 if status then

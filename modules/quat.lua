@@ -6,10 +6,7 @@ local constants     = require(modules .. "constants")
 local vec3          = require(modules .. "vec3")
 local DOT_THRESHOLD = constants.DOT_THRESHOLD
 local DBL_EPSILON   = constants.DBL_EPSILON
-local abs           = math.abs
 local acos          = math.acos
-local asin          = math.asin
-local atan2         = math.atan2
 local cos           = math.cos
 local sin           = math.sin
 local min           = math.min
@@ -20,14 +17,13 @@ local quat_mt       = {}
 
 -- Private constructor.
 local function new(x, y, z, w)
-	local q = {}
-	q.x, q.y, q.z, q.w = x, y, z, w
-	return setmetatable(q, quat_mt)
+	return setmetatable({
+		x = x or 0,
+		y = y or 0,
+		z = z or 0,
+		w = w or 1
+	}, quat_mt)
 end
-
--- Statically allocate a temporary variable used in some of our functions.
-local tmp = new(0, 0, 0, 0)
-local uv, uuv = vec3(), vec3()
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
@@ -38,6 +34,10 @@ if type(jit) == "table" and jit.status() then
 		new = ffi.typeof("cpml_quat")
 	end
 end
+
+-- Statically allocate a temporary variable used in some of our functions.
+local tmp = new()
+local qv, uv, uuv = vec3(), vec3(), vec3()
 
 --- Constants
 -- @table quat
@@ -66,13 +66,13 @@ function quat.new(x, y, z, w)
 
 	-- {x, y, z, w} or {x=x, y=y, z=z, w=w}
 	elseif type(x) == "table" then
-		local x, y, z, w = x.x or x[1], x.y or x[2], x.z or x[3], x.w or x[4]
-		assert(type(x) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
-		assert(type(z) == "number", "new: Wrong argument type for z (<number> expected)")
-		assert(type(w) == "number", "new: Wrong argument type for w (<number> expected)")
+		local xx, yy, zz, ww = x.x or x[1], x.y or x[2], x.z or x[3], x.w or x[4]
+		assert(type(xx) == "number", "new: Wrong argument type for x (<number> expected)")
+		assert(type(yy) == "number", "new: Wrong argument type for y (<number> expected)")
+		assert(type(zz) == "number", "new: Wrong argument type for z (<number> expected)")
+		assert(type(ww) == "number", "new: Wrong argument type for w (<number> expected)")
 
-		return new(x, y, z, w)
+		return new(xx, yy, zz, ww)
 	end
 
 	return new(0, 0, 0, 1)
@@ -83,9 +83,8 @@ end
 -- @tparam vec3 axis
 -- @treturn quat out
 function quat.from_angle_axis(angle, axis)
-	local len = axis:len()
-	local s   = sin(angle * 0.5)
-	local c   = cos(angle * 0.5)
+	local s = sin(angle * 0.5)
+	local c = cos(angle * 0.5)
 	return new(axis.x * s, axis.y * s, axis.z * s, c)
 end
 
@@ -95,10 +94,8 @@ end
 -- @treturn quat out
 function quat.from_direction(normal, up)
 	local u = up or vec3.unit_z
-	local n = vec3()
-	n:normalize(normal)
-
-	local a = vec3():cross(u, n)
+	local n = normal:normalize()
+	local a = u:cross(n)
 	local d = u:dot(n)
 	return new(a.x, a.y, a.z, d + 1)
 end
@@ -111,94 +108,83 @@ function quat.clone(a)
 end
 
 --- Add two quaternions.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam quat b Right hand operant
 -- @treturn quat out
-function quat.add(out, a, b)
-	out.x = a.x + b.x
-	out.y = a.y + b.y
-	out.z = a.z + b.z
-	out.w = a.w + b.w
-	return out
+function quat.add(a, b)
+	return new(
+		a.x + b.x,
+		a.y + b.y,
+		a.z + b.z,
+		a.w + b.w
+	)
 end
 
 --- Subtract a quaternion from another.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam quat b Right hand operant
 -- @treturn quat out
-function quat.sub(out, a, b)
-	out.x = a.x - b.x
-	out.y = a.y - b.y
-	out.z = a.z - b.z
-	out.w = a.w - b.w
-	return out
+function quat.sub(a, b)
+	return new(
+		a.x - b.x,
+		a.y - b.y,
+		a.z - b.z,
+		a.w - b.w
+	)
 end
 
 --- Multiply two quaternions.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam quat b Right hand operant
 -- @treturn quat out
-function quat.mul(out, a, b)
-	out.x = a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y
-	out.y = a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z
-	out.z = a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x
-	out.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
-	return out
+function quat.mul(a, b)
+	return new(
+		a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y,
+		a.y * b.w + a.w * b.y + a.z * b.x - a.x * b.z,
+		a.z * b.w + a.w * b.z + a.x * b.y - a.y * b.x,
+		a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z
+	)
 end
 
 --- Multiply a quaternion and a vec3.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam vec3 b Right hand operant
 -- @treturn quat out
-function quat.mul_vec3(out, a, b)
-	uv:cross(a, b)
-	uuv:cross(a, uv)
-
-	return out
-		:scale(uv, a.w)
-		:add(out, uuv)
-		:scale(out, 2)
-		:add(b, out)
+function quat.mul_vec3(a, b)
+	qv.x = a.x
+	qv.y = a.y
+	qv.z = a.z
+	uv   = qv:cross(b)
+	uuv  = qv:cross(uv)
+	return b + ((uv * a.w) + uuv) * 2
 end
 
 --- Multiply a quaternion by an exponent.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam number n Right hand operant
 -- @treturn quat out
-function quat.pow(out, a, n)
+function quat.pow(a, n)
 	if n == 0 then
-		out.x = 0
-		out.y = 0
-		out.z = 0
-		out.w = 1
-	elseif n > 0 then
-		out.x = a.x^(n-1)
-		out.y = a.y^(n-1)
-		out.z = a.z^(n-1)
-		out.w = a.w^(n-1)
-		out:mul(a, out)
-	elseif n < 0 then
-		out:reciprocal(a)
-		out.x = out.x^(-n)
-		out.y = out.y^(-n)
-		out.z = out.z^(-n)
-		out.w = out.w^(-n)
+		return new(0, 0, 0, 1)
 	end
 
-	return out
+	if n > 0 then
+		return a * a^(n-1)
+	end
+
+	if n < 0 then
+		return a:reciprocal()^(-n)
+	end
 end
 
 --- Normalize a quaternion.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Quaternion to normalize
 -- @treturn quat out
-function quat.normalize(out, a)
-	return out:scale(a, 1 / a:len())
+function quat.normalize(a)
+	if a:is_zero() then
+		return new(0, 0, 0, 0)
+	end
+	return a:scale(1 / a:len())
 end
 
 --- Get the dot product of two quaternions.
@@ -224,16 +210,16 @@ function quat.len2(a)
 end
 
 --- Multiply a quaternion by a scalar.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam number s Right hand operant
 -- @treturn quat out
-function quat.scale(out, a, s)
-	out.x = a.x * s
-	out.y = a.y * s
-	out.z = a.z * s
-	out.w = a.w * s
-	return out
+function quat.scale(a, s)
+	return new(
+		a.x * s,
+		a.y * s,
+		a.z * s,
+		a.w * s
+	)
 end
 
 --- Alias of from_angle_axis.
@@ -245,80 +231,71 @@ function quat.rotate(angle, axis)
 end
 
 --- Return the conjugate of a quaternion.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Quaternion to conjugate
 -- @treturn quat out
-function quat.conjugate(out, a)
-	out.x = -a.x
-	out.y = -a.y
-	out.z = -a.z
-	out.w =  a.w
-	return out
+function quat.conjugate(a)
+	return new(-a.x, -a.y, -a.z, a.w)
 end
 
 --- Return the inverse of a quaternion.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Quaternion to invert
 -- @treturn quat out
-function quat.inverse(out, a)
-	return out
-		:conjugate(a)
-		:normalize(out)
+function quat.inverse(a)
+	tmp.x = -a.x
+	tmp.y = -a.y
+	tmp.z = -a.z
+	tmp.w =  a.w
+	return tmp:normalize()
 end
 
 --- Return the reciprocal of a quaternion.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Quaternion to reciprocate
 -- @treturn quat out
-function quat.reciprocal(out, a)
-	assert(not a:is_zero(), "Cannot reciprocate a zero quaternion")
-	return out
-		:conjugate(a)
-		:scale(out, 1 / a:len2())
+function quat.reciprocal(a)
+	if a:is_zero() then
+		error("Cannot reciprocate a zero quaternion")
+		return false
+	end
+
+	tmp.x = -a.x
+	tmp.y = -a.y
+	tmp.z = -a.z
+	tmp.w =  a.w
+
+	return tmp:scale(1 / a:len2())
 end
 
 --- Lerp between two quaternions.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam quat b Right hand operant
 -- @tparam number s Step value
 -- @treturn quat out
-function quat.lerp(out, a, b, s)
-	tmp:sub(b, a)
-	tmp:scale(tmp, s)
-	tmp:add(tmp, a)
-	return out:normalize(tmp)
+function quat.lerp(a, b, s)
+	return (a + (b - a) * s):normalize()
 end
 
 --- Slerp between two quaternions.
--- @tparam quat out Quaternion to store the result
 -- @tparam quat a Left hand operant
 -- @tparam quat b Right hand operant
 -- @tparam number s Step value
 -- @treturn quat out
-function quat.slerp(out, a, b, s)
+function quat.slerp(a, b, s)
 	local dot = a:dot(b)
 
 	if dot < 0 then
-		a:scale(a, -1)
+		a   = -a
 		dot = -dot
 	end
 
 	if dot > DOT_THRESHOLD then
-		return out:lerp(a, b, s)
+		return a:lerp(b, s)
 	end
 
 	dot = min(max(dot, -1), 1)
+
 	local theta = acos(dot) * s
-
-	tmp:scale(a, cos(theta))
-
-	return out
-		:scale(a, dot)
-		:sub(b, out)
-		:normalize(out)
-		:scale(out, sin(theta))
-		:add(tmp, out)
+	local c = (b - a * dot):normalize()
+	return a * cos(theta) + c * sin(theta)
 end
 
 --- Unpack a quaternion into individual components.
@@ -381,19 +358,19 @@ end
 -- @treturn vec3 axis
 function quat.to_angle_axis(a)
 	if a.w > 1 or a.w < -1 then
-		a:normalize(a)
+		a = a:normalize()
 	end
 
+	local x, y, z
 	local angle = 2 * acos(a.w)
 	local s     = sqrt(1 - a.w * a.w)
-	local x, y, z
 
-	if s < constants.DBL_EPSILON then
+	if s < DBL_EPSILON then
 		x = a.x
 		y = a.y
 		z = a.z
 	else
-		x = a.x / s -- normalize axis
+		x = a.x / s
 		y = a.y / s
 		z = a.z / s
 	end
@@ -405,11 +382,7 @@ end
 -- @tparam quat a Quaternion to convert
 -- @treturn vec3 out
 function quat.to_vec3(a)
-	local out = vec3()
-	out.x = a.x
-	out.y = a.y
-	out.z = a.z
-	return out
+	return vec3(a.x, a.y, a.z)
 end
 
 --- Return a formatted string.
@@ -427,7 +400,7 @@ function quat_mt.__call(_, x, y, z, w)
 end
 
 function quat_mt.__unm(a)
-	return new():scale(a, -1)
+	return a:scale(-1)
 end
 
 function quat_mt.__eq(a,b)
@@ -440,13 +413,13 @@ end
 function quat_mt.__add(a, b)
 	assert(quat.is_quat(a), "__add: Wrong argument type for left hand operant. (<cpml.quat> expected)")
 	assert(quat.is_quat(b), "__add: Wrong argument type for right hand operant. (<cpml.quat> expected)")
-	return new():add(a, b)
+	return a:add(b)
 end
 
 function quat_mt.__sub(a, b)
 	assert(quat.is_quat(a), "__sub: Wrong argument type for left hand operant. (<cpml.quat> expected)")
 	assert(quat.is_quat(b), "__sub: Wrong argument type for right hand operant. (<cpml.quat> expected)")
-	return new():sub(a, b)
+	return a:sub(b)
 end
 
 function quat_mt.__mul(a, b)
@@ -454,20 +427,20 @@ function quat_mt.__mul(a, b)
 	assert(quat.is_quat(b) or vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.quat> or <cpml.vec3> or <number> expected)")
 
 	if quat.is_quat(b) then
-		return new():mul(a, b)
+		return a:mul(b)
 	end
 
 	if type(b) == "number" then
-		return new():scale(a, b)
+		return a:scale(b)
 	end
 
-	return quat.mul_vec3(vec3(), a, b)
+	return a:mul_vec3(b)
 end
 
 function quat_mt.__pow(a, n)
 	assert(quat.is_quat(a), "__pow: Wrong argument type for left hand operant. (<cpml.quat> expected)")
 	assert(type(n) == "number", "__pow: Wrong argument type for right hand operant. (<number> expected)")
-	return new():pow(a, n)
+	return a:pow(n)
 end
 
 if status then

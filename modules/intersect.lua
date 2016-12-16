@@ -4,7 +4,6 @@
 local modules     = (...):gsub('%.[^%.]+$', '') .. "."
 local constants   = require(modules .. "constants")
 local vec3        = require(modules .. "vec3")
-local mat4        = require(modules .. "mat4")
 local utils       = require(modules .. "utils")
 local DBL_EPSILON = constants.DBL_EPSILON
 local sqrt        = math.sqrt
@@ -12,12 +11,6 @@ local abs         = math.abs
 local min         = math.min
 local max         = math.max
 local intersect   = {}
-
--- Some temp variables
-local d, h, s, q, e1, e2 = vec3(), vec3(), vec3(), vec3(), vec3(), vec3()
-local dir, dirfrac       = vec3(), vec3()
-local p13, p43, p21      = vec3(), vec3(), vec3()
-local axes               = { "x", "y", "z" }
 
 -- https://blogs.msdn.microsoft.com/rezanour/2011/08/07/barycentric-coordinates-and-point-in-triangle-tests/
 -- point       is a vec3
@@ -29,15 +22,15 @@ function intersect.point_triangle(point, triangle)
 	local v = triangle[3] - triangle[1]
 	local w = point       - triangle[1]
 
-	local vw = vec3():cross(v, w)
-	local vu = vec3():cross(v, u)
+	local vw = v:cross(w)
+	local vu = v:cross(u)
 
 	if vw:dot(vu) < 0 then
 		return false
 	end
 
-	local uw = vec3():cross(u, w)
-	local uv = vec3():cross(u, v)
+	local uw = u:cross(w)
+	local uv = u:cross(v)
 
 	if uw:dot(uv) < 0 then
 		return false
@@ -104,11 +97,10 @@ end
 -- triangle[2]   is a vec3
 -- triangle[3]   is a vec3
 function intersect.ray_triangle(ray, triangle)
-	e1:sub(triangle[2], triangle[1])
-	e2:sub(triangle[3], triangle[1])
-	h:cross(ray.direction, e2)
-
-	local a = h:dot(e1)
+	local e1 = triangle[2] - triangle[1]
+	local e2 = triangle[3] - triangle[1]
+	local h  = ray.direction:cross(e2)
+	local a  = h:dot(e1)
 
 	-- if a is too close to 0, ray does not intersect triangle
 	if abs(a) <= DBL_EPSILON then
@@ -116,7 +108,7 @@ function intersect.ray_triangle(ray, triangle)
 	end
 
 	local f = 1 / a
-	s:sub(ray.position, triangle[1])
+	local s = ray.position - triangle[1]
 	local u = s:dot(h) * f
 
 	-- ray does not intersect triangle
@@ -124,7 +116,7 @@ function intersect.ray_triangle(ray, triangle)
 		return false
 	end
 
-	q:cross(s, e1)
+	local q = s:cross(e1)
 	local v = ray.direction:dot(q) * f
 
 	-- ray does not intersect triangle
@@ -136,13 +128,9 @@ function intersect.ray_triangle(ray, triangle)
 	-- the intersection point is on the line
 	local t = q:dot(e2) * f
 
-	-- return position of intersection
+	-- return position of intersection and distance from ray origin
 	if t >= DBL_EPSILON then
-		local out = vec3()
-		out:scale(ray.direction, t)
-		out:add(ray.position, out)
-
-		return out
+		return ray.position + ray.direction * t, t
 	end
 
 	-- ray does not intersect triangle
@@ -172,17 +160,12 @@ function intersect.ray_sphere(ray, sphere)
 		return false
 	end
 
-	local t = -b - sqrt(discr)
-
 	-- Clamp t to 0
+	local t = -b - sqrt(discr)
 	t = t < 0 and 0 or t
 
-	local out = vec3()
-	out:scale(ray.direction, t)
-	out:add(out, ray.position)
-
 	-- Return collision point and distance from ray origin
-	return out, t
+	return ray.position + ray.direction * t, t
 end
 
 -- http://gamedev.stackexchange.com/a/18459
@@ -191,10 +174,12 @@ end
 -- aabb.min      is a vec3
 -- aabb.max      is a vec3
 function intersect.ray_aabb(ray, aabb)
-	dir:normalize(ray.direction)
-	dirfrac.x = 1 / dir.x
-	dirfrac.y = 1 / dir.y
-	dirfrac.z = 1 / dir.z
+	local dir     = ray.direction:normalize()
+	local dirfrac = vec3(
+		1 / dir.x,
+		1 / dir.y,
+		1 / dir.z
+	)
 
 	local t1 = (aabb.min.x - ray.position.x) * dirfrac.x
 	local t2 = (aabb.max.x - ray.position.x) * dirfrac.x
@@ -216,12 +201,8 @@ function intersect.ray_aabb(ray, aabb)
 		return false
 	end
 
-	local out = vec3()
-	out:scale(ray.direction, tmin)
-	out:add(out, ray.position)
-
 	-- Return collision point and distance from ray origin
-	return out, tmin
+	return ray.position + ray.direction * tmin, tmin
 end
 
 -- http://stackoverflow.com/a/23976134/1190664
@@ -238,19 +219,15 @@ function intersect.ray_plane(ray, plane)
 	end
 
 	-- distance of direction
-	d:sub(plane.position, ray.position)
+	local d = plane.position - ray.position
 	local t = d:dot(plane.normal) / denom
 
 	if t < DBL_EPSILON then
 		return false
 	end
 
-	local out = vec3()
-	out:scale(ray.direction, t)
-	out:add(out, ray.position)
-
 	-- Return collision point and distance from ray origin
-	return out, t
+	return ray.position + ray.direction * t, t
 end
 
 -- https://web.archive.org/web/20120414063459/http://local.wasp.uwa.edu.au/~pbourke//geometry/lineline3d/
@@ -261,9 +238,9 @@ end
 -- e    is a number
 function intersect.line_line(a, b, e)
 	-- new points
-	p13:sub(a[1], b[1])
-	p43:sub(b[2], b[1])
-	p21:sub(a[2], a[1])
+	local p13 = a[1] - b[1]
+	local p43 = b[2] - b[1]
+	local p21 = a[2] - a[1]
 
 	-- if lengths are negative or too close to 0, lines do not intersect
 	if p43:len2() < DBL_EPSILON or p21:len2() < DBL_EPSILON then
@@ -288,14 +265,8 @@ function intersect.line_line(a, b, e)
 	local mub   = (d1343 + d4321 * mua) / d4343
 
 	-- return positions of intersection on each line
-	local out1 = vec3()
-	out1:scale(p21, mua)
-	out1:add(out1, a[1])
-
-	local out2 = vec3()
-	out2:scale(p43, mub)
-	out2:add(out2, b[1])
-
+	local out1 = a[1] + p21 * mua
+	local out2 = b[1] + p43 * mub
 	local dist = out1:dist(out2)
 
 	-- if distance of the shortest segment between lines is less than threshold
@@ -373,7 +344,7 @@ function intersect.aabb_obb(aabb, obb)
 	local a   = aabb.extent
 	local b   = obb.extent
 	local T   = obb.position - aabb.position
-	local rot = mat4():transpose(obb.rotation)
+	local rot = obb.rotation:transpose()
 	local B   = {}
 	local t
 
@@ -423,15 +394,15 @@ function intersect.aabb_obb(aabb, obb)
 
 	if wy.x > hx.x and wy.y > hx.y and wy.z > hx.z then
 		if wy.x > -hx.x and wy.y > -hx.y and wy.z > -hx.z then
-			return vec3(mat4.mul_vec4({}, obb.rotation, {  0, -1, 0, 1 }))
+			return vec3(obb.rotation * {  0, -1, 0, 1 })
 		else
-			return vec3(mat4.mul_vec4({}, obb.rotation, { -1,  0, 0, 1 }))
+			return vec3(obb.rotation * { -1,  0, 0, 1 })
 		end
 	else
 		if wy.x > -hx.x and wy.y > -hx.y and wy.z > -hx.z then
-			return vec3(mat4.mul_vec4({}, obb.rotation, { 1, 0, 0, 1 }))
+			return vec3(obb.rotation * { 1, 0, 0, 1 })
 		else
-			return vec3(mat4.mul_vec4({}, obb.rotation, { 0, 1, 0, 1 }))
+			return vec3(obb.rotation * { 0, 1, 0, 1 })
 		end
 	end
 end
@@ -441,6 +412,7 @@ end
 -- aabb.max        is a vec3
 -- sphere.position is a vec3
 -- sphere.radius   is a number
+local axes = { "x", "y", "z" }
 function intersect.aabb_sphere(aabb, sphere)
 	local dist2 = sphere.radius ^ 2
 
@@ -556,7 +528,7 @@ function intersect.sphere_triangle(sphere, triangle)
 	local C  = triangle[3] - sphere.position
 
 	-- Compute normal of triangle plane
-	local V  = vec3():cross(B - A, C - A)
+	local V  = (B - A):cross(C - A)
 
 	-- Test if sphere lies outside triangle plane
 	local rr = sphere.radius * sphere.radius
@@ -638,7 +610,7 @@ function intersect.sphere_frustum(sphere, frustum)
 
 	-- dot + radius is the distance of the object from the near plane.
 	-- make sure that the near plane is the last test!
-	return dot + radius
+	return dot + sphere.radius
 end
 
 function intersect.capsule_capsule(c1, c2)
@@ -646,7 +618,7 @@ function intersect.capsule_capsule(c1, c2)
 	local radius = c1.radius + c2.radius
 
 	if dist2 <= radius * radius then
-		return true, p1, p2
+		return p1, p2
 	end
 
 	return false
@@ -689,7 +661,7 @@ function intersect.closest_point_segment_segment(p1, p2, p3, p4)
 			local b     = d1:dot(d2)
 			local denom = a * e - b * b
 
-			if math.abs(denom) > 0 then
+			if abs(denom) > 0 then
 				s = utils.clamp((b * f - c * e) / denom, 0, 1)
 			else
 				s = 0
