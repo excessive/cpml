@@ -159,22 +159,27 @@ function quat.mul_vec3(a, b)
 	return b + ((uv * a.w) + uuv) * 2
 end
 
---- Multiply a quaternion by an exponent.
--- @tparam quat a Left hand operant
--- @tparam number n Right hand operant
+--- Raise a normalized quaternion to a scalar power.
+-- @tparam quat a Left hand operand (should be a unit quaternion)
+-- @tparam number s Right hand operand
 -- @treturn quat out
-function quat.pow(a, n)
-	if n == 0 then
-		return new(0, 0, 0, 1)
+function quat.pow(a, s)
+	-- Do it as a slerp between identity and a (code borrowed from slerp)
+	if a.w < 0 then
+		a   = -a
+	end
+	local dot = a.w
+
+	if dot > DOT_THRESHOLD then
+		return a:scale(s)
 	end
 
-	if n > 0 then
-		return a * a^(n-1)
-	end
+	dot = min(max(dot, -1), 1)
 
-	if n < 0 then
-		return a:reciprocal()^(-n)
-	end
+	local theta = acos(dot) * s
+	local c = new(a.x, a.y, a.z, 0):normalize() * sin(theta)
+	c.w = cos(theta)
+	return c
 end
 
 --- Normalize a quaternion.
