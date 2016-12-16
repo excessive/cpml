@@ -126,10 +126,11 @@ describe("quat:", function()
 	end)
 
 	it("multiplies a quaternion by an exponent of 0", function()
-		local a = quat(2, 3, 4, 1)
+		local a = quat(2, 3, 4, 1):normalize()
 		local e = 0
 		local b = a:pow(e)
 		local c = a^e
+
 		assert.is.equal(0, b.x)
 		assert.is.equal(0, b.y)
 		assert.is.equal(0, b.z)
@@ -138,27 +139,28 @@ describe("quat:", function()
 	end)
 
 	it("multiplies a quaternion by a positive exponent", function()
-		local a = quat(2, 3, 4, 1)
-		local e = 2
+		local a = quat(2, 3, 4, 1):normalize()
+		local e = 0.75
 		local b = a:pow(e)
 		local c = a^e
 
-		assert.is.equal( 4,  b.x)
-		assert.is.equal( 6,  b.y)
-		assert.is.equal( 8,  b.z)
-		assert.is.equal(-28, b.w)
+		assert.is_true(utils.tolerance(-0.3204+b.x, 0.0001))
+		assert.is_true(utils.tolerance(-0.4805+b.y, 0.0001))
+		assert.is_true(utils.tolerance(-0.6407+b.z, 0.0001))
+		assert.is_true(utils.tolerance(-0.5059+b.w, 0.0001))
 		assert.is.equal( b,  c)
 	end)
 
 	it("multiplies a quaternion by a negative exponent", function()
-		local a = quat(2, 3, 4, 1)
-		local e = -2
+		local a = quat(2, 3, 4, 1):normalize()
+		local e = -1
 		local b = a:pow(e)
 		local c = a^e
-		assert.is_true(utils.tolerance(0.0044+b.x, 0.0001))
-		assert.is_true(utils.tolerance(0.0067+b.y, 0.0001))
-		assert.is_true(utils.tolerance(0.0089+b.z, 0.0001))
-		assert.is_true(utils.tolerance(0.0311+b.w, 0.0001))
+
+		assert.is_true(utils.tolerance( 0.3651+b.x, 0.0001))
+		assert.is_true(utils.tolerance( 0.5477+b.y, 0.0001))
+		assert.is_true(utils.tolerance( 0.7303+b.z, 0.0001))
+		assert.is_true(utils.tolerance(-0.1826+b.w, 0.0001))
 		assert.is.equal(b, c)
 	end)
 
