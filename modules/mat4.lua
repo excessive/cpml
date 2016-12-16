@@ -287,7 +287,6 @@ function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity
 end
 
 --- Transform matrix to look at a point.
--- @tparam mat4 out Matrix to store result
 -- @tparam vec3 eye Location of viewer's view plane
 -- @tparam vec3 center Location of object to view
 -- @tparam vec3 up Up direction
