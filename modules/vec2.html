@@ -38,7 +38,7 @@
 
 
 <h2>Modules</h2>
-<ul class="$(kind=='Topics' and '' or 'nowrap'">
+<ul class="nowrap">
   <li><a href="../modules/color.html">color</a></li>
   <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
@@ -78,27 +78,27 @@
 	<td class="summary">Clone a vector.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#add">add (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#add">add (a, b)</a></td>
 	<td class="summary">Add two vectors.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#sub">sub (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#sub">sub (a, b)</a></td>
 	<td class="summary">Subtract one vector from another.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#mul">mul (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#mul">mul (a, b)</a></td>
 	<td class="summary">Multiply a vector by another vector.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#div">div (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#div">div (a, b)</a></td>
 	<td class="summary">Divide a vector by another vector.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize">normalize (out, a)</a></td>
+	<td class="name" nowrap><a href="#normalize">normalize (a)</a></td>
 	<td class="summary">Get the normal of a vector.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#trim">trim (out, a, len)</a></td>
+	<td class="name" nowrap><a href="#trim">trim (a, len)</a></td>
 	<td class="summary">Trim a vector to a given length.</td>
 	</tr>
 	<tr>
@@ -126,15 +126,15 @@
 	<td class="summary">Get the squared distance between two vectors.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#scale">scale (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#scale">scale (a, b)</a></td>
 	<td class="summary">Scale a vector by a scalar.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#rotate">rotate (out, a, phi)</a></td>
+	<td class="name" nowrap><a href="#rotate">rotate (a, phi)</a></td>
 	<td class="summary">Rotate a vector.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#perpendicular">perpendicular (out, a)</a></td>
+	<td class="name" nowrap><a href="#perpendicular">perpendicular (a)</a></td>
 	<td class="summary">Get the perpendicular vector of a vector.</td>
 	</tr>
 	<tr>
@@ -146,7 +146,7 @@
 	<td class="summary">Angle between two vectors.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#lerp">lerp (out, a, b, s)</a></td>
+	<td class="name" nowrap><a href="#lerp">lerp (a, b, s)</a></td>
 	<td class="summary">Lerp between two vectors.</td>
 	</tr>
 	<tr>
@@ -278,7 +278,7 @@
 </dd>
     <dt>
     <a name = "add"></a>
-    <strong>add (out, a, b)</strong>
+    <strong>add (a, b)</strong>
     </dt>
     <dd>
     Add two vectors.
@@ -286,10 +286,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Left hand operant
@@ -313,7 +309,7 @@
 </dd>
     <dt>
     <a name = "sub"></a>
-    <strong>sub (out, a, b)</strong>
+    <strong>sub (a, b)</strong>
     </dt>
     <dd>
     Subtract one vector from another.
@@ -321,10 +317,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Left hand operant
@@ -348,7 +340,7 @@
 </dd>
     <dt>
     <a name = "mul"></a>
-    <strong>mul (out, a, b)</strong>
+    <strong>mul (a, b)</strong>
     </dt>
     <dd>
     Multiply a vector by another vector.
@@ -356,10 +348,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Left hand operant
@@ -383,7 +371,7 @@
 </dd>
     <dt>
     <a name = "div"></a>
-    <strong>div (out, a, b)</strong>
+    <strong>div (a, b)</strong>
     </dt>
     <dd>
     Divide a vector by another vector.
@@ -391,10 +379,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Left hand operant
@@ -418,7 +402,7 @@
 </dd>
     <dt>
     <a name = "normalize"></a>
-    <strong>normalize (out, a)</strong>
+    <strong>normalize (a)</strong>
     </dt>
     <dd>
     Get the normal of a vector.
@@ -426,10 +410,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Vector to normalize
@@ -449,7 +429,7 @@
 </dd>
     <dt>
     <a name = "trim"></a>
-    <strong>trim (out, a, len)</strong>
+    <strong>trim (a, len)</strong>
     </dt>
     <dd>
     Trim a vector to a given length.
@@ -457,10 +437,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Vector to be trimmed
@@ -662,7 +638,7 @@
 </dd>
     <dt>
     <a name = "scale"></a>
-    <strong>scale (out, a, b)</strong>
+    <strong>scale (a, b)</strong>
     </dt>
     <dd>
     Scale a vector by a scalar.
@@ -670,10 +646,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Left hand operant
@@ -697,7 +669,7 @@
 </dd>
     <dt>
     <a name = "rotate"></a>
-    <strong>rotate (out, a, phi)</strong>
+    <strong>rotate (a, phi)</strong>
     </dt>
     <dd>
     Rotate a vector.
@@ -705,10 +677,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Vector to rotate
@@ -732,7 +700,7 @@
 </dd>
     <dt>
     <a name = "perpendicular"></a>
-    <strong>perpendicular (out, a)</strong>
+    <strong>perpendicular (a)</strong>
     </dt>
     <dd>
     Get the perpendicular vector of a vector.
@@ -740,10 +708,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Vector to get perpendicular axes from
@@ -825,7 +789,7 @@
 </dd>
     <dt>
     <a name = "lerp"></a>
-    <strong>lerp (out, a, b, s)</strong>
+    <strong>lerp (a, b, s)</strong>
     </dt>
     <dd>
     Lerp between two vectors.
@@ -833,10 +797,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
-         Vector to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/vec2.html#vec2">vec2</a></span>
          Left hand operant
@@ -995,7 +955,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
         formatted
     </ol>
 
@@ -1039,8 +999,8 @@
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
-<i style="float:right;">Last updated 2016-08-21 20:32:28 </i>
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2016-12-15 16:43:51 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

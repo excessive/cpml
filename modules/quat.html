@@ -38,7 +38,7 @@
 
 
 <h2>Modules</h2>
-<ul class="$(kind=='Topics' and '' or 'nowrap'">
+<ul class="nowrap">
   <li><a href="../modules/color.html">color</a></li>
   <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
@@ -82,27 +82,27 @@
 	<td class="summary">Clone a quaternion.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#add">add (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#add">add (a, b)</a></td>
 	<td class="summary">Add two quaternions.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#sub">sub (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#sub">sub (a, b)</a></td>
 	<td class="summary">Subtract a quaternion from another.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#mul">mul (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#mul">mul (a, b)</a></td>
 	<td class="summary">Multiply two quaternions.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#mul_vec3">mul_vec3 (out, a, b)</a></td>
+	<td class="name" nowrap><a href="#mul_vec3">mul_vec3 (a, b)</a></td>
 	<td class="summary">Multiply a quaternion and a vec3.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#pow">pow (out, a, n)</a></td>
+	<td class="name" nowrap><a href="#pow">pow (a, n)</a></td>
 	<td class="summary">Multiply a quaternion by an exponent.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#normalize">normalize (out, a)</a></td>
+	<td class="name" nowrap><a href="#normalize">normalize (a)</a></td>
 	<td class="summary">Normalize a quaternion.</td>
 	</tr>
 	<tr>
@@ -118,7 +118,7 @@
 	<td class="summary">Return the squared length of a quaternion.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#scale">scale (out, a, s)</a></td>
+	<td class="name" nowrap><a href="#scale">scale (a, s)</a></td>
 	<td class="summary">Multiply a quaternion by a scalar.</td>
 	</tr>
 	<tr>
@@ -126,23 +126,23 @@
 	<td class="summary">Alias of from<em>angle</em>axis.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#conjugate">conjugate (out, a)</a></td>
+	<td class="name" nowrap><a href="#conjugate">conjugate (a)</a></td>
 	<td class="summary">Return the conjugate of a quaternion.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#inverse">inverse (out, a)</a></td>
+	<td class="name" nowrap><a href="#inverse">inverse (a)</a></td>
 	<td class="summary">Return the inverse of a quaternion.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#reciprocal">reciprocal (out, a)</a></td>
+	<td class="name" nowrap><a href="#reciprocal">reciprocal (a)</a></td>
 	<td class="summary">Return the reciprocal of a quaternion.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#lerp">lerp (out, a, b, s)</a></td>
+	<td class="name" nowrap><a href="#lerp">lerp (a, b, s)</a></td>
 	<td class="summary">Lerp between two quaternions.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#slerp">slerp (out, a, b, s)</a></td>
+	<td class="name" nowrap><a href="#slerp">slerp (a, b, s)</a></td>
 	<td class="summary">Slerp between two quaternions.</td>
 	</tr>
 	<tr>
@@ -284,9 +284,7 @@
         </li>
         <li><span class="parameter">up</span>
             <span class="types"><span class="type">vec3</span></span>
-
-
-
+         (optional)
         </li>
     </ul>
 
@@ -330,7 +328,7 @@
 </dd>
     <dt>
     <a name = "add"></a>
-    <strong>add (out, a, b)</strong>
+    <strong>add (a, b)</strong>
     </dt>
     <dd>
     Add two quaternions.
@@ -338,10 +336,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -365,7 +359,7 @@
 </dd>
     <dt>
     <a name = "sub"></a>
-    <strong>sub (out, a, b)</strong>
+    <strong>sub (a, b)</strong>
     </dt>
     <dd>
     Subtract a quaternion from another.
@@ -373,10 +367,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -400,7 +390,7 @@
 </dd>
     <dt>
     <a name = "mul"></a>
-    <strong>mul (out, a, b)</strong>
+    <strong>mul (a, b)</strong>
     </dt>
     <dd>
     Multiply two quaternions.
@@ -408,10 +398,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -435,7 +421,7 @@
 </dd>
     <dt>
     <a name = "mul_vec3"></a>
-    <strong>mul_vec3 (out, a, b)</strong>
+    <strong>mul_vec3 (a, b)</strong>
     </dt>
     <dd>
     Multiply a quaternion and a vec3.
@@ -443,10 +429,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -470,7 +452,7 @@
 </dd>
     <dt>
     <a name = "pow"></a>
-    <strong>pow (out, a, n)</strong>
+    <strong>pow (a, n)</strong>
     </dt>
     <dd>
     Multiply a quaternion by an exponent.
@@ -478,10 +460,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -505,7 +483,7 @@
 </dd>
     <dt>
     <a name = "normalize"></a>
-    <strong>normalize (out, a)</strong>
+    <strong>normalize (a)</strong>
     </dt>
     <dd>
     Normalize a quaternion.
@@ -513,10 +491,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Quaternion to normalize
@@ -621,7 +595,7 @@
 </dd>
     <dt>
     <a name = "scale"></a>
-    <strong>scale (out, a, s)</strong>
+    <strong>scale (a, s)</strong>
     </dt>
     <dd>
     Multiply a quaternion by a scalar.
@@ -629,10 +603,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -689,7 +659,7 @@
 </dd>
     <dt>
     <a name = "conjugate"></a>
-    <strong>conjugate (out, a)</strong>
+    <strong>conjugate (a)</strong>
     </dt>
     <dd>
     Return the conjugate of a quaternion.
@@ -697,10 +667,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Quaternion to conjugate
@@ -720,7 +686,7 @@
 </dd>
     <dt>
     <a name = "inverse"></a>
-    <strong>inverse (out, a)</strong>
+    <strong>inverse (a)</strong>
     </dt>
     <dd>
     Return the inverse of a quaternion.
@@ -728,10 +694,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Quaternion to invert
@@ -751,7 +713,7 @@
 </dd>
     <dt>
     <a name = "reciprocal"></a>
-    <strong>reciprocal (out, a)</strong>
+    <strong>reciprocal (a)</strong>
     </dt>
     <dd>
     Return the reciprocal of a quaternion.
@@ -759,10 +721,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Quaternion to reciprocate
@@ -782,7 +740,7 @@
 </dd>
     <dt>
     <a name = "lerp"></a>
-    <strong>lerp (out, a, b, s)</strong>
+    <strong>lerp (a, b, s)</strong>
     </dt>
     <dd>
     Lerp between two quaternions.
@@ -790,10 +748,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -821,7 +775,7 @@
 </dd>
     <dt>
     <a name = "slerp"></a>
-    <strong>slerp (out, a, b, s)</strong>
+    <strong>slerp (a, b, s)</strong>
     </dt>
     <dd>
     Slerp between two quaternions.
@@ -829,10 +783,6 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">out</span>
-            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-         Quaternion to store the result
-        </li>
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Left hand operant
@@ -1078,7 +1028,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="http://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
         formatted
     </ol>
 
@@ -1119,8 +1069,8 @@
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
-<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.3</a></i>
-<i style="float:right;">Last updated 2016-08-21 20:32:28 </i>
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2016-12-15 16:43:51 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
