@@ -170,7 +170,7 @@ describe("intersect:", function()
 	end)
 
 	it("intersects an aabb with an obb", function()
-		local r = mat4():rotate(math.pi / 4, vec3.unit_z)
+		local r = mat4():rotate(mat4(), math.pi / 4, vec3.unit_z)
 
 		local a = {
 			position = vec3(),

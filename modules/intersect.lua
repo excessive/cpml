@@ -3,6 +3,7 @@
 
 local modules     = (...):gsub('%.[^%.]+$', '') .. "."
 local constants   = require(modules .. "constants")
+local mat4        = require(modules .. "mat4")
 local vec3        = require(modules .. "vec3")
 local utils       = require(modules .. "utils")
 local DBL_EPSILON = constants.DBL_EPSILON
@@ -358,7 +359,7 @@ function intersect.aabb_obb(aabb, obb)
 	local a   = aabb.extent
 	local b   = obb.extent
 	local T   = obb.position - aabb.position
-	local rot = obb.rotation:transpose()
+	local rot = mat4():transpose(obb.rotation)
 	local B   = {}
 	local t
 

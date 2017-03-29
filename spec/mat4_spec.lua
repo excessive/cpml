@@ -142,7 +142,7 @@ describe("mat4:", function()
 			3, 7, 11, 15,
 			4, 8, 12, 16
 		}
-		local c = a:mul(b)
+		local c = mat4():mul(a, b)
 		local d = a * b
 		assert.is.equal(30,  c[1])
 		assert.is.equal(70,  c[2])
@@ -171,7 +171,7 @@ describe("mat4:", function()
 			13, 14, 15, 16
 		}
 		local b = { 10, 20, 30, 40 }
-		local c = mat4.mul_vec4(a, b)
+		local c = mat4.mul_vec4(mat4(), a, b)
 		local d = a * b
 		assert.is.equal(900,  c[1])
 		assert.is.equal(1000, c[2])
@@ -185,14 +185,14 @@ describe("mat4:", function()
 	end)
 
 	it("scales a matrix", function()
-		local a = mat4():scale(vec3(5, 5, 5))
+		local a = mat4():scale(mat4(), vec3(5, 5, 5))
 		assert.is.equal(5, a[1])
 		assert.is.equal(5, a[6])
 		assert.is.equal(5, a[11])
 	end)
 
 	it("rotates a matrix", function()
-		local a = mat4():rotate(math.rad(45), vec3.unit_z)
+		local a = mat4():rotate(mat4(), math.rad(45), vec3.unit_z)
 		assert.is_true(utils.tolerance( 0.7071-a[1], 0.001))
 		assert.is_true(utils.tolerance( 0.7071-a[2], 0.001))
 		assert.is_true(utils.tolerance(-0.7071-a[5], 0.001))
@@ -200,7 +200,7 @@ describe("mat4:", function()
 	end)
 
 	it("translates a matrix", function()
-		local a = mat4():translate(vec3(5, 5, 5))
+		local a = mat4():translate(mat4(), vec3(5, 5, 5))
 		assert.is.equal(5, a[13])
 		assert.is.equal(5, a[14])
 		assert.is.equal(5, a[15])
@@ -208,16 +208,16 @@ describe("mat4:", function()
 
 	it("inverts a matrix", function()
 		local a = mat4()
-			:rotate(math.pi/4, vec3.unit_y)
-			:translate(vec3(4, 5, 6))
+		a = a:rotate(a, math.pi/4, vec3.unit_y)
+		a = a:translate(a, vec3(4, 5, 6))
 
-		local b = a:invert()
+		local b = mat4.invert(mat4(), a)
 		local c = a * b
 		assert.is.equal(mat4(), c)
 
 		local d = mat4()
-			:rotate(math.pi/4, vec3.unit_y)
-			:translate(vec3(4, 5, 6))
+		d:rotate(d, math.pi/4, vec3.unit_y)
+		d:translate(d, vec3(4, 5, 6))
 
 		local e = -d
 		local f = d * e
@@ -230,7 +230,8 @@ describe("mat4:", function()
 			2, 2, 2, 2,
 			3, 3, 3, 3,
 			4, 4, 4, 4
-		}):transpose()
+		})
+		a = a:transpose(a)
 		assert.is.equal(1, a[1])
 		assert.is.equal(2, a[2])
 		assert.is.equal(3, a[3])
@@ -251,7 +252,7 @@ describe("mat4:", function()
 
 	it("shears a matrix", function()
 		local yx, zx, xy, zy, xz, yz = 1, 1, 1, -1, -1, -1
-		local a = mat4():shear(yx, zx, xy, zy, xz, yz)
+		local a = mat4():shear(mat4(), yx, zx, xy, zy, xz, yz)
 		assert.is.equal( 1, a[2])
 		assert.is.equal( 1, a[3])
 		assert.is.equal( 1, a[5])
@@ -287,7 +288,7 @@ describe("mat4:", function()
 		local e = vec3(0, 0, 1.55)
 		local c = vec3(4, 7, 1)
 		local u = vec3(0, 0, 1)
-		local a = mat4().look_at(e, c, u)
+		local a = mat4():look_at(mat4(), e, c, u)
 
 		assert.is_true(utils.tolerance( 0.868-a[1], 0.001))
 		assert.is_true(utils.tolerance( 0.034-a[2], 0.001))

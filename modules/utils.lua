@@ -69,22 +69,22 @@ end
 
 --- Linear interpolation.
 -- Performs linear interpolation between 0 and 1 when `low` < `progress` < `high`.
--- @param progress (0-1)
 -- @param low value to return when `progress` is 0
 -- @param high value to return when `progress` is 1
+-- @param progress (0-1)
 -- @return number
-function utils.lerp(progress, low, high)
+function utils.lerp(low, high, progress)
 	return ((high - low) + low) * progress
 end
 
 -- Exponential decay
--- @param rate portion of the original value remaining per second
 -- @param low initial value
 -- @param high target value
+-- @param rate portion of the original value remaining per second
 -- @param dt time delta
 -- @return number
-function utils.decay(rate, low, high, dt)
-	return utils.lerp(1.0 - math.exp(-rate * dt), low, high)
+function utils.decay(low, high, rate, dt)
+	return utils.lerp(low, high, 1.0 - math.exp(-rate * dt))
 end
 
 --- Hermite interpolation.
