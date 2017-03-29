@@ -79,8 +79,8 @@ function vec3.clone(a)
 end
 
 --- Add two vectors.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
 function vec3.add(a, b)
 	return new(
@@ -91,8 +91,8 @@ function vec3.add(a, b)
 end
 
 --- Subtract one vector from another.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
 function vec3.sub(a, b)
 	return new(
@@ -103,8 +103,8 @@ function vec3.sub(a, b)
 end
 
 --- Multiply a vector by another vectorr.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
 function vec3.mul(a, b)
 	return new(
@@ -115,8 +115,8 @@ function vec3.mul(a, b)
 end
 
 --- Divide a vector by a scalar.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
 function vec3.div(a, b)
 	return new(
@@ -145,8 +145,8 @@ function vec3.trim(a, len)
 end
 
 --- Get the cross product of two vectors.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
 function vec3.cross(a, b)
 	return new(
@@ -157,8 +157,8 @@ function vec3.cross(a, b)
 end
 
 --- Get the dot product of two vectors.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn number dot
 function vec3.dot(a, b)
 	return a.x * b.x + a.y * b.y + a.z * b.z
@@ -179,8 +179,8 @@ function vec3.len2(a)
 end
 
 --- Get the distance between two vectors.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn number dist
 function vec3.dist(a, b)
 	local dx = a.x - b.x
@@ -190,8 +190,8 @@ function vec3.dist(a, b)
 end
 
 --- Get the squared distance between two vectors.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn number dist
 function vec3.dist2(a, b)
 	local dx = a.x - b.x
@@ -201,8 +201,8 @@ function vec3.dist2(a, b)
 end
 
 --- Scale a vector by a scalar.
--- @tparam vec3 a Left hand operant
--- @tparam number b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam number b Right hand operand
 -- @treturn vec3 out
 function vec3.scale(a, b)
 	return new(
@@ -246,8 +246,8 @@ function vec3.perpendicular(a)
 end
 
 --- Lerp between two vectors.
--- @tparam vec3 a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @tparam number s Step value
 -- @treturn vec3 out
 function vec3.lerp(a, b, s)
@@ -311,20 +311,20 @@ function vec3_mt.__eq(a, b)
 end
 
 function vec3_mt.__add(a, b)
-	assert(vec3.is_vec3(a), "__add: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b), "__add: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(a), "__add: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b), "__add: Wrong argument type for right hand operand. (<cpml.vec3> expected)")
 	return a:add(b)
 end
 
 function vec3_mt.__sub(a, b)
-	assert(vec3.is_vec3(a), "__sub: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b), "__sub: Wrong argument type for right hand operant. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(a), "__sub: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b), "__sub: Wrong argument type for right hand operand. (<cpml.vec3> expected)")
 	return a:sub(b)
 end
 
 function vec3_mt.__mul(a, b)
-	assert(vec3.is_vec3(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
+	assert(vec3.is_vec3(a), "__mul: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operand. (<cpml.vec3> or <number> expected)")
 
 	if vec3.is_vec3(b) then
 		return a:mul(b)
@@ -334,8 +334,8 @@ function vec3_mt.__mul(a, b)
 end
 
 function vec3_mt.__div(a, b)
-	assert(vec3.is_vec3(a), "__div: Wrong argument type for left hand operant. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b) or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec3> or <number> expected)")
+	assert(vec3.is_vec3(a), "__div: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
+	assert(vec3.is_vec3(b) or type(b) == "number", "__div: Wrong argument type for right hand operand. (<cpml.vec3> or <number> expected)")
 
 	if vec3.is_vec3(b) then
 		return a:div(b)

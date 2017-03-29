@@ -108,8 +108,8 @@ function quat.clone(a)
 end
 
 --- Add two quaternions.
--- @tparam quat a Left hand operant
--- @tparam quat b Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam quat b Right hand operand
 -- @treturn quat out
 function quat.add(a, b)
 	return new(
@@ -121,8 +121,8 @@ function quat.add(a, b)
 end
 
 --- Subtract a quaternion from another.
--- @tparam quat a Left hand operant
--- @tparam quat b Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam quat b Right hand operand
 -- @treturn quat out
 function quat.sub(a, b)
 	return new(
@@ -134,8 +134,8 @@ function quat.sub(a, b)
 end
 
 --- Multiply two quaternions.
--- @tparam quat a Left hand operant
--- @tparam quat b Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam quat b Right hand operand
 -- @treturn quat out
 function quat.mul(a, b)
 	return new(
@@ -147,8 +147,8 @@ function quat.mul(a, b)
 end
 
 --- Multiply a quaternion and a vec3.
--- @tparam quat a Left hand operant
--- @tparam vec3 b Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam vec3 b Right hand operand
 -- @treturn quat out
 function quat.mul_vec3(a, b)
 	qv.x = a.x
@@ -193,8 +193,8 @@ function quat.normalize(a)
 end
 
 --- Get the dot product of two quaternions.
--- @tparam quat a Left hand operant
--- @tparam quat b Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam quat b Right hand operand
 -- @treturn number dot
 function quat.dot(a, b)
 	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w
@@ -215,8 +215,8 @@ function quat.len2(a)
 end
 
 --- Multiply a quaternion by a scalar.
--- @tparam quat a Left hand operant
--- @tparam number s Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam number s Right hand operand
 -- @treturn quat out
 function quat.scale(a, s)
 	return new(
@@ -271,8 +271,8 @@ function quat.reciprocal(a)
 end
 
 --- Lerp between two quaternions.
--- @tparam quat a Left hand operant
--- @tparam quat b Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam quat b Right hand operand
 -- @tparam number s Step value
 -- @treturn quat out
 function quat.lerp(a, b, s)
@@ -280,8 +280,8 @@ function quat.lerp(a, b, s)
 end
 
 --- Slerp between two quaternions.
--- @tparam quat a Left hand operant
--- @tparam quat b Right hand operant
+-- @tparam quat a Left hand operand
+-- @tparam quat b Right hand operand
 -- @tparam number s Step value
 -- @treturn quat out
 function quat.slerp(a, b, s)
@@ -416,20 +416,20 @@ function quat_mt.__eq(a,b)
 end
 
 function quat_mt.__add(a, b)
-	assert(quat.is_quat(a), "__add: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.is_quat(b), "__add: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(a), "__add: Wrong argument type for left hand operand. (<cpml.quat> expected)")
+	assert(quat.is_quat(b), "__add: Wrong argument type for right hand operand. (<cpml.quat> expected)")
 	return a:add(b)
 end
 
 function quat_mt.__sub(a, b)
-	assert(quat.is_quat(a), "__sub: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.is_quat(b), "__sub: Wrong argument type for right hand operant. (<cpml.quat> expected)")
+	assert(quat.is_quat(a), "__sub: Wrong argument type for left hand operand. (<cpml.quat> expected)")
+	assert(quat.is_quat(b), "__sub: Wrong argument type for right hand operand. (<cpml.quat> expected)")
 	return a:sub(b)
 end
 
 function quat_mt.__mul(a, b)
-	assert(quat.is_quat(a), "__mul: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(quat.is_quat(b) or vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.quat> or <cpml.vec3> or <number> expected)")
+	assert(quat.is_quat(a), "__mul: Wrong argument type for left hand operand. (<cpml.quat> expected)")
+	assert(quat.is_quat(b) or vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operand. (<cpml.quat> or <cpml.vec3> or <number> expected)")
 
 	if quat.is_quat(b) then
 		return a:mul(b)
@@ -443,8 +443,8 @@ function quat_mt.__mul(a, b)
 end
 
 function quat_mt.__pow(a, n)
-	assert(quat.is_quat(a), "__pow: Wrong argument type for left hand operant. (<cpml.quat> expected)")
-	assert(type(n) == "number", "__pow: Wrong argument type for right hand operant. (<number> expected)")
+	assert(quat.is_quat(a), "__pow: Wrong argument type for left hand operand. (<cpml.quat> expected)")
+	assert(type(n) == "number", "__pow: Wrong argument type for right hand operand. (<number> expected)")
 	return a:pow(n)
 end
 

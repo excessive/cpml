@@ -85,8 +85,8 @@ function vec2.clone(a)
 end
 
 --- Add two vectors.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn vec2 out
 function vec2.add(a, b)
 	return new(
@@ -96,8 +96,8 @@ function vec2.add(a, b)
 end
 
 --- Subtract one vector from another.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn vec2 out
 function vec2.sub(a, b)
 	return new(
@@ -107,8 +107,8 @@ function vec2.sub(a, b)
 end
 
 --- Multiply a vector by another vector.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn vec2 out
 function vec2.mul(a, b)
 	return new(
@@ -118,8 +118,8 @@ function vec2.mul(a, b)
 end
 
 --- Divide a vector by another vector.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn vec2 out
 function vec2.div(a, b)
 	return new(
@@ -147,16 +147,16 @@ function vec2.trim(a, len)
 end
 
 --- Get the cross product of two vectors.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn number magnitude
 function vec2.cross(a, b)
 	return a.x * b.y - a.y * b.x
 end
 
 --- Get the dot product of two vectors.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn number dot
 function vec2.dot(a, b)
 	return a.x * b.x + a.y * b.y
@@ -177,8 +177,8 @@ function vec2.len2(a)
 end
 
 --- Get the distance between two vectors.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn number dist
 function vec2.dist(a, b)
 	local dx = a.x - b.x
@@ -187,8 +187,8 @@ function vec2.dist(a, b)
 end
 
 --- Get the squared distance between two vectors.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @treturn number dist
 function vec2.dist2(a, b)
 	local dx = a.x - b.x
@@ -197,8 +197,8 @@ function vec2.dist2(a, b)
 end
 
 --- Scale a vector by a scalar.
--- @tparam vec2 a Left hand operant
--- @tparam number b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam number b Right hand operand
 -- @treturn vec2 out
 function vec2.scale(a, b)
 	return new(
@@ -256,8 +256,8 @@ function vec2.angle_between(a, b)
 end
 
 --- Lerp between two vectors.
--- @tparam vec2 a Left hand operant
--- @tparam vec2 b Right hand operant
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
 -- @tparam number s Step value
 -- @treturn vec2 out
 function vec2.lerp(a, b, s)
@@ -330,20 +330,20 @@ function vec2_mt.__eq(a, b)
 end
 
 function vec2_mt.__add(a, b)
-	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operand. (<cpml.vec2> expected)")
 	return a:add(b)
 end
 
 function vec2_mt.__sub(a, b)
-	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operant. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operand. (<cpml.vec2> expected)")
 	return a:sub(b)
 end
 
 function vec2_mt.__mul(a, b)
-	assert(vec2.is_vec2(a), "__mul: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.is_vec2(b) or type(b) == "number", "__mul: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
+	assert(vec2.is_vec2(a), "__mul: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b) or type(b) == "number", "__mul: Wrong argument type for right hand operand. (<cpml.vec2> or <number> expected)")
 
 	if vec2.is_vec2(b) then
 		return a:mul(b)
@@ -353,8 +353,8 @@ function vec2_mt.__mul(a, b)
 end
 
 function vec2_mt.__div(a, b)
-	assert(vec2.is_vec2(a), "__div: Wrong argument type for left hand operant. (<cpml.vec2> expected)")
-	assert(vec2.is_vec2(b) or type(b) == "number", "__div: Wrong argument type for right hand operant. (<cpml.vec2> or <number> expected)")
+	assert(vec2.is_vec2(a), "__div: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
+	assert(vec2.is_vec2(b) or type(b) == "number", "__div: Wrong argument type for right hand operand. (<cpml.vec2> or <number> expected)")
 
 	if vec2.is_vec2(b) then
 		return a:div(b)

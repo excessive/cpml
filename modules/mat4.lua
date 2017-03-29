@@ -321,8 +321,8 @@ end
 
 --- Multiply two matrices.
 -- @tparam mat4 out Matrix to store the result
--- @tparam mat4 a Left hand operant
--- @tparam mat4 b Right hand operant
+-- @tparam mat4 a Left hand operand
+-- @tparam mat4 b Right hand operand
 -- @treturn mat4 out
 function mat4.mul(out, a, b)
 	tm4[1]  = a[1]  * b[1] + a[2]  * b[5] + a[3]  * b[9]  + a[4]  * b[13]
@@ -351,8 +351,8 @@ end
 
 --- Multiply a matrix and a vec4.
 -- @tparam mat4 out Matrix to store the result
--- @tparam mat4 a Left hand operant
--- @tparam table b Right hand operant
+-- @tparam mat4 a Left hand operand
+-- @tparam table b Right hand operand
 -- @treturn mat4 out
 function mat4.mul_vec4(out, a, b)
 	tv4[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
@@ -812,13 +812,13 @@ function mat4_mt.__eq(a, b)
 end
 
 function mat4_mt.__mul(a, b)
-	assert(mat4.is_mat4(a), "__mul: Wrong argument type for left hand operant. (<cpml.mat4> expected)")
+	assert(mat4.is_mat4(a), "__mul: Wrong argument type for left hand operand. (<cpml.mat4> expected)")
 
 	if vec3.is_vec3(b) then
 		return vec3(mat4.mul_vec4({}, a, { b.x, b.y, b.z, 1 }))
 	end
 
-	assert(mat4.is_mat4(b) or #b == 4, "__mul: Wrong argument type for right hand operant. (<cpml.mat4> or table #4 expected)")
+	assert(mat4.is_mat4(b) or #b == 4, "__mul: Wrong argument type for right hand operand. (<cpml.mat4> or table #4 expected)")
 
 	if mat4.is_mat4(b) then
 		return new():mul(a, b)
