@@ -85,6 +85,10 @@
 	<td class="summary">Create a matrix from a direction/up pair.</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#from_transform">from_transform (trans, rot, scale)</a></td>
+	<td class="summary">Create a matrix from a transform.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#from_ortho">from_ortho (left, right, top, bottom, near, far)</a></td>
 	<td class="summary">Create matrix from orthogonal.</td>
 	</tr>
@@ -93,43 +97,43 @@
 	<td class="summary">Create matrix from perspective.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#look_at">look_at (eye, center, up)</a></td>
-	<td class="summary">Transform matrix to look at a point.</td>
-	</tr>
-	<tr>
 	<td class="name" nowrap><a href="#clone">clone (a)</a></td>
 	<td class="summary">Clone a matrix.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#mul">mul (a, b)</a></td>
+	<td class="name" nowrap><a href="#mul">mul (out, a, b)</a></td>
 	<td class="summary">Multiply two matrices.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#mul_vec4">mul_vec4 (a, b)</a></td>
+	<td class="name" nowrap><a href="#mul_vec4">mul_vec4 (out, a, b)</a></td>
 	<td class="summary">Multiply a matrix and a vec4.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#invert">invert (a)</a></td>
+	<td class="name" nowrap><a href="#invert">invert (out, a)</a></td>
 	<td class="summary">Invert a matrix.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#scale">scale (a, s)</a></td>
+	<td class="name" nowrap><a href="#scale">scale (out, a, s)</a></td>
 	<td class="summary">Scale a matrix.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#rotate">rotate (a, angle, axis)</a></td>
+	<td class="name" nowrap><a href="#rotate">rotate (out, a, angle, axis)</a></td>
 	<td class="summary">Rotate a matrix.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#translate">translate (a, t)</a></td>
+	<td class="name" nowrap><a href="#translate">translate (out, a, t)</a></td>
 	<td class="summary">Translate a matrix.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#shear">shear (a, yx, zx, xy, zy, xz, yz)</a></td>
+	<td class="name" nowrap><a href="#shear">shear (out, a, yx, zx, xy, zy, xz, yz)</a></td>
 	<td class="summary">Shear a matrix.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#transpose">transpose (a)</a></td>
+	<td class="name" nowrap><a href="#look_at">look_at (out, a, eye, center, up)</a></td>
+	<td class="summary">Transform matrix to look at a point.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#transpose">transpose (out, a)</a></td>
 	<td class="summary">Transpose a matrix.</td>
 	</tr>
 	<tr>
@@ -300,6 +304,41 @@
 
 </dd>
     <dt>
+    <a name = "from_transform"></a>
+    <strong>from_transform (trans, rot, scale)</strong>
+    </dt>
+    <dd>
+    Create a matrix from a transform.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">trans</span>
+            <span class="types"><span class="type">vec3</span></span>
+         Translation vector
+        </li>
+        <li><span class="parameter">rot</span>
+            <span class="types"><span class="type">quat</span></span>
+         Rotation quaternion
+        </li>
+        <li><span class="parameter">scale</span>
+            <span class="types"><span class="type">vec3</span></span>
+         Scale vector
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">mat4</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "from_ortho"></a>
     <strong>from_ortho (left, right, top, bottom, near, far)</strong>
     </dt>
@@ -398,41 +437,6 @@
 
 </dd>
     <dt>
-    <a name = "look_at"></a>
-    <strong>look_at (eye, center, up)</strong>
-    </dt>
-    <dd>
-    Transform matrix to look at a point.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">eye</span>
-            <span class="types"><span class="type">vec3</span></span>
-         Location of viewer's view plane
-        </li>
-        <li><span class="parameter">center</span>
-            <span class="types"><span class="type">vec3</span></span>
-         Location of object to view
-        </li>
-        <li><span class="parameter">up</span>
-            <span class="types"><span class="type">vec3</span></span>
-         Up direction
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">mat4</span></span>
-        out
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "clone"></a>
     <strong>clone (a)</strong>
     </dt>
@@ -461,7 +465,7 @@
 </dd>
     <dt>
     <a name = "mul"></a>
-    <strong>mul (a, b)</strong>
+    <strong>mul (out, a, b)</strong>
     </dt>
     <dd>
     Multiply two matrices.
@@ -469,13 +473,17 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
-         Left hand operant
+         Left hand operand
         </li>
         <li><span class="parameter">b</span>
             <span class="types"><span class="type">mat4</span></span>
-         Right hand operant
+         Right hand operand
         </li>
     </ul>
 
@@ -492,7 +500,7 @@
 </dd>
     <dt>
     <a name = "mul_vec4"></a>
-    <strong>mul_vec4 (a, b)</strong>
+    <strong>mul_vec4 (out, a, b)</strong>
     </dt>
     <dd>
     Multiply a matrix and a vec4.
@@ -500,20 +508,24 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
-         Left hand operant
+         Left hand operand
         </li>
         <li><span class="parameter">b</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
-         Right hand operant
+         Right hand operand
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+           <span class="types"><span class="type">mat4</span></span>
         out
     </ol>
 
@@ -523,7 +535,7 @@
 </dd>
     <dt>
     <a name = "invert"></a>
-    <strong>invert (a)</strong>
+    <strong>invert (out, a)</strong>
     </dt>
     <dd>
     Invert a matrix.
@@ -531,6 +543,10 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
          Matrix to invert
@@ -550,7 +566,7 @@
 </dd>
     <dt>
     <a name = "scale"></a>
-    <strong>scale (a, s)</strong>
+    <strong>scale (out, a, s)</strong>
     </dt>
     <dd>
     Scale a matrix.
@@ -558,6 +574,10 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
          Matrix to scale
@@ -581,7 +601,7 @@
 </dd>
     <dt>
     <a name = "rotate"></a>
-    <strong>rotate (a, angle, axis)</strong>
+    <strong>rotate (out, a, angle, axis)</strong>
     </dt>
     <dd>
     Rotate a matrix.
@@ -589,6 +609,10 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
          Matrix to rotate
@@ -616,7 +640,7 @@
 </dd>
     <dt>
     <a name = "translate"></a>
-    <strong>translate (a, t)</strong>
+    <strong>translate (out, a, t)</strong>
     </dt>
     <dd>
     Translate a matrix.
@@ -624,6 +648,10 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
          Matrix to translate
@@ -647,7 +675,7 @@
 </dd>
     <dt>
     <a name = "shear"></a>
-    <strong>shear (a, yx, zx, xy, zy, xz, yz)</strong>
+    <strong>shear (out, a, yx, zx, xy, zy, xz, yz)</strong>
     </dt>
     <dd>
     Shear a matrix.
@@ -655,6 +683,10 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
          Matrix to translate
@@ -709,8 +741,51 @@
 
 </dd>
     <dt>
+    <a name = "look_at"></a>
+    <strong>look_at (out, a, eye, center, up)</strong>
+    </dt>
+    <dd>
+    Transform matrix to look at a point.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store result
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to transform
+        </li>
+        <li><span class="parameter">eye</span>
+            <span class="types"><span class="type">vec3</span></span>
+         Location of viewer's view plane
+        </li>
+        <li><span class="parameter">center</span>
+            <span class="types"><span class="type">vec3</span></span>
+         Location of object to view
+        </li>
+        <li><span class="parameter">up</span>
+            <span class="types"><span class="type">vec3</span></span>
+         Up direction
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">mat4</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "transpose"></a>
-    <strong>transpose (a)</strong>
+    <strong>transpose (out, a)</strong>
     </dt>
     <dd>
     Transpose a matrix.
@@ -718,6 +793,10 @@
 
     <h3>Parameters:</h3>
     <ul>
+        <li><span class="parameter">out</span>
+            <span class="types"><span class="type">mat4</span></span>
+         Matrix to store the result
+        </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">mat4</span></span>
          Matrix to transpose
@@ -823,7 +902,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2016-12-15 16:43:51 </i>
+<i style="float:right;">Last updated 2017-03-29 07:43:35 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
