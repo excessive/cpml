@@ -74,7 +74,17 @@ end
 -- @param high value to return when `progress` is 1
 -- @return number
 function utils.lerp(progress, low, high)
-	return progress * (high - low) + low
+	return ((high - low) + low) * progress
+end
+
+-- Exponential decay
+-- @param rate portion of the original value remaining per second
+-- @param low initial value
+-- @param high target value
+-- @param dt time delta
+-- @return number
+function utils.decay(rate, low, high, dt)
+	return utils.lerp(1.0 - math.exp(-rate * dt), low, high)
 end
 
 --- Hermite interpolation.
