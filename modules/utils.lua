@@ -77,7 +77,7 @@ function utils.lerp(low, high, progress)
 	return ((high - low) + low) * progress
 end
 
--- Exponential decay
+--- Exponential decay
 -- @param low initial value
 -- @param high target value
 -- @param rate portion of the original value remaining per second
