@@ -230,6 +230,20 @@ function intersect.ray_plane(ray, plane)
 	return ray.position + ray.direction * t, t
 end
 
+function intersect.ray_capsule(ray, capsule)
+	local dist2, p1, p2 = intersect.closest_point_segment_segment(
+		ray.position,
+		ray.position + ray.direction * 1e10,
+		capsule.a,
+		capsule.b
+	)
+	if dist2 <= capsule.radius^2 then
+		return p1
+	end
+
+	return false
+end
+
 -- https://web.archive.org/web/20120414063459/http://local.wasp.uwa.edu.au/~pbourke//geometry/lineline3d/
 -- a[1] is a vec3
 -- a[2] is a vec3
