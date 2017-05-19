@@ -74,7 +74,7 @@ end
 -- @param progress (0-1)
 -- @return number
 function utils.lerp(low, high, progress)
-	return ((high - low) + low) * progress
+	return (1 - progress) * low + progress * high
 end
 
 --- Exponential decay
