@@ -16,6 +16,11 @@ describe("utils:", function()
 		local b = vec3(1, 1, 1)
 		local c = vec3(0.5, 0.5, 0.5)
 		assert.is.equal(utils.lerp(a, b, 0.5), c)
+
+		a = vec3(5, 5, 5)
+		b = vec3(0, 0, 0)
+		c = vec3(2.5, 2.5, 2.5)
+		assert.is.equal(utils.lerp(a, b, 0.5), c)
 	end)
 
 	it("decays exponentially", function()
