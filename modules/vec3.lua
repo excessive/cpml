@@ -275,6 +275,18 @@ function vec3.lerp(a, b, s, out)
 	return a:add(b:sub(a, r):scale(s), r) -- a + (b - a) * s
 end
 
+--- Invert a vector
+-- @tparam vec3 a Vector to invert
+-- @tparam[opt] vec3 out Container for the result
+-- @treturn vec3 out
+function vec3.invert(a, out)
+	local r = out or new()
+	r.x = -a.x
+	r.y = -a.y
+	r.z = -a.z
+	return r
+end
+
 --- Unpack a vector into individual components.
 -- @tparam vec3 a Vector to unpack
 -- @treturn number x
@@ -321,7 +333,7 @@ function vec3_mt.__call(_, x, y, z)
 end
 
 function vec3_mt.__unm(a)
-	return new(-a.x, -a.y, -a.z)
+	return vec3.invert(a)
 end
 
 function vec3_mt.__eq(a, b)
