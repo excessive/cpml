@@ -73,87 +73,99 @@ end
 
 --- Clone a vector.
 -- @tparam vec3 a Vector to be cloned
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.clone(a)
-	return new(a.x, a.y, a.z)
+function vec3.clone(a, out)
+	local r = out or new()
+	r.x = a.x
+	r.y = a.y
+	r.z = a.z
+	return r
 end
 
 --- Add two vectors.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.add(a, b)
-	return new(
-		a.x + b.x,
-		a.y + b.y,
-		a.z + b.z
-	)
+function vec3.add(a, b, out)
+	local r = out or new()
+	r.x = a.x + b.x
+	r.y = a.y + b.y
+	r.z = a.z + b.z
+	return r
 end
 
 --- Subtract one vector from another.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.sub(a, b)
-	return new(
-		a.x - b.x,
-		a.y - b.y,
-		a.z - b.z
-	)
+function vec3.sub(a, b, out)
+	local r = out or new()
+	r.x = a.x - b.x
+	r.y = a.y - b.y
+	r.z = a.z - b.z
+	return r
 end
 
---- Multiply a vector by another vectorr.
+--- Multiply a vector by another vector.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.mul(a, b)
-	return new(
-		a.x * b.x,
-		a.y * b.y,
-		a.z * b.z
-	)
+function vec3.mul(a, b, out)
+	local r = out or new()
+	r.x = a.x * b.x
+	r.y = a.y * b.y
+	r.z = a.z * b.z
+	return r
 end
 
---- Divide a vector by a scalar.
+--- Divide a vector by a vector.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.div(a, b)
-	return new(
-		a.x / b.x,
-		a.y / b.y,
-		a.z / b.z
-	)
+function vec3.div(a, b, out)
+	local r = out or new()
+	r.x = a.x / b.x
+	r.y = a.y / b.y
+	r.z = a.z / b.z
+	return r
 end
 
 --- Get the normal of a vector.
 -- @tparam vec3 a Vector to normalize
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.normalize(a)
+function vec3.normalize(a, out)
 	if a:is_zero() then
-		return new()
+		return out or new()
 	end
-	return a:scale(1 / a:len())
+	return a:scale(1 / a:len(), out)
 end
 
 --- Trim a vector to a given length
 -- @tparam vec3 a Vector to be trimmed
 -- @tparam number len Length to trim the vector to
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.trim(a, len)
-	return a:normalize():scale(math.min(a:len(), len))
+function vec3.trim(a, len, out)
+	return a:normalize(out):scale(math.min(a:len(), len), out)
 end
 
 --- Get the cross product of two vectors.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.cross(a, b)
-	return new(
-		a.y * b.z - a.z * b.y,
-		a.z * b.x - a.x * b.z,
-		a.x * b.y - a.y * b.x
-	)
+function vec3.cross(a, b, out)
+	local r = out or new()
+	r.x = a.y * b.z - a.z * b.y
+	r.y = a.z * b.x - a.x * b.z
+	r.z = a.x * b.y - a.y * b.x
+	return r
 end
 
 --- Get the dot product of two vectors.
@@ -203,21 +215,23 @@ end
 --- Scale a vector by a scalar.
 -- @tparam vec3 a Left hand operand
 -- @tparam number b Right hand operand
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.scale(a, b)
-	return new(
-		a.x * b,
-		a.y * b,
-		a.z * b
-	)
+function vec3.scale(a, b, out)
+	local r = out or new()
+	r.x = a.x * b
+	r.y = a.y * b
+	r.z = a.z * b
+	return r
 end
 
 --- Rotate vector about an axis.
 -- @tparam vec3 a Vector to rotate
 -- @tparam number phi Angle to rotate vector by (in radians)
 -- @tparam vec3 axis Axis to rotate by
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.rotate(a, phi, axis)
+function vec3.rotate(a, phi, axis, out)
 	if not vec3.is_vec3(axis) then
 		return a
 	end
@@ -231,27 +245,34 @@ function vec3.rotate(a, phi, axis)
 	local m2 = new((u.y * u.x * (1 - c) + u.z * s), (c + u.y * u.y * (1 - c)),       (u.y * u.z * (1 - c) - u.x * s))
 	local m3 = new((u.z * u.x * (1 - c) - u.y * s), (u.z * u.y * (1 - c) + u.x * s), (c + u.z * u.z * (1 - c))      )
 
-	return new(
-		a:dot(m1),
-		a:dot(m2),
-		a:dot(m3)
-	)
+	local r = out or new()
+	r.x = a:dot(m1)
+	r.y = a:dot(m2)
+	r.z = a:dot(m3)
+	return r
 end
 
 --- Get the perpendicular vector of a vector.
 -- @tparam vec3 a Vector to get perpendicular axes from
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.perpendicular(a)
-	return new(-a.y, a.x, 0)
+function vec3.perpendicular(a, out)
+	local r = out or new()
+	r.x = -a.y
+	r.y = a.x
+	r.z = 0
+	return r
 end
 
 --- Lerp between two vectors.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
 -- @tparam number s Step value
+-- @tparam[opt] vec3 out Container for the result
 -- @treturn vec3 out
-function vec3.lerp(a, b, s)
-	return a + (b - a) * s
+function vec3.lerp(a, b, s, out)
+	local r = out or new()
+	return a:add(b:sub(a, r):scale(s), r) -- a + (b - a) * s
 end
 
 --- Unpack a vector into individual components.
