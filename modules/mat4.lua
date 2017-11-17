@@ -502,7 +502,6 @@ function mat4.look_at(out, a, eye, look_at, up)
 	local z_axis = (eye - look_at):normalize()
 	local x_axis = up:cross(z_axis):normalize()
 	local y_axis = z_axis:cross(x_axis)
-	local out = mat4()
 	out[1] = x_axis.x
 	out[2] = y_axis.x
 	out[3] = z_axis.x
