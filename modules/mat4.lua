@@ -498,31 +498,29 @@ end
 -- @tparam vec3 center Location of object to view
 -- @tparam vec3 up Up direction
 -- @treturn mat4 out
-function mat4.look_at(out, a, eye, center, up)
-	forward = vec3.normalize(center - eye)
-	side = vec3.cross(forward, up):normalize(side)
-	new_up = vec3.cross(side, forward)
+function mat4.look_at(out, a, eye, look_at, up)
+	local z_axis = (eye - look_at):normalize()
+	local x_axis = up:cross(z_axis):normalize()
+	local y_axis = z_axis:cross(x_axis)
+	local out = mat4()
+	out[1] = x_axis.x
+	out[2] = y_axis.x
+	out[3] = z_axis.x
+	out[4] = 0
+	out[5] = x_axis.y
+	out[6] = y_axis.y
+	out[7] = z_axis.y
+	out[8] = 0
+	out[9] = x_axis.z
+	out[10] = y_axis.z
+	out[11] = z_axis.z
+	out[12] = 0
+	out[13] = 0
+	out[14] = 0
+	out[15] = 0
+	out[16] = 1
 
-	identity(tmp)
-	tmp[1]  =  side.x
-	tmp[5]  =  side.y
-	tmp[9]  =  side.z
-	tmp[2]  =  new_up.x
-	tmp[6]  =  new_up.y
-	tmp[10] =  new_up.z
-	tmp[3]  = -forward.x
-	tmp[7]  = -forward.y
-	tmp[11] = -forward.z
-	tmp[13] = -side:dot(eye)
-	tmp[14] = -new_up:dot(eye)
-	tmp[15] =  forward:dot(eye)
-	tmp[16] = 1
-
-	for i = 1, 16 do
-		out[i] = tmp[i]
-	end
-
-	return out
+  return out
 end
 
 --- Transpose a matrix.
