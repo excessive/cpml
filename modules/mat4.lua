@@ -491,6 +491,34 @@ function mat4.shear(out, a, yx, zx, xy, zy, xz, yz)
 	return out:mul(tmp, a)
 end
 
+--- Reflect a matrix across a plane.
+-- @tparam mat4 Matrix to store the result
+-- @tparam a Matrix to reflect
+-- @tparam vec3 position A point on the plane
+-- @tparam vec3 normal The (normalized!) normal vector of the plane
+function mat4.reflect(out, a, position, normal)
+	local nx, ny, nz = normal:unpack()
+	local d = -position:dot(normal)
+	tmp[1] = 1 - 2 * nx ^ 2
+	tmp[2] = 2 * nx * ny
+	tmp[3] = -2 * nx * nz
+	tmp[4] = 0
+	tmp[5] = -2 * nx * ny
+	tmp[6] = 1 - 2 * ny ^ 2
+	tmp[7] = -2 * ny * nz
+	tmp[8] = 0
+	tmp[9] = -2 * nx * nz
+	tmp[10] = -2 * ny * nz
+	tmp[11] = 1 - 2 * nz ^ 2
+	tmp[12] = 0
+	tmp[13] = -2 * nx * d
+	tmp[14] = -2 * ny * d
+	tmp[15] = -2 * nz * d
+	tmp[16] = 1
+
+	return out:mul(tmp, a)
+end
+
 --- Transform matrix to look at a point.
 -- @tparam mat4 out Matrix to store result
 -- @tparam mat4 a Matrix to transform
