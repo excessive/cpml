@@ -272,6 +272,23 @@ function vec2.unpack(a)
 	return a.x, a.y
 end
 
+--- Return the component-wise minimum of two vectors.
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
+-- @treturn vec2 A vector where each component is the lesser value for that component between the two given vectors.
+function vec2.component_min(a, b)
+	return new(math.min(a.x, b.x), math.min(a.y, b.y))
+end
+
+--- Return the component-wise maximum of two vectors.
+-- @tparam vec2 a Left hand operand
+-- @tparam vec2 b Right hand operand
+-- @treturn vec2 A vector where each component is the lesser value for that component between the two given vectors.
+function vec2.component_max(a, b)
+	return new(math.max(a.x, b.x), math.max(a.y, b.y))
+end
+
+
 --- Return a boolean showing if a table is or is not a vec2.
 -- @tparam vec2 a Vector to be tested
 -- @treturn boolean is_vec2
