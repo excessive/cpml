@@ -80,12 +80,19 @@ end
 
 --- Create a quaternion from an angle/axis pair.
 -- @tparam number angle Angle (in radians)
--- @tparam vec3 axis
+-- @param axis/x -- Can be of two types, a vec3 axis, or the x component of that axis
+-- @param y axis -- y component of axis (optional, only if x component param used)
+-- @param z axis -- z component of axis (optional, only if x component param used)
 -- @treturn quat out
-function quat.from_angle_axis(angle, axis)
-	local s = sin(angle * 0.5)
-	local c = cos(angle * 0.5)
-	return new(axis.x * s, axis.y * s, axis.z * s, c)
+function quat.from_angle_axis(angle, axis, a3, a4)
+	if axis and a3 and a4 then
+		local x, y, z = axis, a3, a4
+		local s = sin(angle * 0.5)
+		local c = cos(angle * 0.5)
+		return new(x * s, y * s, z * s, c)
+	else
+		return quat.from_angle_axis(angle, axis.x, axis.y, axis.z)
+	end
 end
 
 --- Create a quaternion from a normal/up vector pair.
@@ -229,10 +236,12 @@ end
 
 --- Alias of from_angle_axis.
 -- @tparam number angle Angle (in radians)
--- @tparam vec3 axis
+-- @param axis/x -- Can be of two types, a vec3 axis, or the x component of that axis
+-- @param y axis -- y component of axis (optional, only if x component param used)
+-- @param z axis -- z component of axis (optional, only if x component param used)
 -- @treturn quat out
-function quat.rotate(angle, axis)
-	return quat.from_angle_axis(angle, axis)
+function quat.rotate(angle, axis, a3, a4)
+	return quat.from_angle_axis(angle, axis, a3, a4)
 end
 
 --- Return the conjugate of a quaternion.
@@ -357,11 +366,13 @@ function quat.is_imaginary(a)
 	return a.w == 0
 end
 
---- Convert a quaternion into an angle/axis pair.
+--- Convert a quaternion into an angle plus axis components.
 -- @tparam quat a Quaternion to convert
 -- @treturn number angle
--- @treturn vec3 axis
-function quat.to_angle_axis(a)
+-- @treturn x axis-x
+-- @treturn y axis-y
+-- @treturn z axis-z
+function quat.to_angle_axis_unpack(a)
 	if a.w > 1 or a.w < -1 then
 		a = a:normalize()
 	end
@@ -380,6 +391,15 @@ function quat.to_angle_axis(a)
 		z = a.z / s
 	end
 
+	return angle, x, y, z
+end
+
+--- Convert a quaternion into an angle/axis pair.
+-- @tparam quat a Quaternion to convert
+-- @treturn number angle
+-- @treturn vec3 axis
+function quat.to_angle_axis(a)
+	local angle, x, y, z = a:to_angle_axis_unpack()
 	return angle, vec3(x, y, z)
 end
 
