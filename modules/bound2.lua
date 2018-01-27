@@ -8,10 +8,10 @@ local bound2    = {}
 local bound2_mt = {}
 
 -- Private constructor.
-local function new(x, y)
+local function new(min, max)
 	return setmetatable({
-		-- min: vec2, minimum value for each component 
-		-- max: vec2, maximum value for each component 
+		min=min, -- min: vec2, minimum value for each component 
+		max=max, -- max: vec2, maximum value for each component 
 	}, bound2_mt)
 end
 
@@ -25,7 +25,7 @@ if type(jit) == "table" and jit.status() then
 	end
 end
 
-vec2.zero = new(vec2.zero, vec2.zero)
+bound2.zero = new(vec2.zero, vec2.zero)
 
 --- The public constructor.
 -- @param min Can be of two types: </br>
@@ -74,7 +74,7 @@ end
 -- @tparam vec2 new size
 -- @treturn bound2 resized bound
 function bound2.with_size(a, size)
-	return vec2.new(a.min, a.min + size)
+	return bound2.new(a.min, a.min + size)
 end
 
 --- Get half-size of bounding box as a vector. A more correct term for this is probably "apothem"
@@ -96,7 +96,7 @@ end
 -- @tparam vec2 new center
 -- @treturn bound2 Bound with same size as input but different center
 function bound2.with_center(a, center)
-	return bound2.offset(a, a:center() - center)
+	return bound2.offset(a, center - a:center())
 end
 
 --- Resize bounding box from center
@@ -154,6 +154,10 @@ end
 
 bound2_mt.__index    = bound2
 bound2_mt.__tostring = bound2.to_string
+
+function bound2_mt.__call(_, a, b)
+	return bound2.new(a, b)
+end
 
 if status then
 	ffi.metatype(new, bound2_mt)

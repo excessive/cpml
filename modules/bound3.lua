@@ -25,7 +25,7 @@ if type(jit) == "table" and jit.status() then
 	end
 end
 
-vec3.zero = new(vec3.zero, vec3.zero)
+bound3.zero = new(vec3.zero, vec3.zero)
 
 --- The public constructor.
 -- @param min Can be of two types: </br>
@@ -74,7 +74,7 @@ end
 -- @tparam vec3 new size
 -- @treturn bound3 resized bound
 function bound3.with_size(a, size)
-	return vec3.new(a.min, a.min + size)
+	return bound3.new(a.min, a.min + size)
 end
 
 --- Get half-size of bounding box as a vector. A more correct term for this is probably "apothem"
@@ -96,7 +96,7 @@ end
 -- @tparam vec3 new center
 -- @treturn bound3 Bound with same size as input but different center
 function bound3.with_center(a, center)
-	return bound3.offset(a, a:center() - center)
+	return bound3.offset(a, center - a:center())
 end
 
 --- Resize bounding box from center
@@ -154,6 +154,10 @@ end
 
 bound3_mt.__index    = bound3
 bound3_mt.__tostring = bound3.to_string
+
+function bound3_mt.__call(_, a, b)
+	return bound3.new(a, b)
+end
 
 if status then
 	ffi.metatype(new, bound3_mt)
