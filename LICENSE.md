@@ -10,6 +10,8 @@ Portions of mat4.lua are from LuaMatrix, (c) 2010 Michael Lutz. MIT.
 
 Code in simplex.lua is (c) 2011 Stefan Gustavson. MIT.
 
+Code in bound2.lua and bound3.lua are (c) 2018 Andi McClure. MIT.
+
 Code in quat.lua is from Andrew Stacey and covered under the CC0 license.
 
 Code in octree.lua is derived from UnityOctree. (c) 2014 Nition. BSD-2-Clause.
