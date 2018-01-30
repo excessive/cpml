@@ -136,7 +136,7 @@ end
 --- Multiply two quaternions.
 -- @tparam quat a Left hand operand
 -- @tparam quat b Right hand operand
--- @treturn quat out
+-- @treturn quat quaternion equivalent to "apply b, then a"
 function quat.mul(a, b)
 	return new(
 		a.x * b.w + a.w * b.x + a.y * b.z - a.z * b.y,
