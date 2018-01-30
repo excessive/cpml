@@ -91,6 +91,15 @@ local function color_to_hsv(c)
 	return { h, s, v, a }
 end
 
+--- The public constructor.
+-- @param x Can be of three types: </br>
+-- number red component 0-255
+-- table {r, g, b, a}
+-- nil for {0,0,0,0}
+-- @tparam number g Green component 0-255
+-- @tparam number b Blue component 0-255
+-- @tparam number a Alpha component 0-255
+-- @treturn color out
 function color.new(r, g, b, a)
 	-- number, number, number, number
 	if r and g and b and a then
@@ -112,21 +121,49 @@ function color.new(r, g, b, a)
 		return new(rr, gg, bb, aa)
 	end
 
-	new(0, 0, 0, 0)
+	return new(0, 0, 0, 0)
 end
 
+--- Convert hue,saturation,value table to color object.
+-- @tparam table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-255}
+-- @treturn color out
+color.hsv_to_color_table = hsv_to_color
+
+--- Convert color to hue,saturation,value table
+-- @tparam color in
+-- @treturn table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-255}
+color.color_to_hsv_table = color_to_hsv
+
+--- Convert hue,saturation,value to color object.
+-- @tparam number h hue 0-359
+-- @tparam number s saturation 0-1
+-- @tparam number v value 0-1
+-- @treturn color out
 function color.from_hsv(h, s, v)
-	return hsv_to_color { h, s, v, 255 }
+	return hsv_to_color { h, s, v }
 end
 
+--- Convert hue,saturation,value to color object.
+-- @tparam number h hue 0-359
+-- @tparam number s saturation 0-1
+-- @tparam number v value 0-1
+-- @tparam number a alpha 0-255
+-- @treturn color out
 function color.from_hsva(h, s, v, a)
 	return hsv_to_color { h, s, v, a }
 end
 
+--- Invert a color.
+-- @tparam color to invert
+-- @treturn color out
 function color.invert(c)
 	return new(255 - c[1], 255 - c[2], 255 - c[3], c[4])
 end
 
+--- Lighten a color by a component-wise fixed amount (alpha unchanged)
+-- @tparam color to lighten
+-- @tparam number amount to increase each component by, 0-255 scale
+-- @treturn color out
 function color.lighten(c, v)
 	return new(
 		utils.clamp(c[1] + v * 255, 0, 255),
@@ -140,6 +177,10 @@ function color.lerp(a, b, s)
 	return a + s * (b - a)
 end
 
+--- Darken a color by a component-wise fixed amount (alpha unchanged)
+-- @tparam color to darken
+-- @tparam number amount to decrease each component by, 0-255 scale
+-- @treturn color out
 function color.darken(c, v)
 	return new(
 		utils.clamp(c[1] - v * 255, 0, 255),
@@ -149,6 +190,10 @@ function color.darken(c, v)
 	)
 end
 
+--- Multiply a color's components by a value (alpha unchanged)
+-- @tparam color to multiply
+-- @tparam number to multiply each component by
+-- @treturn color out
 function color.multiply(c, v)
 	local t = color.new()
 	for i = 1, 3 do
@@ -160,6 +205,9 @@ function color.multiply(c, v)
 end
 
 -- directly set alpha channel
+-- @tparam color to alter
+-- @tparam number new alpha 0-255
+-- @treturn color out
 function color.alpha(c, v)
 	local t = color.new()
 	for i = 1, 3 do
@@ -170,6 +218,10 @@ function color.alpha(c, v)
 	return t
 end
 
+--- Multiply a color's alpha by a value
+-- @tparam color to multiply
+-- @tparam number to multiply alpha by
+-- @treturn color out
 function color.opacity(c, v)
 	local t = color.new()
 	for i = 1, 3 do
@@ -180,18 +232,30 @@ function color.opacity(c, v)
 	return t
 end
 
+--- Set a color's hue (saturation, value, alpha unchanged)
+-- @tparam color to alter
+-- @tparam hue to set 0-359
+-- @treturn color out
 function color.hue(col, hue)
 	local c = color_to_hsv(col)
 	c[1] = (hue + 360) % 360
 	return hsv_to_color(c)
 end
 
+--- Set a color's saturation (hue, value, alpha unchanged)
+-- @tparam color to alter
+-- @tparam hue to set 0-359
+-- @treturn color out
 function color.saturation(col, percent)
 	local c = color_to_hsv(col)
 	c[2] = utils.clamp(percent, 0, 1)
 	return hsv_to_color(c)
 end
 
+--- Set a color's value (saturation, hue, alpha unchanged)
+-- @tparam color to alter
+-- @tparam hue to set 0-359
+-- @treturn color out
 function color.value(col, percent)
 	local c = color_to_hsv(col)
 	c[3] = utils.clamp(percent, 0, 1)
@@ -252,6 +316,9 @@ function color.linear_to_gamma(r, g, b, a)
 	end
 end
 
+--- Check if color is valid
+-- @tparam color to test
+-- @treturn boolean is color
 function color.is_color(a)
 	if type(a) ~= "table" then
 		return false
@@ -266,6 +333,9 @@ function color.is_color(a)
 	return true
 end
 
+--- Return a formatted string.
+-- @tparam color a color to be turned into a string
+-- @treturn string formatted
 function color.to_string(a)
 	return string.format("[ %3.0f, %3.0f, %3.0f, %3.0f ]", a[1], a[2], a[3], a[4])
 end
