@@ -319,6 +319,20 @@ function mat4.clone(a)
 	return new(a)
 end
 
+local matrix = {}
+--- Returns a table with the matrix that you can then send through shader:send safely
+-- @tparam mat4 a Matrix to turn into a table
+-- @treturn table out
+function mat4.send(a)
+	if type(m) == "table" then return m end
+
+	for i=1, 16 do
+		matrix[i]=m[i]
+	end
+
+	return matrix
+end
+
 --- Multiply two matrices.
 -- @tparam mat4 out Matrix to store the result
 -- @tparam mat4 a Left hand operand
