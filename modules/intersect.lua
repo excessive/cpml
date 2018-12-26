@@ -576,9 +576,9 @@ function intersect.sphere_triangle(sphere, triangle)
 	local e2 = BC:dot(BC)
 	local e3 = CA:dot(CA)
 
-	local Q1 = A * e1 - d1 * AB
-	local Q2 = B * e2 - d2 * BC
-	local Q3 = C * e3 - d3 * CA
+	local Q1 = A * e1 - AB * d1
+	local Q2 = B * e2 - BC * d2
+	local Q3 = C * e3 - CA * d3
 
 	local QC = C * e1 - Q1
 	local QA = A * e2 - Q2
