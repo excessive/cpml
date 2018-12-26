@@ -4,7 +4,6 @@
 local modules = (...): gsub('%.[^%.]+$', '') .. "."
 local vec2    = require(modules .. "vec2")
 local vec3    = require(modules .. "vec3")
-local sqrt    = math.sqrt
 local abs     = math.abs
 local ceil    = math.ceil
 local floor   = math.floor
@@ -202,7 +201,7 @@ function utils.refract(i, n, ior)
 	local k = 1 - ior * ior * (1 - d * d)
 
 	if k >= 0 then
-		return (i * ior) - (n * (ior * d + sqrt(k)))
+		return (i * ior) - (n * (ior * d + k ^ 0.5))
 	end
 
 	return vec3()
