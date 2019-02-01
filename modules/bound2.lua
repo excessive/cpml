@@ -62,6 +62,14 @@ function bound2.at(a, b) -- "bounded by". b may be nil
 	end
 end
 
+--- Extend bound to include point
+-- @tparam bound2 a bound
+-- @tparam vec2 point to include
+-- @treturn bound2 Bound covering current min, current max and new point
+function bound2.extend(a, center)
+	return bound2.new(a.min:component_min(center), a.max:component_max(center))
+end
+
 --- Get size of bounding box as a vector 
 -- @tparam bound2 a bound
 -- @treturn vec2 Vector spanning min to max points

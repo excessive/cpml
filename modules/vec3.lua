@@ -164,6 +164,15 @@ function vec3.dot(a, b)
 	return a.x * b.x + a.y * b.y + a.z * b.z
 end
 
+--- Project vector a onto b.
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
+-- @treturn number projected vector
+function vec3.project(a, b)
+	local bhat = b:normalize()
+	return bhat * a:dot(bhat)
+end
+
 --- Get the length of a vector.
 -- @tparam vec3 a Vector to get the length of
 -- @treturn number len
@@ -252,6 +261,13 @@ end
 -- @treturn vec3 out
 function vec3.lerp(a, b, s)
 	return a + (b - a) * s
+end
+
+-- Round all components to nearest int.
+-- @tparam vec3 a Vector to round.
+-- @treturn vec3 Integer vector
+function vec3.round(a)
+	return vec3.new(math.floor(a.x+0.5), math.floor(a.y+0.5), math.floor(a.z+0.5))
 end
 
 --- Unpack a vector into individual components.

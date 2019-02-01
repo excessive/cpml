@@ -42,6 +42,8 @@ local cpml = {
 }
 
 local files = {
+	"bound2",
+	"bound3",
 	"color",
 	"constants",
 	"intersect",

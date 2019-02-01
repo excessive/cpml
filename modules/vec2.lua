@@ -321,6 +321,35 @@ function vec2.to_polar(a)
 	return radius, theta
 end
 
+-- Convert vec2 to vec3.
+-- @tparam vec2 a Vector to convert.
+-- @tparam number the new z component.
+-- @treturn vec3 Converted vector
+function vec2.append(a, z)
+	return vec3(a.x, a.y, z)
+end
+
+-- Negate y axis only of vector.
+-- @tparam vec2 a Vector to y-flip.
+-- @treturn vec2 y-flipped vector
+function vec2.flip_x(a)
+	return vec2.new(-a.x, a.y)
+end
+
+-- Negate y axis only of vector.
+-- @tparam vec2 a Vector to y-flip.
+-- @treturn vec2 y-flipped vector
+function vec2.flip_y(a)
+	return vec2.new(a.x, -a.y)
+end
+
+-- Round all components to nearest int.
+-- @tparam vec2 a Vector to round.
+-- @treturn vec2 Integer vector
+function vec2.round(a)
+	return vec2.new(math.floor(a.x+0.5), math.floor(a.y+0.5))
+end
+
 --- Return a formatted string.
 -- @tparam vec2 a Vector to be turned into a string
 -- @treturn string formatted
