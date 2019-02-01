@@ -216,4 +216,23 @@ describe("bound3:", function()
 		assert.is.equal(0, bound3.zero.max.y)
 		assert.is.equal(0, bound3.zero.max.z)
 	end)
+
+	it("extends a bound3 with a point", function()
+		local min = vec3(1,2,6)
+		local max = vec3(4,5,9)
+		local downright = vec3(8,8,10)
+		local downleft = vec3(-4,8,10)
+		local top = vec3(2, 0, 7)
+
+		local a = bound3(min, max)
+		local temp
+
+		temp = a:extend(downright)
+		assert.is_true(a.min == min and a.max == max)
+		assert.is_true(temp.min == min and temp.max == downright)
+		temp = a:extend(downleft)
+		assert.is_true(temp.min == vec3(-4,2,6) and temp.max == vec3(4,8,10))
+		temp = a:extend(top)
+		assert.is_true(temp.min == vec3(1,0,6) and temp.max == max)
+	end)
 end)

@@ -156,8 +156,8 @@ end
 -- @tparam vec2 point to test
 -- @treturn boolean true if point in bounding box
 function bound2.contains(a, v)
-	return a.min.x <= v.x and a.min.y <= v.y and a.min.z <= v.z
-	   and a.max.x >= v.x and a.max.y >= v.y and a.max.z >= v.z
+	return a.min.x <= v.x and a.min.y <= v.y
+	   and a.max.x >= v.x and a.max.y >= v.y
 end
 
 bound2_mt.__index    = bound2
