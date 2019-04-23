@@ -48,14 +48,20 @@ local function new(triangles, maxTrianglesPerNode)
 
 	-- create the root node, add all the triangles to it
 	local triangleCount = #triangles
-	local extents = tree:calcExtents(0, triangleCount, EPSILON)
-	tree._rootNode = Node(extents[1], extents[2], 0, triangleCount, 0)
+	local extents = tree:calcExtents(1, triangleCount, EPSILON)
+	tree._rootNode = Node(extents[1], extents[2], 1, triangleCount, 1)
 
-	tree._nodesToSplit = { tree._rootNode }
-	for _, node in ipairs(tree._nodesToSplit) do
-		tree:splitNode(node)
+	local function split_r(node)
+		local left, right = tree:splitNode(tree._rootNode)
+		if left then
+			split_r(left)
+		end
+		if right then
+			split_r(right)
+		end
 	end
-	tree._nodesToSplit = {}
+
+	split_r(tree._rootNode)
 
 	return tree
 end
@@ -66,9 +72,9 @@ function BVH:intersectRay(rayOrigin, rayDirection, backfaceCulling)
 	local intersectingTriangles        = {}
 
 	local invRayDirection = vec3(
-		1.0 / rayDirection.x,
-		1.0 / rayDirection.y,
-		1.0 / rayDirection.z
+		1 / rayDirection.x,
+		1 / rayDirection.y,
+		1 / rayDirection.z
 	)
 
 	-- go over the BVH tree, and extract the list of triangles that lie in nodes that intersect the ray.
@@ -86,7 +92,7 @@ function BVH:intersectRay(rayOrigin, rayDirection, backfaceCulling)
 			end
 
 			for i=node._startIndex, node._endIndex do
-				table.insert(trianglesInIntersectingNodes, self._bboxArray[i*7])
+				table.insert(trianglesInIntersectingNodes, self._bboxArray[1+(i-1)*7])
 			end
 		end
 	end
@@ -101,15 +107,16 @@ function BVH:intersectRay(rayOrigin, rayDirection, backfaceCulling)
 	for i=1, #trianglesInIntersectingNodes do
 		local triIndex = trianglesInIntersectingNodes[i]
 
-		triangle[1].x = self._trianglesArray[triIndex*9]
-		triangle[1].y = self._trianglesArray[triIndex*9+1]
-		triangle[1].z = self._trianglesArray[triIndex*9+2]
-		triangle[2].x = self._trianglesArray[triIndex*9+3]
-		triangle[2].y = self._trianglesArray[triIndex*9+4]
-		triangle[2].z = self._trianglesArray[triIndex*9+5]
-		triangle[3].x = self._trianglesArray[triIndex*9+6]
-		triangle[3].y = self._trianglesArray[triIndex*9+7]
-		triangle[3].z = self._trianglesArray[triIndex*9+8]
+		-- print(triIndex, #self._trianglesArray)
+		triangle[1].x = self._trianglesArray[1+(triIndex-1)*9]
+		triangle[1].y = self._trianglesArray[1+(triIndex-1)*9+1]
+		triangle[1].z = self._trianglesArray[1+(triIndex-1)*9+2]
+		triangle[2].x = self._trianglesArray[1+(triIndex-1)*9+3]
+		triangle[2].y = self._trianglesArray[1+(triIndex-1)*9+4]
+		triangle[2].z = self._trianglesArray[1+(triIndex-1)*9+5]
+		triangle[3].x = self._trianglesArray[1+(triIndex-1)*9+6]
+		triangle[3].y = self._trianglesArray[1+(triIndex-1)*9+7]
+		triangle[3].z = self._trianglesArray[1+(triIndex-1)*9+8]
 
 		local intersectionPoint, intersectionDistance = intersect.ray_triangle(ray, triangle, backfaceCulling)
 
@@ -127,31 +134,31 @@ function BVH:intersectRay(rayOrigin, rayDirection, backfaceCulling)
 end
 
 function BVH.calcBoundingBoxes(trianglesArray)
-	local p0x, p0y, p0z
 	local p1x, p1y, p1z
 	local p2x, p2y, p2z
+	local p3x, p3y, p3z
 	local minX, minY, minZ
 	local maxX, maxY, maxZ
 
 	local bboxArray = {}
 
 	for i=1, #trianglesArray / 9 do
-		p0x = trianglesArray[i*9]
-		p0y = trianglesArray[i*9+1]
-		p0z = trianglesArray[i*9+2]
-		p1x = trianglesArray[i*9+3]
-		p1y = trianglesArray[i*9+4]
-		p1z = trianglesArray[i*9+5]
-		p2x = trianglesArray[i*9+6]
-		p2y = trianglesArray[i*9+7]
-		p2z = trianglesArray[i*9+8]
+		p1x = trianglesArray[1+(i-1)*9]
+		p1y = trianglesArray[1+(i-1)*9+1]
+		p1z = trianglesArray[1+(i-1)*9+2]
+		p2x = trianglesArray[1+(i-1)*9+3]
+		p2y = trianglesArray[1+(i-1)*9+4]
+		p2z = trianglesArray[1+(i-1)*9+5]
+		p3x = trianglesArray[1+(i-1)*9+6]
+		p3y = trianglesArray[1+(i-1)*9+7]
+		p3z = trianglesArray[1+(i-1)*9+8]
 
-		minX = math.min(p0x, p1x, p2x)
-		minY = math.min(p0y, p1y, p2y)
-		minZ = math.min(p0z, p1z, p2z)
-		maxX = math.max(p0x, p1x, p2x)
-		maxY = math.max(p0y, p1y, p2y)
-		maxZ = math.max(p0z, p1z, p2z)
+		minX = math.min(p1x, p2x, p3x)
+		minY = math.min(p1y, p2y, p3y)
+		minZ = math.min(p1z, p2z, p3z)
+		maxX = math.max(p1x, p2x, p3x)
+		maxY = math.max(p1y, p2y, p3y)
+		maxZ = math.max(p1z, p2z, p3z)
 
 		BVH.setBox(bboxArray, i, i, minX, minY, minZ, maxX, maxY, maxZ)
 	end
@@ -174,12 +181,12 @@ function BVH:calcExtents(startIndex, endIndex, expandBy)
 	local maxZ = -math.huge
 
 	for i=startIndex, endIndex do
-		minX = math.min(self._bboxArray[i*7+1], minX)
-		minY = math.min(self._bboxArray[i*7+2], minY)
-		minZ = math.min(self._bboxArray[i*7+3], minZ)
-		maxX = math.max(self._bboxArray[i*7+4], maxX)
-		maxY = math.max(self._bboxArray[i*7+5], maxY)
-		maxZ = math.max(self._bboxArray[i*7+6], maxZ)
+		minX = math.min(self._bboxArray[1+(i-1)*7+1], minX)
+		minY = math.min(self._bboxArray[1+(i-1)*7+2], minY)
+		minZ = math.min(self._bboxArray[1+(i-1)*7+3], minZ)
+		maxX = math.max(self._bboxArray[1+(i-1)*7+4], maxX)
+		maxY = math.max(self._bboxArray[1+(i-1)*7+5], maxY)
+		maxZ = math.max(self._bboxArray[1+(i-1)*7+6], maxZ)
 	end
 
 	return {
@@ -195,9 +202,9 @@ function BVH:splitNode(node)
 	end
 
 	local startIndex = node._startIndex
-	local endIndex = node._endIndex
+	local endIndex   = node._endIndex
 
-	local leftNode = { {},{},{} }
+	local leftNode  = { {},{},{} }
 	local rightNode = { {},{},{} }
 	local extentCenters = { node:centerX(), node:centerY(), node:centerZ() }
 
@@ -207,12 +214,11 @@ function BVH:splitNode(node)
 		node._extentsMax.z - node._extentsMin.z
 	}
 
-	-- NOTE: Indices might be off by 1?
 	local objectCenter = {}
 	for i=startIndex, endIndex do
-		objectCenter[1] = (self._bboxArray[i * 7 + 1] + self._bboxArray[i * 7 + 4]) * 0.5 -- center = (min + max) / 2
-		objectCenter[2] = (self._bboxArray[i * 7 + 2] + self._bboxArray[i * 7 + 5]) * 0.5 -- center = (min + max) / 2
-		objectCenter[3] = (self._bboxArray[i * 7 + 3] + self._bboxArray[i * 7 + 6]) * 0.5 -- center = (min + max) / 2
+		objectCenter[1] = (self._bboxArray[1+(i-1)*7+1] + self._bboxArray[1+(i-1)*7+4]) * 0.5 -- center = (min + max) / 2
+		objectCenter[2] = (self._bboxArray[1+(i-1)*7+2] + self._bboxArray[1+(i-1)*7+5]) * 0.5 -- center = (min + max) / 2
+		objectCenter[3] = (self._bboxArray[1+(i-1)*7+3] + self._bboxArray[1+(i-1)*7+6]) * 0.5 -- center = (min + max) / 2
 
 		for j=1, 3 do
 			if objectCenter[j] < extentCenters[j] then
@@ -227,9 +233,9 @@ function BVH:splitNode(node)
 	-- here, dont try to split any more (cause it will always fail, and we'll
 	-- enter an infinite loop
 	local splitFailed = {
-		(#leftNode[1] == 0) or (#rightNode[1] == 0),
-		(#leftNode[2] == 0) or (#rightNode[2] == 0),
-		(#leftNode[3] == 0) or (#rightNode[3] == 0)
+		#leftNode[1] == 0 or #rightNode[1] == 0,
+		#leftNode[2] == 0 or #rightNode[2] == 0,
+		#leftNode[3] == 0 or #rightNode[3] == 0
 	}
 
 	if splitFailed[1] and splitFailed[2] and splitFailed[3] then
@@ -239,7 +245,7 @@ function BVH:splitNode(node)
 	-- choose the longest split axis. if we can't split by it, choose next best one.
 	local splitOrder = { 1, 2, 3 }
 	table.sort(splitOrder, function(a, b)
-		return (extentsLength[b] - extentsLength[a])
+		return extentsLength[b] - extentsLength[a]
 	end)
 
 	local leftElements
@@ -247,7 +253,6 @@ function BVH:splitNode(node)
 
 	for i=1, 3 do
 		local candidateIndex = splitOrder[i]
-
 		if not splitFailed[candidateIndex] then
 			leftElements  = leftNode[candidateIndex]
 			rightElements = rightNode[candidateIndex]
@@ -273,15 +278,16 @@ function BVH:splitNode(node)
 		table.insert(concatenatedElements, element)
 	end
 
+	-- print(#leftElements, #rightElements, #concatenatedElements)
+
 	for i=1, #concatenatedElements do
 		currElement = concatenatedElements[i]
 		BVH.copyBox(self._bboxArray, currElement, self._bboxHelper, helperPos)
 		helperPos = helperPos + 1
 	end
 
-	-- NOTE: Maybe off by 1
 	-- copy results back to main array
-	for i=node._startIndex * 7, node._endIndex * 7 do
+	for i=1+(node._startIndex-1)*7, 1+(node._endIndex-1)*7 do
 		self._bboxArray[i] = self._bboxHelper[i]
 	end
 
@@ -297,8 +303,7 @@ function BVH:splitNode(node)
 	node:clearShapes()
 
 	-- add new nodes to the split queue
-	table.insert(self._nodesToSplit, node0)
-	table.insert(self._nodesToSplit, node1)
+	return node0, node1
 end
 
 function BVH._calcTValues(minVal, maxVal, rayOriginCoord, invdir)
@@ -356,37 +361,37 @@ function BVH.intersectNodeBox(rayOrigin, invRayDirection, node)
 end
 
 function BVH.setBox(bboxArray, pos, triangleId, minX, minY, minZ, maxX, maxY, maxZ)
-	bboxArray[pos*7]   = triangleId
-	bboxArray[pos*7+1] = minX
-	bboxArray[pos*7+2] = minY
-	bboxArray[pos*7+3] = minZ
-	bboxArray[pos*7+4] = maxX
-	bboxArray[pos*7+5] = maxY
-	bboxArray[pos*7+6] = maxZ
+	bboxArray[1+(pos-1)*7]   = triangleId
+	bboxArray[1+(pos-1)*7+1] = minX
+	bboxArray[1+(pos-1)*7+2] = minY
+	bboxArray[1+(pos-1)*7+3] = minZ
+	bboxArray[1+(pos-1)*7+4] = maxX
+	bboxArray[1+(pos-1)*7+5] = maxY
+	bboxArray[1+(pos-1)*7+6] = maxZ
 end
 
 function BVH.copyBox(sourceArray, sourcePos, destArray, destPos)
-	destArray[destPos*7]   = sourceArray[sourcePos*7]
-	destArray[destPos*7+1] = sourceArray[sourcePos*7+1]
-	destArray[destPos*7+2] = sourceArray[sourcePos*7+2]
-	destArray[destPos*7+3] = sourceArray[sourcePos*7+3]
-	destArray[destPos*7+4] = sourceArray[sourcePos*7+4]
-	destArray[destPos*7+5] = sourceArray[sourcePos*7+5]
-	destArray[destPos*7+6] = sourceArray[sourcePos*7+6]
+	destArray[1+(destPos-1)*7]   = sourceArray[1+(sourcePos-1)*7]
+	destArray[1+(destPos-1)*7+1] = sourceArray[1+(sourcePos-1)*7+1]
+	destArray[1+(destPos-1)*7+2] = sourceArray[1+(sourcePos-1)*7+2]
+	destArray[1+(destPos-1)*7+3] = sourceArray[1+(sourcePos-1)*7+3]
+	destArray[1+(destPos-1)*7+4] = sourceArray[1+(sourcePos-1)*7+4]
+	destArray[1+(destPos-1)*7+5] = sourceArray[1+(sourcePos-1)*7+5]
+	destArray[1+(destPos-1)*7+6] = sourceArray[1+(sourcePos-1)*7+6]
 end
 
 function BVH.getBox(bboxArray, pos, outputBox)
-	outputBox.triangleId = bboxArray[pos*7]
-	outputBox.minX       = bboxArray[pos*7+1]
-	outputBox.minY       = bboxArray[pos*7+2]
-	outputBox.minZ       = bboxArray[pos*7+3]
-	outputBox.maxX       = bboxArray[pos*7+4]
-	outputBox.maxY       = bboxArray[pos*7+5]
-	outputBox.maxZ       = bboxArray[pos*7+6]
+	outputBox.triangleId = bboxArray[1+(pos-1)*7]
+	outputBox.minX       = bboxArray[1+(pos-1)*7+1]
+	outputBox.minY       = bboxArray[1+(pos-1)*7+2]
+	outputBox.minZ       = bboxArray[1+(pos-1)*7+3]
+	outputBox.maxX       = bboxArray[1+(pos-1)*7+4]
+	outputBox.maxY       = bboxArray[1+(pos-1)*7+5]
+	outputBox.maxZ       = bboxArray[1+(pos-1)*7+6]
 end
 
 local function new_node(extentsMin, extentsMax, startIndex, endIndex, level)
-	return {
+	return setmetatable({
 		_extentsMin = extentsMin,
 		_extentsMax = extentsMax,
 		_startIndex = startIndex,
@@ -394,7 +399,7 @@ local function new_node(extentsMin, extentsMax, startIndex, endIndex, level)
 		_level      = level
 		--_node0    = nil
 		--_node1    = nil
-	}
+	}, BVHNode)
 end
 
 function BVHNode:elementCount()
