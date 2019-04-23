@@ -42,6 +42,7 @@ local cpml = {
 }
 
 local files = {
+	"bvh",
 	"color",
 	"constants",
 	"intersect",

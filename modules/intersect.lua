@@ -97,11 +97,17 @@ end
 -- triangle[1]   is a vec3
 -- triangle[2]   is a vec3
 -- triangle[3]   is a vec3
-function intersect.ray_triangle(ray, triangle)
+-- backface_cull is a boolean (optional)
+function intersect.ray_triangle(ray, triangle, backface_cull)
 	local e1 = triangle[2] - triangle[1]
 	local e2 = triangle[3] - triangle[1]
 	local h  = ray.direction:cross(e2)
 	local a  = h:dot(e1)
+
+	-- if a is negative, ray hits the backface
+	if backface_cull and a < 0 then
+		return false
+	end
 
 	-- if a is too close to 0, ray does not intersect triangle
 	if abs(a) <= DBL_EPSILON then
