@@ -199,6 +199,8 @@ describe("bound3:", function()
 	it("tests for points inside bound3", function()
 		local a = bound3(vec3(1,2,3), vec3(4,5,6))
 
+		assert.is_true(a:contains(vec3(1,2,3)))
+		assert.is_true(a:contains(vec3(4,5,6)))
 		assert.is_true(a:contains(vec3(2,3,4)))
 		assert.is_not_true(a:contains(vec3(0,3,4)))
 		assert.is_not_true(a:contains(vec3(5,3,4)))
