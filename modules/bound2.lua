@@ -152,6 +152,13 @@ function bound2.contains(a, v)
 	   and a.max.x >= v.x and a.max.y >= v.y
 end
 
+--- Return a formatted string.
+-- @tparam bound2 a bound to be turned into a string
+-- @treturn string formatted
+function bound2.to_string(a)
+	return string.format("(%s-%s)", a.min, a.max)
+end
+
 bound2_mt.__index    = bound2
 bound2_mt.__tostring = bound2.to_string
 
