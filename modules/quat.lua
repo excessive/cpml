@@ -177,10 +177,6 @@ function quat.pow(a, s)
 	end
 	local dot = a.w
 
-	if dot > DOT_THRESHOLD then
-		return a:scale(s)
-	end
-
 	dot = min(max(dot, -1), 1)
 
 	local theta = acos(dot) * s
