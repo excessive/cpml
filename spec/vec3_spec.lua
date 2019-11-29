@@ -46,6 +46,12 @@ describe("vec3:", function()
 		assert.is.equal(a, b)
 	end)
 
+	it("clones a vector using the constructor", function()
+		local a = vec3(3, 5, 7)
+		local b = vec3(a)
+		assert.is.equal(a, b)
+	end)
+
 	it("adds a vector to another", function()
 		local a = vec3(3, 5, 7)
 		local b = vec3(7, 4, 1)

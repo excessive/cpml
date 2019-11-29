@@ -41,6 +41,12 @@ describe("vec2:", function()
 		assert.is.equal(a, b)
 	end)
 
+	it("clones a vector using the constructor", function()
+		local a = vec2(3, 5)
+		local b = vec2(a)
+		assert.is.equal(a, b)
+	end)
+
 	it("adds a vector to another", function()
 		local a = vec2(3, 5)
 		local b = vec2(7, 4)
@@ -181,5 +187,14 @@ describe("vec2:", function()
 		local a = vec2()
 		local b = a:to_string()
 		assert.is.equal("(+0.000,+0.000)", b)
+	end)
+
+	-- Do this last, to insulate tests from accidental state contamination
+	it("converts a vec3 to vec2 using the constructor", function()
+		local vec3 = require "modules.vec3"
+		local a = vec2(3, 5)
+		local b = vec3(3, 5, 7)
+		local c = vec2(b)
+		assert.is.equal(a, c)
 	end)
 end)

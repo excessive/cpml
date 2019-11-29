@@ -54,7 +54,7 @@ function vec2.new(x, y)
 		return new(x, y)
 
 	-- {x, y} or {x=x, y=y}
-	elseif type(x) == "table" then
+	elseif type(x) == "table" or type(x) == "cdata" then -- table in vanilla lua, cdata in luajit
 		local xx, yy = x.x or x[1], x.y or x[2]
 		assert(type(xx) == "number", "new: Wrong argument type for x (<number> expected)")
 		assert(type(yy) == "number", "new: Wrong argument type for y (<number> expected)")
