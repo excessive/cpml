@@ -172,8 +172,8 @@ describe("vec2:", function()
 		local a    = vec2(3, 5)
 		local r, t = a:to_polar()
 		local b    = vec2.from_cartesian(r, t)
-		assert.is.equal(a.x, b.x)
-		assert.is.equal(a.y, b.y)
+		assert.is_true(abs(a.x - b.x) <= DBL_EPSILON*2) -- Allow 2X epsilon error because there were 2 operations.
+		assert.is_true(abs(a.y - b.y) <= DBL_EPSILON*2)
 	end)
 
 	it("gets a perpendicular vector", function()

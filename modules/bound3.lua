@@ -167,7 +167,9 @@ function bound3_mt.__call(_, a, b)
 end
 
 if status then
-	ffi.metatype(new, bound3_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, bound3_mt)
+	end, function() end)
 end
 
 return setmetatable({}, bound3_mt)

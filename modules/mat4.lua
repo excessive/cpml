@@ -542,10 +542,10 @@ function mat4.look_at(out, a, eye, look_at, up)
 	out[10] = y_axis.z
 	out[11] = z_axis.z
 	out[12] = 0
-	out[13] = 0
-	out[14] = 0
-	out[15] = 0
-	out[16] = 1
+	out[13] = -out[  1]*eye.x - out[4+1]*eye.y - out[8+1]*eye.z
+	out[14] = -out[  2]*eye.x - out[4+2]*eye.y - out[8+2]*eye.z
+	out[15] = -out[  3]*eye.x - out[4+3]*eye.y - out[8+3]*eye.z
+	out[16] = -out[  4]*eye.x - out[4+4]*eye.y - out[8+4]*eye.z + 1
 
   return out
 end
@@ -853,7 +853,9 @@ function mat4_mt.__mul(a, b)
 end
 
 if status then
-	ffi.metatype(new, mat4_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, mat4_mt)
+	end, function() end)
 end
 
 return setmetatable({}, mat4_mt)

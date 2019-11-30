@@ -361,7 +361,9 @@ function vec3_mt.__div(a, b)
 end
 
 if status then
-	ffi.metatype(new, vec3_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, vec3_mt)
+	end, function() end)
 end
 
 return setmetatable({}, vec3_mt)
