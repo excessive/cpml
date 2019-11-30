@@ -469,7 +469,9 @@ function quat_mt.__pow(a, n)
 end
 
 if status then
-	ffi.metatype(new, quat_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, quat_mt)
+	end, function() end)
 end
 
 return setmetatable({}, quat_mt)

@@ -853,7 +853,9 @@ function mat4_mt.__mul(a, b)
 end
 
 if status then
-	ffi.metatype(new, mat4_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, mat4_mt)
+	end, function() end)
 end
 
 return setmetatable({}, mat4_mt)
