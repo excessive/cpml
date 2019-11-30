@@ -3,6 +3,7 @@
 
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3    = require(modules .. "vec3")
+local private = require(modules .. "_private_utils")
 local acos    = math.acos
 local atan2   = math.atan2
 local sqrt    = math.sqrt
@@ -319,6 +320,14 @@ function vec2.to_polar(a)
 	local theta  = atan2(a.y, a.x)
 	theta = theta > 0 and theta or theta + 2 * math.pi
 	return radius, theta
+end
+
+-- Round all components to nearest int (or other precision).
+-- @tparam vec2 a Vector to round.
+-- @tparam precision Digits after the decimal (round numebr if unspecified)
+-- @treturn vec2 Rounded vector
+function vec2.round(a, precision)
+	return vec2.new(private.round(a.x, precision), private.round(a.y, precision))
 end
 
 --- Return a formatted string.

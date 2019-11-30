@@ -208,6 +208,17 @@ describe("bound3:", function()
 		assert.is_not_true(a:contains(vec3(2,3,7)))
 	end)
 
+	it("rounds a bound3", function()
+		local a = bound3(vec3(1.1,1.9,3), vec3(3.9,5.1,6)):round()
+
+		assert.is.equal(1, a.min.x)
+		assert.is.equal(2, a.min.y)
+		assert.is.equal(3, a.min.z)
+		assert.is.equal(4, a.max.x)
+		assert.is.equal(5, a.max.y)
+		assert.is.equal(6, a.max.z)
+	end)
+
 	it("checks for bound3.zero", function()
 		assert.is.equal(0, bound3.zero.min.x)
 		assert.is.equal(0, bound3.zero.min.y)

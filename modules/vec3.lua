@@ -1,6 +1,8 @@
 --- A 3 component vector.
 -- @module vec3
 
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local private = require(modules .. "_private_utils")
 local sqrt    = math.sqrt
 local cos     = math.cos
 local sin     = math.sin
@@ -252,6 +254,14 @@ end
 -- @treturn vec3 out
 function vec3.lerp(a, b, s)
 	return a + (b - a) * s
+end
+
+-- Round all components to nearest int (or other precision).
+-- @tparam vec3 a Vector to round.
+-- @tparam precision Digits after the decimal (round numebr if unspecified)
+-- @treturn vec3 Rounded vector
+function vec3.round(a, precision)
+	return vec3.new(private.round(a.x, precision), private.round(a.y, precision), private.round(a.z, precision))
 end
 
 --- Unpack a vector into individual components.
