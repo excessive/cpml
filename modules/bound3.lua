@@ -62,6 +62,22 @@ function bound3.at(a, b) -- "bounded by". b may be nil
 	end
 end
 
+--- Extend bound to include point
+-- @tparam bound3 a bound
+-- @tparam vec3 point to include
+-- @treturn bound3 Bound covering current min, current max and new point
+function bound3.extend(a, center)
+	return bound3.new(a.min:component_min(center), a.max:component_max(center))
+end
+
+--- Extend bound to entirety of other bound
+-- @tparam bound3 a bound
+-- @tparam bound3 bound to cover
+-- @treturn bound3 Bound covering current min and max of each bound in the pair
+function bound3.extend_bound(a, b)
+	return a:extend(b.min):extend(b.max)
+end
+
 --- Get size of bounding box as a vector 
 -- @tparam bound3 a bound
 -- @treturn vec3 Vector spanning min to max points

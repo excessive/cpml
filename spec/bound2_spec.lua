@@ -171,6 +171,42 @@ describe("bound2:", function()
 		assert.is_not_true(a:contains(vec2(2,3)))
 	end)
 
+	it("extends a bound2 with a point", function()
+		local min = vec2(1,2)
+		local max = vec2(4,5)
+		local downright = vec2(8,8)
+		local downleft = vec2(-4,8)
+		local top = vec2(2, 0)
+
+		local a = bound2(min, max)
+		local temp
+
+		temp = a:extend(downright)
+		assert.is_true(a.min == min and a.max == max)
+		assert.is_true(temp.min == min and temp.max == downright)
+		temp = a:extend(downleft)
+		assert.is_true(temp.min == vec2(-4,2) and temp.max == vec2(4,8))
+		temp = a:extend(top)
+		assert.is_true(temp.min == vec2(1,0) and temp.max == max)
+	end)
+
+	it("extends a bound with another bound", function()
+		local min = vec2(1,2)
+		local max = vec2(4,5)
+		local leftexpand = bound2.new(vec2(0,0), vec2(1.5, 6))
+		local rightexpand = bound2.new(vec2(1.5,0), vec2(5, 6))
+
+		local a = bound2(min, max)
+		local temp
+
+		temp = a:extend_bound(leftexpand)
+		assert.is_equal(temp.min, vec2(0,0))
+		assert.is_equal(temp.max, vec2(4,6))
+		temp = temp:extend_bound(rightexpand)
+		assert.is_equal(temp.min, vec2(0,0))
+		assert.is_equal(temp.max, vec2(5,6))
+	end)
+	
 	it("checks for bound2.zero", function()
 		assert.is.equal(0, bound2.zero.min.x)
 		assert.is.equal(0, bound2.zero.min.y)
