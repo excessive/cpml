@@ -189,6 +189,14 @@ describe("vec2:", function()
 		assert.is.equal("(+0.000,+0.000)", b)
 	end)
 
+	it("flips a 2-vector", function()
+		local a = vec2(1,2)
+		local temp = a:flip_x()
+		assert.is.equal(temp, vec2(-1, 2))
+		temp = temp:flip_y()
+		assert.is.equal(temp, vec2(-1, -2))
+	end)
+
 	-- Do this last, to insulate tests from accidental state contamination
 	it("converts a vec3 to vec2 using the constructor", function()
 		local vec3 = require "modules.vec3"

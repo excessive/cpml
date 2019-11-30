@@ -279,6 +279,27 @@ function vec3.component_max(a, b)
 	return new(math.max(a.x, b.x), math.max(a.y, b.y), math.max(a.z, b.z))
 end
 
+-- Negate x axis only of vector.
+-- @tparam vec2 a Vector to x-flip.
+-- @treturn vec2 x-flipped vector
+function vec3.flip_x(a)
+	return vec3.new(-a.x, a.y, a.z)
+end
+
+-- Negate y axis only of vector.
+-- @tparam vec2 a Vector to y-flip.
+-- @treturn vec2 y-flipped vector
+function vec3.flip_y(a)
+	return vec3.new(a.x, -a.y, a.z)
+end
+
+-- Negate z axis only of vector.
+-- @tparam vec2 a Vector to z-flip.
+-- @treturn vec2 z-flipped vector
+function vec3.flip_z(a)
+	return vec3.new(a.x, a.y, -a.z)
+end
+
 --- Return a boolean showing if a table is or is not a vec3.
 -- @tparam vec3 a Vector to be tested
 -- @treturn boolean is_vec3
