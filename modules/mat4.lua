@@ -665,7 +665,7 @@ function mat4.to_string(a)
 	return str
 end
 
---- Convert a matrix to vec4s.
+--- Convert a matrix to row vec4s.
 -- @tparam mat4 a Matrix to be converted
 -- @treturn table vec4s
 function mat4.to_vec4s(a)
@@ -674,6 +674,18 @@ function mat4.to_vec4s(a)
 		{ a[5],  a[6],  a[7],  a[8]  },
 		{ a[9],  a[10], a[11], a[12] },
 		{ a[13], a[14], a[15], a[16] }
+	}
+end
+
+--- Convert a matrix to col vec4s.
+-- @tparam mat4 a Matrix to be converted
+-- @treturn table vec4s
+function mat4.to_vec4s_cols(a)
+	return {
+		{ a[1], a[5], a[9],  a[13] },
+		{ a[2], a[6], a[10], a[14] },
+		{ a[3], a[7], a[11], a[15] },
+		{ a[4], a[8], a[12], a[16] }
 	}
 end
 
