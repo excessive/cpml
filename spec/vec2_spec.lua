@@ -189,7 +189,16 @@ describe("vec2:", function()
 		assert.is.equal("(+0.000,+0.000)", b)
 	end)
 
-	-- Do this last, to insulate tests from accidental state contamination
+	-- Do vec3 tests last, to insulate tests from accidental state contamination
+	it("converts a 2-vector to a 3-vector", function()
+		local vec3 = require "modules.vec3"
+		local a = vec2(1,2)
+		local b = a:to_vec3()
+		local c = a:to_vec3(3)
+		assert.is.equal(b, vec3(1,2,0))
+		assert.is.equal(c, vec3(1,2,3))
+	end)
+
 	it("converts a vec3 to vec2 using the constructor", function()
 		local vec3 = require "modules.vec3"
 		local a = vec2(3, 5)
