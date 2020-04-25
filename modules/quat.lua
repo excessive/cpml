@@ -364,13 +364,25 @@ end
 
 --- Convert a quaternion into an angle plus axis components.
 -- @tparam quat a Quaternion to convert
+-- @tparam identity an optional table to return on identity/degenerate quaternions (by default returns 0,0,0,1)
 -- @treturn number angle
 -- @treturn x axis-x
 -- @treturn y axis-y
 -- @treturn z axis-z
-function quat.to_angle_axis_unpack(a)
+function quat.to_angle_axis_unpack(a, identity)
 	if a.w > 1 or a.w < -1 then
 		a = a:normalize()
+	end
+
+	-- If length of xyz components is less than DBL_EPSILON, this is zero or close enough (an identity quaternion)
+	-- Normally an identity quat would return a nonsense answer, so we return an arbitrary zero rotation early.
+	-- FIXME: Is it safe to assume there are *no* valid quaternions with nonzero degenerate lengths?
+	if a.x*a.x + a.y*a.y + a.z*a.z < constants.DBL_EPSILON*constants.DBL_EPSILON then
+		if identity then
+			return unpack(identity)
+		else
+			return 0,0,0,1
+		end
 	end
 
 	local x, y, z
@@ -394,8 +406,8 @@ end
 -- @tparam quat a Quaternion to convert
 -- @treturn number angle
 -- @treturn vec3 axis
-function quat.to_angle_axis(a)
-	local angle, x, y, z = a:to_angle_axis_unpack()
+function quat.to_angle_axis(a, default)
+	local angle, x, y, z = a:to_angle_axis_unpack(default)
 	return angle, vec3(x, y, z)
 end
 
