@@ -4,6 +4,7 @@
 local modules = (...): gsub('%.[^%.]+$', '') .. "."
 local vec2    = require(modules .. "vec2")
 local vec3    = require(modules .. "vec3")
+local private = require(modules .. "_private_utils")
 local abs     = math.abs
 local ceil    = math.ceil
 local floor   = math.floor
@@ -103,10 +104,7 @@ end
 -- @param value
 -- @param precision
 -- @return number
-function utils.round(value, precision)
-	if precision then return utils.round(value / precision) * precision end
-	return value >= 0 and floor(value+0.5) or ceil(value-0.5)
-end
+utils.round = private.round
 
 --- Wrap `value` around if it exceeds `limit`.
 -- @param value
