@@ -1,0 +1,11 @@
+-- Functions exported by utils.lua but needed by vec2 or vec3 (which utils.lua requires)
+
+local private = {}
+local floor   = math.floor
+
+function private.round(value, precision)
+	if precision then return utils.round(value / precision) * precision end
+	return value >= 0 and floor(value+0.5) or ceil(value-0.5)
+end
+
+return private

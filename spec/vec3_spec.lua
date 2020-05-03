@@ -203,6 +203,13 @@ describe("vec3:", function()
 		assert.is.equal("(+0.000,+0.000,+0.000)", b)
 	end)
 
+	it("rounds a 3-vector", function()
+		local a = vec3(1.1,1.9,3):round()
+		assert.is.equal(a.x, 1)
+		assert.is.equal(a.y, 2)
+		assert.is.equal(a.z, 3)
+	end)
+
 	it("flips a 3-vector", function()
 		local a = vec3(1,2,3)
 		local temp = a:flip_x()

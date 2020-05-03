@@ -62,6 +62,22 @@ function bound2.at(a, b) -- "bounded by". b may be nil
 	end
 end
 
+--- Extend bound to include point
+-- @tparam bound2 a bound
+-- @tparam vec2 point to include
+-- @treturn bound2 Bound covering current min, current max and new point
+function bound2.extend(a, center)
+	return bound2.new(a.min:component_min(center), a.max:component_max(center))
+end
+
+--- Extend bound to entirety of other bound
+-- @tparam bound2 a bound
+-- @tparam bound2 bound to cover
+-- @treturn bound2 Bound covering current min and max of each bound in the pair
+function bound2.extend_bound(a, b)
+	return a:extend(b.min):extend(b.max)
+end
+
 --- Get size of bounding box as a vector 
 -- @tparam bound2 a bound
 -- @treturn vec2 Vector spanning min to max points
@@ -152,6 +168,14 @@ function bound2.contains(a, v)
 	   and a.max.x >= v.x and a.max.y >= v.y
 end
 
+-- Round all components of all vectors to nearest int (or other precision).
+-- @tparam vec3 a bound to round.
+-- @tparam precision Digits after the decimal (round number if unspecified)
+-- @treturn vec3 Rounded bound
+function bound2.round(a, precision)
+	return bound2.new(a.min:round(precision), a.max.round(precision))
+end
+
 --- Return a formatted string.
 -- @tparam bound2 a bound to be turned into a string
 -- @treturn string formatted
@@ -167,7 +191,9 @@ function bound2_mt.__call(_, a, b)
 end
 
 if status then
-	ffi.metatype(new, bound2_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, bound2_mt)
+	end, function() end)
 end
 
 return setmetatable({}, bound2_mt)

@@ -172,8 +172,8 @@ describe("vec2:", function()
 		local a    = vec2(3, 5)
 		local r, t = a:to_polar()
 		local b    = vec2.from_cartesian(r, t)
-		assert.is.equal(a.x, b.x)
-		assert.is.equal(a.y, b.y)
+		assert.is_true(abs(a.x - b.x) <= DBL_EPSILON*2) -- Allow 2X epsilon error because there were 2 operations.
+		assert.is_true(abs(a.y - b.y) <= DBL_EPSILON*2)
 	end)
 
 	it("gets a perpendicular vector", function()
@@ -187,6 +187,12 @@ describe("vec2:", function()
 		local a = vec2()
 		local b = a:to_string()
 		assert.is.equal("(+0.000,+0.000)", b)
+	end)
+
+	it("rounds a 2-vector", function()
+		local a = vec2(1.1,1.9):round()
+		assert.is.equal(a.x, 1)
+		assert.is.equal(a.y, 2)
 	end)
 
 	it("flips a 2-vector", function()
