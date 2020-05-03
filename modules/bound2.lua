@@ -152,6 +152,14 @@ function bound2.contains(a, v)
 	   and a.max.x >= v.x and a.max.y >= v.y
 end
 
+-- Round all components of all vectors to nearest int (or other precision).
+-- @tparam vec3 a bound to round.
+-- @tparam precision Digits after the decimal (round number if unspecified)
+-- @treturn vec3 Rounded bound
+function bound2.round(a, precision)
+	return bound2.new(a.min:round(precision), a.max.round(precision))
+end
+
 --- Return a formatted string.
 -- @tparam bound2 a bound to be turned into a string
 -- @treturn string formatted
