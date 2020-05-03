@@ -12,3 +12,7 @@ Online documentation can be found [here](http://excessive.github.io/cpml/) or yo
 
 # Installation
 Clone the repository and require it, or if you prefer luarocks: `$ luarocks install --server=http://luarocks.org/dev cpml`. Add `--tree=whatever` for a local install.
+
+# Versions
+
+This library has a major compatibility break at version 1.0. Up to version 0.10, composition a*b means "apply b, then a" for quaternions and "apply a, then b" for matrices. Starting with version 1.0, the two are consistent and matrix a*b means "apply b, then a".
