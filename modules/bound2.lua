@@ -173,7 +173,7 @@ end
 -- @tparam precision Digits after the decimal (round number if unspecified)
 -- @treturn vec3 Rounded bound
 function bound2.round(a, precision)
-	return bound2.new(a.min:round(precision), a.max.round(precision))
+	return bound2.new(a.min:round(precision), a.max:round(precision))
 end
 
 --- Return a formatted string.
