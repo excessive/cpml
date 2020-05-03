@@ -62,6 +62,22 @@ function bound3.at(a, b) -- "bounded by". b may be nil
 	end
 end
 
+--- Extend bound to include point
+-- @tparam bound3 a bound
+-- @tparam vec3 point to include
+-- @treturn bound3 Bound covering current min, current max and new point
+function bound3.extend(a, center)
+	return bound3.new(a.min:component_min(center), a.max:component_max(center))
+end
+
+--- Extend bound to entirety of other bound
+-- @tparam bound3 a bound
+-- @tparam bound3 bound to cover
+-- @treturn bound3 Bound covering current min and max of each bound in the pair
+function bound3.extend_bound(a, b)
+	return a:extend(b.min):extend(b.max)
+end
+
 --- Get size of bounding box as a vector 
 -- @tparam bound3 a bound
 -- @treturn vec3 Vector spanning min to max points
@@ -152,6 +168,14 @@ function bound3.contains(a, v)
 	   and a.max.x >= v.x and a.max.y >= v.y and a.max.z >= v.z
 end
 
+-- Round all components of all vectors to nearest int (or other precision).
+-- @tparam vec3 a bound to round.
+-- @tparam precision Digits after the decimal (round number if unspecified)
+-- @treturn vec3 Rounded bound
+function bound3.round(a, precision)
+	return bound3.new(a.min:round(precision), a.max:round(precision))
+end
+
 --- Return a formatted string.
 -- @tparam bound3 a bound to be turned into a string
 -- @treturn string formatted
@@ -167,7 +191,9 @@ function bound3_mt.__call(_, a, b)
 end
 
 if status then
-	ffi.metatype(new, bound3_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, bound3_mt)
+	end, function() end)
 end
 
 return setmetatable({}, bound3_mt)

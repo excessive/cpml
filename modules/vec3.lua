@@ -1,6 +1,8 @@
 --- A 3 component vector.
 -- @module vec3
 
+local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local private = require(modules .. "_private_utils")
 local sqrt    = math.sqrt
 local cos     = math.cos
 local sin     = math.sin
@@ -254,6 +256,14 @@ function vec3.lerp(a, b, s)
 	return a + (b - a) * s
 end
 
+-- Round all components to nearest int (or other precision).
+-- @tparam vec3 a Vector to round.
+-- @tparam precision Digits after the decimal (round numebr if unspecified)
+-- @treturn vec3 Rounded vector
+function vec3.round(a, precision)
+	return vec3.new(private.round(a.x, precision), private.round(a.y, precision), private.round(a.z, precision))
+end
+
 --- Unpack a vector into individual components.
 -- @tparam vec3 a Vector to unpack
 -- @treturn number x
@@ -277,6 +287,27 @@ end
 -- @treturn vec3 A vector where each component is the lesser value for that component between the two given vectors.
 function vec3.component_max(a, b)
 	return new(math.max(a.x, b.x), math.max(a.y, b.y), math.max(a.z, b.z))
+end
+
+-- Negate x axis only of vector.
+-- @tparam vec2 a Vector to x-flip.
+-- @treturn vec2 x-flipped vector
+function vec3.flip_x(a)
+	return vec3.new(-a.x, a.y, a.z)
+end
+
+-- Negate y axis only of vector.
+-- @tparam vec2 a Vector to y-flip.
+-- @treturn vec2 y-flipped vector
+function vec3.flip_y(a)
+	return vec3.new(a.x, -a.y, a.z)
+end
+
+-- Negate z axis only of vector.
+-- @tparam vec2 a Vector to z-flip.
+-- @treturn vec2 z-flipped vector
+function vec3.flip_z(a)
+	return vec3.new(a.x, a.y, -a.z)
 end
 
 --- Return a boolean showing if a table is or is not a vec3.
@@ -361,7 +392,9 @@ function vec3_mt.__div(a, b)
 end
 
 if status then
-	ffi.metatype(new, vec3_mt)
+	xpcall(function() -- Allow this to silently fail; assume failure means someone messed with package.loaded
+		ffi.metatype(new, vec3_mt)
+	end, function() end)
 end
 
 return setmetatable({}, vec3_mt)
