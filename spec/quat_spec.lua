@@ -1,6 +1,7 @@
 local quat  = require "modules.quat"
 local vec3  = require "modules.vec3"
 local utils = require "modules.utils"
+local constants = require "modules.constants"
 
 describe("quat:", function()
 	it("creates an identity quaternion", function()
@@ -123,6 +124,19 @@ describe("quat:", function()
 		assert.is.equal( 4,  c.y)
 		assert.is.equal( 17, c.z)
 		assert.is.equal(b, c)
+	end)
+
+	it("verifies quat composition order", function()
+		local a = quat(2, 3, 4, 1):normalize() -- Only the normal quaternions represent rotations
+		local b = quat(3, 6, 9, 1):normalize()
+		local c = a * b
+
+		local v = vec3(3, 4, 5)
+
+		local cv = c * v
+		local abv = a * (b * v)
+
+		assert.is_true((abv - cv):len() < 1e-07) -- Verify (a*b)*v == a*(b*v) within an epsilon
 	end)
 
 	it("multiplies a quaternion by an exponent of 0", function()

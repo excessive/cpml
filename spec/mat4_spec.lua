@@ -184,6 +184,32 @@ describe("mat4:", function()
 		assert.is.equal(c[4], d[4])
 	end)
 
+	it("verifies mat4 composition order", function()
+		local a = mat4 {
+			1, 5, 9,  13,
+			2, 6, 10, 14,
+			3, 7, 11, 15,
+			4, 8, 12, 16
+		}
+		local b = mat4 {
+			2,  3,  5,  7,
+			11, 13, 17, 19,
+			23, 29, 31, 37,
+			41, 43, 47, 53
+		}
+		local c = mat4():mul(a, b)
+		local d = a * b
+
+		local v = { 10, 20, 30, 40 }
+
+		local cv = c * v
+		local abv = a*(b*v)
+
+		assert.is.equal(cv.x, abv.x) -- Verify (a*b)*v == a*(b*v)
+		assert.is.equal(cv.y, abv.y)
+		assert.is.equal(cv.z, abv.z)
+	end)
+
 	it("scales a matrix", function()
 		local a = mat4():scale(mat4(), vec3(5, 5, 5))
 		assert.is.equal(5, a[1])
