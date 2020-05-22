@@ -2,6 +2,7 @@
 
 local private = {}
 local floor   = math.floor
+local ceil    = math.ceil
 
 function private.round(value, precision)
 	if precision then return utils.round(value / precision) * precision end
