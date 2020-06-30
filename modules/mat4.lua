@@ -127,7 +127,22 @@ end
 -- @tparam quat q Rotation quaternion
 -- @treturn mat4 out
 function mat4.from_quaternion(q)
-	return mat4.from_angle_axis(q:to_angle_axis())
+	local x, y, z, w = q:unpack()
+	local l = x * x + y * y + z * z + w * w
+	
+	if l == 0 then
+		return new()
+	end
+	
+	l = 1 / sqrt(l)
+	x, y, z, w = x * l, y * l, z * l, w * l
+	local xx, yy, zz = x * x, y * y, z * z
+	return new {
+		  1 - 2 * (yy + zz), 2 * (x * y + w * z), 2 * (x * z - w * y), 0,
+		2 * (x * y - w * z),   1 - 2 * (xx + zz), 2 * (y * z + w * x), 0,
+		2 * (x * z + w * y), 2 * (y * z - w * x),   1 - 2 * (xx + yy), 0,
+		0, 0, 0, 1
+	}
 end
 
 --- Create a matrix from a direction/up pair.
@@ -160,21 +175,21 @@ end
 -- @tparam vec3 scale Scale vector
 -- @treturn mat4 out
 function mat4.from_transform(trans, rot, scale)
-	local angle, axis = rot:to_angle_axis()
-	local l = axis:len()
-
+	local x, y, z, w = rot:unpack()
+	local l = x * x + y * y + z * z + w * w
+	
 	if l == 0 then
 		return new()
 	end
-
-	local x, y, z = axis.x / l, axis.y / l, axis.z / l
-	local c = cos(angle)
-	local s = sin(angle)
-
+	
+	l = 1 / sqrt(l)
+	x, y, z, w = x * l, y * l, z * l, w * l
+	local xx, yy, zz = x * x, y * y, z * z
+	local sx, sy, sz = 2 * scale.x,  2 * scale.y, 2 * scale.z
 	return new {
-		x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
-		x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0,
-		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0,
+		sx * (0.5 - yy - zz), sx * (x * y + w * z), sx * (x * z - w * y), 0,
+		sy * (x * y - w * z), sy * (0.5 - xx - zz), sy * (y * z + w * x), 0,
+		sz * (x * z + w * y), sz * (y * z - w * x), sz * (0.5 - xx - yy), 0,
 		trans.x, trans.y, trans.z, 1
 	}
 end
