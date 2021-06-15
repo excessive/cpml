@@ -203,6 +203,62 @@ describe("vec2:", function()
 		assert.is.equal(temp, vec2(-1, -2))
 	end)
 
+	it("finds angle from one 2-vector to another", function()
+		local d = {
+			right = vec2(1,  0),
+			down  = vec2(0,  -1),
+			left  = vec2(-1, 0),
+			up    = vec2(0,  1),
+		}
+		assert.is.equal(math.deg(d.right:angle_to(d.right)), 0.0)
+		assert.is.equal(math.deg(d.right:angle_to(d.down)), -90.0)
+		assert.is.equal(math.deg(d.right:angle_to(d.left)), 180.0)
+		assert.is.equal(math.deg(d.right:angle_to(d.up)), 90.0)
+
+		assert.is.equal(math.deg(d.down:angle_to(d.right)), 90.0)
+		assert.is.equal(math.deg(d.down:angle_to(d.down)), 0.0)
+		assert.is.equal(math.deg(d.down:angle_to(d.left)), -90.0)
+		assert.is.equal(math.deg(d.down:angle_to(d.up)), 180.0)
+
+		assert.is.equal(math.deg(d.left:angle_to(d.right)), 180.0)
+		assert.is.equal(math.deg(d.left:angle_to(d.down)), 90.0)
+		assert.is.equal(math.deg(d.left:angle_to(d.left)), 0.0)
+		assert.is.equal(math.deg(d.left:angle_to(d.up)), -90.0)
+
+		assert.is.equal(math.deg(d.up:angle_to(d.right)), -90.0)
+		assert.is.equal(math.deg(d.up:angle_to(d.down)), 180.0)
+		assert.is.equal(math.deg(d.up:angle_to(d.left)), 90.0)
+		assert.is.equal(math.deg(d.up:angle_to(d.up)), 0.0)
+	end)
+
+	it("finds angle between two 2-vectors", function()
+		local d = {
+			right = vec2(1,  0),
+			down  = vec2(0,  -1),
+			left  = vec2(-1, 0),
+			up    = vec2(0,  1),
+		}
+		assert.is.equal(math.deg(d.right:angle_between(d.right)), 0.0)
+		assert.is.equal(math.deg(d.right:angle_between(d.down)), 90.0)
+		assert.is.equal(math.deg(d.right:angle_between(d.left)), 180.0)
+		assert.is.equal(math.deg(d.right:angle_between(d.up)), 90.0)
+
+		assert.is.equal(math.deg(d.down:angle_between(d.right)), 90.0)
+		assert.is.equal(math.deg(d.down:angle_between(d.down)), 0.0)
+		assert.is.equal(math.deg(d.down:angle_between(d.left)), 90.0)
+		assert.is.equal(math.deg(d.down:angle_between(d.up)), 180.0)
+
+		assert.is.equal(math.deg(d.left:angle_between(d.right)), 180.0)
+		assert.is.equal(math.deg(d.left:angle_between(d.down)), 90.0)
+		assert.is.equal(math.deg(d.left:angle_between(d.left)), 0.0)
+		assert.is.equal(math.deg(d.left:angle_between(d.up)), 90.0)
+
+		assert.is.equal(math.deg(d.up:angle_between(d.right)), 90.0)
+		assert.is.equal(math.deg(d.up:angle_between(d.down)), 180.0)
+		assert.is.equal(math.deg(d.up:angle_between(d.left)), 90.0)
+		assert.is.equal(math.deg(d.up:angle_between(d.up)), 0.0)
+	end)
+
 	-- Do this last, to insulate tests from accidental state contamination
 	-- Do vec3 tests last, to insulate tests from accidental state contamination
 	it("converts a 2-vector to a 3-vector", function()
