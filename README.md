@@ -1,7 +1,7 @@
 Cirno's Perfect Math Library
 ====
 
-[![Build Status](https://travis-ci.org/excessive/cpml.svg?branch=master)](https://travis-ci.org/excessive/cpml)
+[![Build Status](https://travis-ci.com/excessive/cpml.svg?branch=master)](https://travis-ci.com/excessive/cpml)
 [![Coverage Status](https://coveralls.io/repos/github/excessive/cpml/badge.svg?branch=master)](https://coveralls.io/github/excessive/cpml?branch=master)
 
 Various useful bits of game math. 3D line intersections, ray casting, vectors, matrices, quaternions, etc.
