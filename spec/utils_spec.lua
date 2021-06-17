@@ -45,6 +45,4 @@ project_from(out, a, b)
 mirror_on(out, a, b)
 reflect(out, i, n)
 refract(out, i, n, ior)
-angle_to(a, b)
-angle_between(a, b)
 --]]

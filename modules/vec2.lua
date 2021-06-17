@@ -228,22 +228,31 @@ function vec2.perpendicular(a)
 	return new(-a.y, a.x)
 end
 
---- Angle from one vector to another.
+--- Signed angle from one vector to another.
+-- Rotations from +x to +y are positive.
 -- @tparam vec2 a Vector
 -- @tparam vec2 b Vector
--- @treturn number angle
+-- @treturn number angle in (-pi, pi]
 function vec2.angle_to(a, b)
 	if b then
-		return atan2(a.y - b.y, a.x - b.x)
+		local angle = atan2(b.y, b.x) - atan2(a.y, a.x)
+		-- convert to (-pi, pi]
+		if angle > math.pi       then
+			angle = angle - 2 * math.pi
+		elseif angle <= -math.pi then
+			angle = angle + 2 * math.pi
+		end
+		return angle
 	end
 
 	return atan2(a.y, a.x)
 end
 
---- Angle between two vectors.
+--- Unsigned angle between two vectors.
+-- Directionless and thus commutative.
 -- @tparam vec2 a Vector
 -- @tparam vec2 b Vector
--- @treturn number angle
+-- @treturn number angle in [0, pi]
 function vec2.angle_between(a, b)
 	if b then
 		if vec2.is_vec2(a) then
