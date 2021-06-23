@@ -33,7 +33,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Tables">Tables</a></li>
+<li><a href="#Functions">Functions</a></li>
 </ul>
 
 
@@ -41,9 +41,9 @@
 <ul class="nowrap">
   <li><a href="../modules/bound2.html">bound2</a></li>
   <li><a href="../modules/bound3.html">bound3</a></li>
-  <li><a href="../modules/bvh.html">bvh</a></li>
+  <li><strong>bvh</strong></li>
   <li><a href="../modules/color.html">color</a></li>
-  <li><strong>constants</strong></li>
+  <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
   <li><a href="../modules/mat4.html">mat4</a></li>
   <li><a href="../modules/mesh.html">mesh</a></li>
@@ -63,18 +63,22 @@
 
 <div id="content">
 
-<h1>Module <code>constants</code></h1>
-<p>Various useful constants</p>
+<h1>Module <code>bvh</code></h1>
+<p>BVH Tree</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Tables">Tables</a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#constants">constants</a></td>
-	<td class="summary">Constants</td>
+	<td class="name" nowrap><a href="#OctreeNode:draw_bounds">OctreeNode:draw_bounds (cube, depth)</a></td>
+	<td class="summary">Draws node boundaries visually for debugging.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#OctreeNode:draw_objects">OctreeNode:draw_objects (cube, filter)</a></td>
+	<td class="summary">Draws the bounds of all objects in the tree visually for debugging.</td>
 	</tr>
 </table>
 
@@ -82,27 +86,47 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "constants"></a>
-    <strong>constants</strong>
+    <a name = "OctreeNode:draw_bounds"></a>
+    <strong>OctreeNode:draw_bounds (cube, depth)</strong>
     </dt>
     <dd>
-    Constants
+    Draws node boundaries visually for debugging.
 
 
-    <h3>Fields:</h3>
+    <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">FLT_EPSILON</span>
-         Floating point precision breaks down
+        <li><span class="parameter">cube</span>
+         Cube model to draw
         </li>
-        <li><span class="parameter">DBL_EPSILON</span>
-         Double-precise floating point precision breaks down
+        <li><span class="parameter">depth</span>
+         Used for recurcive calls to self method
         </li>
-        <li><span class="parameter">DOT_THRESHOLD</span>
-         Close enough to 1 for interpolations to occur
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "OctreeNode:draw_objects"></a>
+    <strong>OctreeNode:draw_objects (cube, filter)</strong>
+    </dt>
+    <dd>
+    Draws the bounds of all objects in the tree visually for debugging.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cube</span>
+         Cube model to draw
+        </li>
+        <li><span class="parameter">filter</span>
+         a function returning true or false to determine visibility.
         </li>
     </ul>
 

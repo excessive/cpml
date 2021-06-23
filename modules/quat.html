@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
     <title>CPML documentation</title>
-    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
 </head>
 <body>
 
@@ -26,6 +26,7 @@
 <br/>
 <h1>CPML</h1>
 
+
 <ul>
   <li><a href="../index.html">Index</a></li>
 </ul>
@@ -39,6 +40,9 @@
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/bound2.html">bound2</a></li>
+  <li><a href="../modules/bound3.html">bound3</a></li>
+  <li><a href="../modules/bvh.html">bvh</a></li>
   <li><a href="../modules/color.html">color</a></li>
   <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
@@ -50,6 +54,10 @@
   <li><a href="../modules/utils.html">utils</a></li>
   <li><a href="../modules/vec2.html">vec2</a></li>
   <li><a href="../modules/vec3.html">vec3</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
 </ul>
 
 </div>
@@ -70,7 +78,7 @@
 	<td class="summary">The public constructor.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#from_angle_axis">from_angle_axis (angle, axis)</a></td>
+	<td class="name" nowrap><a href="#from_angle_axis">from_angle_axis (angle, axis, y, z)</a></td>
 	<td class="summary">Create a quaternion from an angle/axis pair.</td>
 	</tr>
 	<tr>
@@ -122,7 +130,7 @@
 	<td class="summary">Multiply a quaternion by a scalar.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#rotate">rotate (angle, axis)</a></td>
+	<td class="name" nowrap><a href="#rotate">rotate (angle, axis, y, z)</a></td>
 	<td class="summary">Alias of from<em>angle</em>axis.</td>
 	</tr>
 	<tr>
@@ -166,7 +174,11 @@
 	<td class="summary">Return a boolean showing if a table is or is not an imaginary quat.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#to_angle_axis">to_angle_axis (a)</a></td>
+	<td class="name" nowrap><a href="#to_angle_axis_unpack">to_angle_axis_unpack (a, vec3)</a></td>
+	<td class="summary">Convert a quaternion into an angle plus axis components.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_angle_axis">to_angle_axis (a, vec3)</a></td>
 	<td class="summary">Convert a quaternion into an angle/axis pair.</td>
 	</tr>
 	<tr>
@@ -235,7 +247,7 @@
 </dd>
     <dt>
     <a name = "from_angle_axis"></a>
-    <strong>from_angle_axis (angle, axis)</strong>
+    <strong>from_angle_axis (angle, axis, y, z)</strong>
     </dt>
     <dd>
     Create a quaternion from an angle/axis pair.
@@ -248,10 +260,13 @@
          Angle (in radians)
         </li>
         <li><span class="parameter">axis</span>
-            <span class="types"><span class="type">vec3</span></span>
-
-
-
+        /x -- Can be of two types, a vec3 axis, or the x component of that axis
+        </li>
+        <li><span class="parameter">y</span>
+         axis -- y component of axis (optional, only if x component param used)
+        </li>
+        <li><span class="parameter">z</span>
+         axis -- z component of axis (optional, only if x component param used)
         </li>
     </ul>
 
@@ -412,7 +427,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
-        out
+        quaternion equivalent to "apply b, then a"
     </ol>
 
 
@@ -626,7 +641,7 @@
 </dd>
     <dt>
     <a name = "rotate"></a>
-    <strong>rotate (angle, axis)</strong>
+    <strong>rotate (angle, axis, y, z)</strong>
     </dt>
     <dd>
     Alias of from<em>angle</em>axis.
@@ -639,10 +654,13 @@
          Angle (in radians)
         </li>
         <li><span class="parameter">axis</span>
-            <span class="types"><span class="type">vec3</span></span>
-
-
-
+        /x -- Can be of two types, a vec3 axis, or the x component of that axis
+        </li>
+        <li><span class="parameter">y</span>
+         axis -- y component of axis (optional, only if x component param used)
+        </li>
+        <li><span class="parameter">z</span>
+         axis -- z component of axis (optional, only if x component param used)
         </li>
     </ul>
 
@@ -953,8 +971,48 @@
 
 </dd>
     <dt>
+    <a name = "to_angle_axis_unpack"></a>
+    <strong>to_angle_axis_unpack (a, vec3)</strong>
+    </dt>
+    <dd>
+    Convert a quaternion into an angle plus axis components.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
+         Quaternion to convert
+        </li>
+        <li><span class="parameter">vec3</span>
+            <span class="types"><span class="type">identityAxis</span></span>
+         of axis to use on identity/degenerate quaternions (optional, default returns 0,0,0,1)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        angle</li>
+        <li>
+           <span class="types"><span class="type">x</span></span>
+        axis-x</li>
+        <li>
+           <span class="types"><span class="type">y</span></span>
+        axis-y</li>
+        <li>
+           <span class="types"><span class="type">z</span></span>
+        axis-z</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "to_angle_axis"></a>
-    <strong>to_angle_axis (a)</strong>
+    <strong>to_angle_axis (a, vec3)</strong>
     </dt>
     <dd>
     Convert a quaternion into an angle/axis pair.
@@ -965,6 +1023,10 @@
         <li><span class="parameter">a</span>
             <span class="types"><a class="type" href="../modules/quat.html#quat">quat</a></span>
          Quaternion to convert
+        </li>
+        <li><span class="parameter">vec3</span>
+            <span class="types"><span class="type">identityAxis</span></span>
+         of axis to use on identity/degenerate quaternions (optional, default returns 0,vec3(0,0,1))
         </li>
     </ul>
 
@@ -1070,7 +1132,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2017-03-29 07:43:35 </i>
+<i style="float:right;">Last updated 2021-06-23 22:50:22 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -1,0 +1,669 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>CPML documentation</title>
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>CPML</h1>
+
+
+<ul>
+  <li><a href="../index.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>bound2</strong></li>
+  <li><a href="../modules/bound3.html">bound3</a></li>
+  <li><a href="../modules/bvh.html">bvh</a></li>
+  <li><a href="../modules/color.html">color</a></li>
+  <li><a href="../modules/constants.html">constants</a></li>
+  <li><a href="../modules/intersect.html">intersect</a></li>
+  <li><a href="../modules/mat4.html">mat4</a></li>
+  <li><a href="../modules/mesh.html">mesh</a></li>
+  <li><a href="../modules/octree.html">octree</a></li>
+  <li><a href="../modules/quat.html">quat</a></li>
+  <li><a href="../modules/simplex.html">simplex</a></li>
+  <li><a href="../modules/utils.html">utils</a></li>
+  <li><a href="../modules/vec2.html">vec2</a></li>
+  <li><a href="../modules/vec3.html">vec3</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>bound2</code></h1>
+<p>A 2 component bounding box.</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new (min, max)</a></td>
+	<td class="summary">The public constructor.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#clone">clone (a)</a></td>
+	<td class="summary">Clone a bound.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#at">at (a, b)</a></td>
+	<td class="summary">Construct a bound covering one or two points</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#extend">extend (a, point)</a></td>
+	<td class="summary">Extend bound to include point</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#extend_bound">extend_bound (a, bound)</a></td>
+	<td class="summary">Extend bound to entirety of other bound</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#size">size (a)</a></td>
+	<td class="summary">Get size of bounding box as a vector</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#with_size">with_size (a, new)</a></td>
+	<td class="summary">Resize bounding box from minimum corner</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#radius">radius (a)</a></td>
+	<td class="summary">Get half-size of bounding box as a vector.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#center">center (a)</a></td>
+	<td class="summary">Get center of bounding box</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#with_center">with_center (a, new)</a></td>
+	<td class="summary">Move bounding box to new center</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#with_size_centered">with_size_centered (a, new)</a></td>
+	<td class="summary">Resize bounding box from center</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#check">check (a)</a></td>
+	<td class="summary">Convert possibly-invalid bounding box to valid one</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#inset">inset (a, a)</a></td>
+	<td class="summary">Shrink bounding box with fixed margin</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#outset">outset (a, a)</a></td>
+	<td class="summary">Expand bounding box with fixed margin</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#offset">offset (a, offset)</a></td>
+	<td class="summary">Offset bounding box</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#contains">contains (a, point)</a></td>
+	<td class="summary">Test if point in bound</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_string">to_string (a)</a></td>
+	<td class="summary">Return a formatted string.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new (min, max)</strong>
+    </dt>
+    <dd>
+    The public constructor.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">min</span>
+         Can be of two types: </br>
+ vec2 min, minimum value for each component
+ nil Create bound at single point 0,0
+        </li>
+        <li><span class="parameter">max</span>
+            <span class="types"><span class="type">vec2</span></span>
+        , maximum value for each component
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "clone"></a>
+    <strong>clone (a)</strong>
+    </dt>
+    <dd>
+    Clone a bound.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound to be cloned
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "at"></a>
+    <strong>at (a, b)</strong>
+    </dt>
+    <dd>
+    Construct a bound covering one or two points
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">vec2</span></span>
+         Any vector
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><span class="type">vec2</span></span>
+         Any second vector (optional)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">vec2</span></span>
+        Minimum bound containing the given points
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "extend"></a>
+    <strong>extend (a, point)</strong>
+    </dt>
+    <dd>
+    Extend bound to include point
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+        <li><span class="parameter">point</span>
+            <span class="types"><span class="type">vec2</span></span>
+         to include
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        Bound covering current min, current max and new point
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "extend_bound"></a>
+    <strong>extend_bound (a, bound)</strong>
+    </dt>
+    <dd>
+    Extend bound to entirety of other bound
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+        <li><span class="parameter">bound</span>
+            <span class="types"><span class="type">bound2</span></span>
+         to cover
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        Bound covering current min and max of each bound in the pair
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "size"></a>
+    <strong>size (a)</strong>
+    </dt>
+    <dd>
+    Get size of bounding box as a vector
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">vec2</span></span>
+        Vector spanning min to max points
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "with_size"></a>
+    <strong>with_size (a, new)</strong>
+    </dt>
+    <dd>
+    Resize bounding box from minimum corner
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+        <li><span class="parameter">new</span>
+            <span class="types"><span class="type">vec2</span></span>
+         size
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        resized bound
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "radius"></a>
+    <strong>radius (a)</strong>
+    </dt>
+    <dd>
+    Get half-size of bounding box as a vector.  A more correct term for this is probably "apothem"
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">vec2</span></span>
+        Vector spanning center to max point
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "center"></a>
+    <strong>center (a)</strong>
+    </dt>
+    <dd>
+    Get center of bounding box
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        Point in center of bound
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "with_center"></a>
+    <strong>with_center (a, new)</strong>
+    </dt>
+    <dd>
+    Move bounding box to new center
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+        <li><span class="parameter">new</span>
+            <span class="types"><span class="type">vec2</span></span>
+         center
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        Bound with same size as input but different center
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "with_size_centered"></a>
+    <strong>with_size_centered (a, new)</strong>
+    </dt>
+    <dd>
+    Resize bounding box from center
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+        <li><span class="parameter">new</span>
+            <span class="types"><span class="type">vec2</span></span>
+         size
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        resized bound
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "check"></a>
+    <strong>check (a)</strong>
+    </dt>
+    <dd>
+    Convert possibly-invalid bounding box to valid one
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        bound with all components corrected for min-max property
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "inset"></a>
+    <strong>inset (a, a)</strong>
+    </dt>
+    <dd>
+    Shrink bounding box with fixed margin
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">vec2</span></span>
+         margin
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">vec2</span></span>
+         margin
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        bound with margin subtracted from all edges. May not be valid, consider calling check()
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "outset"></a>
+    <strong>outset (a, a)</strong>
+    </dt>
+    <dd>
+    Expand bounding box with fixed margin
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">vec2</span></span>
+         margin
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">vec2</span></span>
+         margin
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        bound with margin added to all edges. May not be valid, consider calling check()
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "offset"></a>
+    <strong>offset (a, offset)</strong>
+    </dt>
+    <dd>
+    Offset bounding box
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+        <li><span class="parameter">offset</span>
+            <span class="types"><span class="type">vec2</span></span>
+
+
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bound2</span></span>
+        bound with same size, but position moved by offset
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "contains"></a>
+    <strong>contains (a, point)</strong>
+    </dt>
+    <dd>
+    Test if point in bound
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound
+        </li>
+        <li><span class="parameter">point</span>
+            <span class="types"><span class="type">vec2</span></span>
+         to test
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        true if point in bounding box
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_string"></a>
+    <strong>to_string (a)</strong>
+    </dt>
+    <dd>
+    Return a formatted string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">bound2</span></span>
+         bound to be turned into a string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        formatted
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2021-06-23 22:50:22 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

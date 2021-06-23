@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
     <title>CPML documentation</title>
-    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+    <link rel="stylesheet" href="../ldoc_new.css" type="text/css" />
 </head>
 <body>
 
@@ -26,14 +26,23 @@
 <br/>
 <h1>CPML</h1>
 
+
 <ul>
   <li><a href="../index.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Fields">Fields</a></li>
+</ul>
 
 
 <h2>Modules</h2>
 <ul class="nowrap">
+  <li><a href="../modules/bound2.html">bound2</a></li>
+  <li><a href="../modules/bound3.html">bound3</a></li>
+  <li><a href="../modules/bvh.html">bvh</a></li>
   <li><strong>color</strong></li>
   <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
@@ -45,6 +54,10 @@
   <li><a href="../modules/utils.html">utils</a></li>
   <li><a href="../modules/vec2.html">vec2</a></li>
   <li><a href="../modules/vec3.html">vec3</a></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="../topics/README.md.html">README</a></li>
 </ul>
 
 </div>
@@ -58,18 +71,547 @@
 </p>
 
 
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new (x, g, b, a)</a></td>
+	<td class="summary">The public constructor.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_hsv">from_hsv (h, s, v)</a></td>
+	<td class="summary">Convert hue,saturation,value to color object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#from_hsva">from_hsva (h, s, v, a)</a></td>
+	<td class="summary">Convert hue,saturation,value to color object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#invert">invert (to)</a></td>
+	<td class="summary">Invert a color.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#lighten">lighten (to, amount)</a></td>
+	<td class="summary">Lighten a color by a component-wise fixed amount (alpha unchanged)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#darken">darken (to, amount)</a></td>
+	<td class="summary">Darken a color by a component-wise fixed amount (alpha unchanged)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#multiply">multiply (to, to)</a></td>
+	<td class="summary">Multiply a color's components by a value (alpha unchanged)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#opacity">opacity (to, to)</a></td>
+	<td class="summary">Multiply a color's alpha by a value</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#hue">hue (to, to)</a></td>
+	<td class="summary">Set a color's hue (saturation, value, alpha unchanged)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#saturation">saturation (to, to)</a></td>
+	<td class="summary">Set a color's saturation (hue, value, alpha unchanged)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#value">value (to, to)</a></td>
+	<td class="summary">Set a color's value (saturation, hue, alpha unchanged)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#is_color">is_color (to)</a></td>
+	<td class="summary">Check if color is valid</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#to_string">to_string (a)</a></td>
+	<td class="summary">Return a formatted string.</td>
+	</tr>
+</table>
+<h2><a href="#Fields">Fields</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#hsv_to_color_table">hsv_to_color_table</a></td>
+	<td class="summary">Convert hue,saturation,value table to color object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#color_to_hsv_table">color_to_hsv_table</a></td>
+	<td class="summary">Convert color to hue,saturation,value table</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new (x, g, b, a)</strong>
+    </dt>
+    <dd>
+    The public constructor.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+         Can be of three types: </br>
+ number red component 0-255
+ table {r, g, b, a}
+ nil for {0,0,0,0}
+        </li>
+        <li><span class="parameter">g</span>
+            <span class="types"><span class="type">number</span></span>
+         Green component 0-255
+        </li>
+        <li><span class="parameter">b</span>
+            <span class="types"><span class="type">number</span></span>
+         Blue component 0-255
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">number</span></span>
+         Alpha component 0-255
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_hsv"></a>
+    <strong>from_hsv (h, s, v)</strong>
+    </dt>
+    <dd>
+    Convert hue,saturation,value to color object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">h</span>
+            <span class="types"><span class="type">number</span></span>
+         hue 0-359
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><span class="type">number</span></span>
+         saturation 0-1
+        </li>
+        <li><span class="parameter">v</span>
+            <span class="types"><span class="type">number</span></span>
+         value 0-1
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "from_hsva"></a>
+    <strong>from_hsva (h, s, v, a)</strong>
+    </dt>
+    <dd>
+    Convert hue,saturation,value to color object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">h</span>
+            <span class="types"><span class="type">number</span></span>
+         hue 0-359
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><span class="type">number</span></span>
+         saturation 0-1
+        </li>
+        <li><span class="parameter">v</span>
+            <span class="types"><span class="type">number</span></span>
+         value 0-1
+        </li>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">number</span></span>
+         alpha 0-255
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "invert"></a>
+    <strong>invert (to)</strong>
+    </dt>
+    <dd>
+    Invert a color.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">color</span></span>
+         invert
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "lighten"></a>
+    <strong>lighten (to, amount)</strong>
+    </dt>
+    <dd>
+    Lighten a color by a component-wise fixed amount (alpha unchanged)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">color</span></span>
+         lighten
+        </li>
+        <li><span class="parameter">amount</span>
+            <span class="types"><span class="type">number</span></span>
+         to increase each component by, 0-255 scale
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "darken"></a>
+    <strong>darken (to, amount)</strong>
+    </dt>
+    <dd>
+    Darken a color by a component-wise fixed amount (alpha unchanged)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">color</span></span>
+         darken
+        </li>
+        <li><span class="parameter">amount</span>
+            <span class="types"><span class="type">number</span></span>
+         to decrease each component by, 0-255 scale
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "multiply"></a>
+    <strong>multiply (to, to)</strong>
+    </dt>
+    <dd>
+    Multiply a color's components by a value (alpha unchanged)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">number</span></span>
+         multiply each component by
+        </li>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">number</span></span>
+         multiply each component by
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "opacity"></a>
+    <strong>opacity (to, to)</strong>
+    </dt>
+    <dd>
+    Multiply a color's alpha by a value
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">number</span></span>
+         multiply alpha by
+        </li>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">number</span></span>
+         multiply alpha by
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "hue"></a>
+    <strong>hue (to, to)</strong>
+    </dt>
+    <dd>
+    Set a color's hue (saturation, value, alpha unchanged)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
+         set 0-359
+        </li>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
+         set 0-359
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "saturation"></a>
+    <strong>saturation (to, to)</strong>
+    </dt>
+    <dd>
+    Set a color's saturation (hue, value, alpha unchanged)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
+         set 0-359
+        </li>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
+         set 0-359
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "value"></a>
+    <strong>value (to, to)</strong>
+    </dt>
+    <dd>
+    Set a color's value (saturation, hue, alpha unchanged)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
+         set 0-359
+        </li>
+        <li><span class="parameter">to</span>
+            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
+         set 0-359
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "is_color"></a>
+    <strong>is_color (to)</strong>
+    </dt>
+    <dd>
+    Check if color is valid
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">color</span></span>
+         test
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">boolean</span></span>
+        is color
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "to_string"></a>
+    <strong>to_string (a)</strong>
+    </dt>
+    <dd>
+    Return a formatted string.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">a</span>
+            <span class="types"><span class="type">color</span></span>
+         color to be turned into a string
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        formatted
+    </ol>
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "hsv_to_color_table"></a>
+    <strong>hsv_to_color_table</strong>
+    </dt>
+    <dd>
+    Convert hue,saturation,value table to color object.
+
+
+    <ul>
+        <li><span class="parameter">hsva</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         {hue 0-359, saturation 0-1, value 0-1, alpha 0-255}
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "color_to_hsv_table"></a>
+    <strong>color_to_hsv_table</strong>
+    </dt>
+    <dd>
+    Convert color to hue,saturation,value table
+
+
+    <ul>
+        <li><span class="parameter">in</span>
+            <span class="types"><span class="type">color</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2017-03-29 07:43:35 </i>
+<i style="float:right;">Last updated 2021-06-23 22:50:22 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

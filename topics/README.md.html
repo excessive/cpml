@@ -31,19 +31,19 @@
   <li><a href="../index.html">Index</a></li>
 </ul>
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#Tables">Tables</a></li>
+
+
+<h2>Topics</h2>
+<ul class="">
+  <li><strong>README</strong></li>
 </ul>
-
-
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/bound2.html">bound2</a></li>
   <li><a href="../modules/bound3.html">bound3</a></li>
   <li><a href="../modules/bvh.html">bvh</a></li>
   <li><a href="../modules/color.html">color</a></li>
-  <li><strong>constants</strong></li>
+  <li><a href="../modules/constants.html">constants</a></li>
   <li><a href="../modules/intersect.html">intersect</a></li>
   <li><a href="../modules/mat4.html">mat4</a></li>
   <li><a href="../modules/mesh.html">mesh</a></li>
@@ -54,64 +54,29 @@
   <li><a href="../modules/vec2.html">vec2</a></li>
   <li><a href="../modules/vec3.html">vec3</a></li>
 </ul>
-<h2>Topics</h2>
-<ul class="">
-  <li><a href="../topics/README.md.html">README</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Module <code>constants</code></h1>
-<p>Various useful constants</p>
-<p>
 
-</p>
+<h1>Cirno's Perfect Math Library</h1>
 
+<p><a href="https://travis-ci.com/excessive/cpml"><img src="https://travis-ci.com/excessive/cpml.svg?branch=master" alt="Build Status"/></a>
+<a href="https://coveralls.io/github/excessive/cpml?branch=master"><img src="https://coveralls.io/repos/github/excessive/cpml/badge.svg?branch=master" alt="Coverage Status"/></a></p>
 
-<h2><a href="#Tables">Tables</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#constants">constants</a></td>
-	<td class="summary">Constants</td>
-	</tr>
-</table>
+<p>Various useful bits of game math. 3D line intersections, ray casting, 2d/3d vectors, 4x4 matrices, quaternions, etc.</p>
 
-<br/>
-<br/>
+<p>Intended to be used with LuaJIT and LÖVE (this is the backbone of LÖVE3D).</p>
 
+<p>Online documentation can be found <a href="http://excessive.github.io/cpml/">here</a> or you can generate them yourself using <code>ldoc -c doc/config.ld -o index .</code></p>
 
-    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
+<h1>Installation</h1>
+<p>Clone the repository and require it, or if you prefer luarocks: <code>$ luarocks install --server=http://luarocks.org/dev cpml</code>. Add <code>--tree=whatever</code> for a local install.</p>
 
-    <dl class="function">
-    <dt>
-    <a name = "constants"></a>
-    <strong>constants</strong>
-    </dt>
-    <dd>
-    Constants
+<h1>Versions</h1>
 
-
-    <h3>Fields:</h3>
-    <ul>
-        <li><span class="parameter">FLT_EPSILON</span>
-         Floating point precision breaks down
-        </li>
-        <li><span class="parameter">DBL_EPSILON</span>
-         Double-precise floating point precision breaks down
-        </li>
-        <li><span class="parameter">DOT_THRESHOLD</span>
-         Close enough to 1 for interpolations to occur
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-</dl>
+<p>This library has a major compatibility break at version 1.0. Up to version 0.10, composition a<em>b means "apply b, then a" for quaternions and "apply a, then b" for matrices. Now as of version 1.0, the two are consistent and matrix a</em>b means "apply b, then a".</p>
 
 
 </div> <!-- id="content" -->
