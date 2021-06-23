@@ -1,0 +1,44 @@
+name: Validate Code
+
+on:
+  pull_request:
+    branches:
+    - master
+    - refactor
+  push:
+    branches:
+    - master
+    - refactor
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        luaVersion: ["5.1.5", "luajit-2.0.5", "luajit-2.1.0-beta3"]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v8.0.0
+      with:
+        luaVersion: ${{ matrix.luaVersion }}
+    - name: Setup Lua Rocks
+      uses: leafo/gh-actions-luarocks@v4
+    - name: Install dependencies
+      run: |
+        luarocks --local install busted
+        luarocks --local install luacov
+        luarocks --local install luacov-coveralls
+    - name: Run busted
+      run: ~/.luarocks/bin/busted --verbose --coverage spec
+    - name: Upload coverage
+      continue-on-error: true # don't know why coveralls isn't uploading. For now, let this fail.
+      run: |
+        # ignore dotfile directories created by lua setup
+        ~/.luarocks/bin/luacov-coveralls --exclude '^%.%a+$' --repo-token WcsY9jsU97Zt0ZIbGHJftGkC8DsD16FVl
+    # - name: Run luacheck
+    #   run: luacheck --std max+busted *.lua spec
+
