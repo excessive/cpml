@@ -7,3 +7,6 @@ file = {
    "../init.lua",
    "../modules"
 }
+dir='./out'
+readme='../README.md'
+style='!new'

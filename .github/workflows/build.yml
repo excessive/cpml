@@ -1,0 +1,31 @@
+# Based on https://gist.github.com/domenic/ec8b0fc8ab45f39403dd
+name: Documentation
+
+on:
+  pull_request: # Build on pull requests to ensure they don't break docs.
+    branches:
+    - master
+  push:         # We'll only push new docs when master is updated (see below).
+    branches:
+    - master
+
+jobs:
+  build:
+    name: Build Docs
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Lua
+      uses: leafo/gh-actions-lua@v8
+      with:
+        luaVersion: 5.4
+    - name: Setup Lua Rocks
+      uses: leafo/gh-actions-luarocks@v4
+    - name: Setup and run ldoc
+      run: bash ./doc/install_and_build_docs
+    - name: Deploy
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./doc/out
