@@ -37,7 +37,7 @@ jobs:
     - name: Upload coverage
       run: |
         # ignore dotfile directories created by lua setup
-        ~/.luarocks/bin/luacov-coveralls --exclude '^%.%a+$'
+        ~/.luarocks/bin/luacov-coveralls --exclude '^%.%a+$' --repo-token WcsY9jsU97Zt0ZIbGHJftGkC8DsD16FVl
     # - name: Run luacheck
     #   run: luacheck --std max+busted *.lua spec
 
