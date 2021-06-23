@@ -35,6 +35,7 @@ jobs:
     - name: Run busted
       run: ~/.luarocks/bin/busted --verbose --coverage spec
     - name: Upload coverage
+      continue-on-error: true # don't know why coveralls isn't uploading. For now, let this fail.
       run: |
         # ignore dotfile directories created by lua setup
         ~/.luarocks/bin/luacov-coveralls --exclude '^%.%a+$' --repo-token WcsY9jsU97Zt0ZIbGHJftGkC8DsD16FVl
