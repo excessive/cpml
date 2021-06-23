@@ -1,0 +1,13 @@
+#! /bin/sh
+
+# on github, leafo/gh-actions-lua leafo/gh-actions-luarocks setup luarocks for us.
+#~ sudo apt-get install lua5.3 liblua5.3-dev luarocks
+
+# github ldoc is far ahead of the released version.
+echo ldoc version:
+git ls-remote https://github.com/lunarmodules/LDoc master
+luarocks --local install https://raw.githubusercontent.com/lunarmodules/LDoc/master/ldoc-scm-3.rockspec
+
+echo
+cd ./doc
+~/.luarocks/bin/ldoc .
