@@ -389,18 +389,14 @@ function mat4.invert(out, a)
 	tm4[15] = -a[1] * a[6]  * a[15] + a[1] * a[7]  * a[14] + a[5]  * a[2] * a[15] - a[5]  * a[3] * a[14] - a[13] * a[2] * a[7]  + a[13] * a[3] * a[6]
 	tm4[16] =  a[1] * a[6]  * a[11] - a[1] * a[7]  * a[10] - a[5]  * a[2] * a[11] + a[5]  * a[3] * a[10] + a[9]  * a[2] * a[7]  - a[9]  * a[3] * a[6]
 
-	for i=1, 16 do
-		out[i] = tm4[i]
-	end
-
-	local det = a[1] * out[1] + a[2] * out[5] + a[3] * out[9] + a[4] * out[13]
+	local det = a[1] * tm4[1] + a[2] * tm4[5] + a[3] * tm4[9] + a[4] * tm4[13]
 
 	if det == 0 then return a end
 
 	det = 1 / det
 
 	for i = 1, 16 do
-		out[i] = out[i] * det
+		out[i] = tm4[i] * det
 	end
 
 	return out
