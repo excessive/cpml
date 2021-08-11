@@ -236,10 +236,10 @@ function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity
 	local isOpenGL    = true
 
 	local function CreateNDCScaleAndOffsetFromFov(tanHalfFov)
-		x_scale  = 2 / (tanHalfFov.LeftTan + tanHalfFov.RightTan)
-		x_offset =     (tanHalfFov.LeftTan - tanHalfFov.RightTan) * x_scale * 0.5
-		y_scale  = 2 / (tanHalfFov.UpTan   + tanHalfFov.DownTan )
-		y_offset =     (tanHalfFov.UpTan   - tanHalfFov.DownTan ) * y_scale * 0.5
+		local x_scale  = 2 / (tanHalfFov.LeftTan + tanHalfFov.RightTan)
+		local x_offset =     (tanHalfFov.LeftTan - tanHalfFov.RightTan) * x_scale * 0.5
+		local y_scale  = 2 / (tanHalfFov.UpTan   + tanHalfFov.DownTan )
+		local y_offset =     (tanHalfFov.UpTan   - tanHalfFov.DownTan ) * y_scale * 0.5
 
 		local result = {
 			Scale  = vec2(x_scale, y_scale),
