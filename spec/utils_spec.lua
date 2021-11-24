@@ -27,6 +27,18 @@ describe("utils:", function()
 		local v = utils.decay(0, 1, 0.5, 1)
 		assert.is_true(tolerance(v, 0.39346934028737))
 	end)
+
+	it("rounds a number", function()
+		-- round up
+		local v = utils.round(1.3252525, 0.01)
+		assert.is_true(tolerance(v, 1.33))
+		-- round down
+		v = utils.round(1.3242525, 0.1)
+		assert.is_true(tolerance(v, 1.3))
+		-- no precision
+		v = utils.round(1.3242525)
+		assert.is_true(tolerance(v, 1))
+	end)
 end)
 
 --[[
@@ -37,7 +49,6 @@ tolerance(value, threshold)
 map(value, min_in, max_in, min_out, max_out)
 lerp(progress, low, high)
 smoothstep(progress, low, high)
-round(value, precision)
 wrap(value, limit)
 is_pot(value)
 project_on(out, a, b)
