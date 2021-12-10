@@ -1,6 +1,8 @@
-local mat4  = require "modules.mat4"
-local vec3  = require "modules.vec3"
-local utils = require "modules.utils"
+local mat4        = require "modules.mat4"
+local vec3        = require "modules.vec3"
+local quat        = require "modules.quat"
+local utils       = require "modules.utils"
+local FLT_EPSILON = require("modules.constants").FLT_EPSILON
 
 describe("mat4:", function()
 	it("creates an identity matrix", function()
@@ -484,6 +486,26 @@ describe("mat4:", function()
 		)
 		assert.is.equal(s, a)
 	end)
+
+	it("creates a matrix out of transform values", function()
+		local scale = vec3(1, 2, 3)
+		local rot = quat.from_angle_axis(math.pi * 0.5, vec3(0, 1, 0))
+		local trans = vec3(3, 4, 5)
+		local a = mat4.from_transform(trans, rot, scale)
+
+		local v = vec3(-2, 3, 4)
+		-- scaled, rotated, then translated
+		-- v * mT * mR * mS
+
+		local result = a * v
+		local expected = vec3(-9, 10, 3)
+
+		-- float margin is considered
+		assert.is_true(math.abs(expected.x - result.x) < FLT_EPSILON)
+		assert.is_true(math.abs(expected.y - result.y) < FLT_EPSILON)
+		assert.is_true(math.abs(expected.z - result.z) < FLT_EPSILON)
+	end)
+
 end)
 
 --[[
