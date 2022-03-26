@@ -133,14 +133,16 @@ function vec3.div(a, b)
 	)
 end
 
---- Get the unit vector for a vector.
+--- Get the unit vector and length for a vector.
 -- @tparam vec3 a Vector to normalize
 -- @treturn vec3 out
+-- @treturn number length
 function vec3.normalized(a)
 	if a:is_zero() then
-		return new()
+		return new(), 0
 	end
-	return a:scale(1 / a:len())
+	local len = a:len()
+	return a:scale(1 / len), len
 end
 
 --- Trim a vector to a given length
@@ -148,7 +150,8 @@ end
 -- @tparam number len Length to trim the vector to
 -- @treturn vec3 out
 function vec3.trim(a, len)
-	return a:normalized():scale(math.min(a:len(), len))
+	local u, a_len = a:normalized()
+	return u:scale(math.min(a_len, len))
 end
 
 --- Get the cross product of two vectors.

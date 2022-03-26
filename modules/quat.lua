@@ -187,15 +187,18 @@ function quat.pow(a, s)
 	return c
 end
 
---- Normalize a quaternion.
+--- Get the unit and length for a quaternion.
 -- @tparam quat a Quaternion to normalize
 -- @treturn quat out
+-- @treturn number length
 function quat.normalized(a)
 	if a:is_zero() then
-		return new(0, 0, 0, 0)
+		return new(0, 0, 0, 0), 0
 	end
-	return a:scale(1 / a:len())
+	local len = a:len()
+	return a:scale(1 / len), len
 end
+
 
 --- Get the dot product of two quaternions.
 -- @tparam quat a Left hand operand
