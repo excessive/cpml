@@ -4,6 +4,7 @@
 local modules       = (...):gsub('%.[^%.]+$', '') .. "."
 local constants     = require(modules .. "constants")
 local vec3          = require(modules .. "vec3")
+local private       = require(modules .. "_private_utils")
 local DOT_THRESHOLD = constants.DOT_THRESHOLD
 local DBL_EPSILON   = constants.DBL_EPSILON
 local acos          = math.acos
@@ -360,6 +361,16 @@ end
 -- @treturn boolean is_imaginary
 function quat.is_imaginary(a)
 	return a.w == 0
+end
+
+--- Return whether any component is NaN
+-- @tparam quat a Quaternion to be tested
+-- @treturn boolean if x,y,z, or w is NaN
+function quat.has_nan(a)
+	return private.is_nan(a.x) or
+		private.is_nan(a.y) or
+		private.is_nan(a.z) or
+		private.is_nan(a.w)
 end
 
 --- Convert a quaternion into an angle plus axis components.

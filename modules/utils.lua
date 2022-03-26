@@ -128,6 +128,12 @@ function utils.is_pot(value)
 	return (frexp(value)) == 0.5
 end
 
+--- Check if a value is NaN
+-- Returns true if a number is not a valid number
+-- @param value
+-- @return boolean
+utils.is_nan = private.is_nan
+
 -- Originally from vec3
 function utils.project_on(a, b)
 	local s =

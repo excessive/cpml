@@ -28,6 +28,11 @@ describe("utils:", function()
 		assert.is_true(tolerance(v, 0.39346934028737))
 	end)
 
+	it("checks a nan", function()
+		local a = 0/0
+		assert.is_true(utils.is_nan(a))
+	end)
+
 	it("rounds a number", function()
 		-- round up
 		local v = utils.round(1.3252525, 0.01)

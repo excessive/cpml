@@ -6,6 +6,7 @@ local vec2      = require(modules .. "vec2")
 local vec3      = require(modules .. "vec3")
 local quat      = require(modules .. "quat")
 local utils     = require(modules .. "utils")
+local private   = require(modules .. "_private_utils")
 local sqrt      = math.sqrt
 local cos       = math.cos
 local sin       = math.sin
@@ -648,6 +649,18 @@ function mat4.is_mat4(a)
 	end
 
 	return true
+end
+
+--- Return whether any component is NaN
+-- @tparam mat4 a Matrix to be tested
+-- @treturn boolean if any component is NaN
+function vec2.has_nan(a)
+	for i=1, 16 do
+		if private.is_nan(a[i]) then
+			return true
+		end
+	end
+	return false
 end
 
 --- Return a formatted string.
