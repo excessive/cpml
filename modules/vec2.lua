@@ -134,10 +134,10 @@ function vec2.div(a, b)
 	)
 end
 
---- Get the normal of a vector.
+--- Get the unit vector for a vector.
 -- @tparam vec2 a Vector to normalize
 -- @treturn vec2 out
-function vec2.normalize(a)
+function vec2.normalized(a)
 	if a:is_zero() then
 		return new()
 	end
@@ -149,7 +149,7 @@ end
 -- @tparam number len Length to trim the vector to
 -- @treturn vec2 out
 function vec2.trim(a, len)
-	return a:normalize():scale(math.min(a:len(), len))
+	return a:normalized():scale(math.min(a:len(), len))
 end
 
 --- Get the cross product of two vectors.

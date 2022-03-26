@@ -136,9 +136,9 @@ end
 -- @tparam vec3 up Up direction
 -- @treturn mat4 out
 function mat4.from_direction(direction, up)
-	local forward = vec3.normalize(direction)
-	local side = vec3.cross(forward, up):normalize()
-	local new_up = vec3.cross(side, forward):normalize()
+	local forward = vec3.normalized(direction)
+	local side = vec3.cross(forward, up):normalized()
+	local new_up = vec3.cross(side, forward):normalized()
 
 	local out = new()
 	out[1]    = side.x
@@ -528,8 +528,8 @@ end
 -- @tparam vec3 up Up direction
 -- @treturn mat4 out
 function mat4.look_at(out, a, eye, look_at, up)
-	local z_axis = (eye - look_at):normalize()
-	local x_axis = up:cross(z_axis):normalize()
+	local z_axis = (eye - look_at):normalized()
+	local x_axis = up:cross(z_axis):normalized()
 	local y_axis = z_axis:cross(x_axis)
 	out[1] = x_axis.x
 	out[2] = y_axis.x
@@ -718,7 +718,7 @@ function mat4.to_quat(a)
 		w
 	)
 
-	return q:normalize(q)
+	return q:normalized(q)
 end
 
 -- http://www.crownandcutlass.com/features/technicaldetails/frustum.html

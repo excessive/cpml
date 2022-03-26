@@ -41,7 +41,7 @@ describe("quat:", function()
 	end)
 
 	it("creates a quaternion from a direction", function()
-		local v = vec3(-80, 80, -80):normalize()
+		local v = vec3(-80, 80, -80):normalized()
 		local a = quat.from_direction(v, vec3.unit_z)
 		assert.is_true(utils.tolerance(-0.577-a.x, 0.001))
 		assert.is_true(utils.tolerance(-0.577-a.y, 0.001))
@@ -127,8 +127,8 @@ describe("quat:", function()
 	end)
 
 	it("verifies quat composition order", function()
-		local a = quat(2, 3, 4, 1):normalize() -- Only the normal quaternions represent rotations
-		local b = quat(3, 6, 9, 1):normalize()
+		local a = quat(2, 3, 4, 1):normalized() -- Only the normal quaternions represent rotations
+		local b = quat(3, 6, 9, 1):normalized()
 		local c = a * b
 
 		local v = vec3(3, 4, 5)
@@ -140,7 +140,7 @@ describe("quat:", function()
 	end)
 
 	it("multiplies a quaternion by an exponent of 0", function()
-		local a = quat(2, 3, 4, 1):normalize()
+		local a = quat(2, 3, 4, 1):normalized()
 		local e = 0
 		local b = a:pow(e)
 		local c = a^e
@@ -153,7 +153,7 @@ describe("quat:", function()
 	end)
 
 	it("multiplies a quaternion by a positive exponent", function()
-		local a = quat(2, 3, 4, 1):normalize()
+		local a = quat(2, 3, 4, 1):normalized()
 		local e = 0.75
 		local b = a:pow(e)
 		local c = a^e
@@ -166,7 +166,7 @@ describe("quat:", function()
 	end)
 
 	it("multiplies a quaternion by a negative exponent", function()
-		local a = quat(2, 3, 4, 1):normalize()
+		local a = quat(2, 3, 4, 1):normalized()
 		local e = -1
 		local b = a:pow(e)
 		local c = a^e
@@ -187,7 +187,7 @@ describe("quat:", function()
 	end)
 
 	it("normalizes a quaternion", function()
-		local a = quat(1, 1, 1, 1):normalize()
+		local a = quat(1, 1, 1, 1):normalized()
 		assert.is.equal(0.5, a.x)
 		assert.is.equal(0.5, a.y)
 		assert.is.equal(0.5, a.z)

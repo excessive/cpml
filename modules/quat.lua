@@ -103,7 +103,7 @@ end
 -- @treturn quat out
 function quat.from_direction(normal, up)
 	local u = up or vec3.unit_z
-	local n = normal:normalize()
+	local n = normal:normalized()
 	local a = u:cross(n)
 	local d = u:dot(n)
 	return new(a.x, a.y, a.z, d + 1)
@@ -182,7 +182,7 @@ function quat.pow(a, s)
 	dot = min(max(dot, -1), 1)
 
 	local theta = acos(dot) * s
-	local c = new(a.x, a.y, a.z, 0):normalize() * sin(theta)
+	local c = new(a.x, a.y, a.z, 0):normalized() * sin(theta)
 	c.w = cos(theta)
 	return c
 end
@@ -190,7 +190,7 @@ end
 --- Normalize a quaternion.
 -- @tparam quat a Quaternion to normalize
 -- @treturn quat out
-function quat.normalize(a)
+function quat.normalized(a)
 	if a:is_zero() then
 		return new(0, 0, 0, 0)
 	end
@@ -257,7 +257,7 @@ function quat.inverse(a)
 	tmp.y = -a.y
 	tmp.z = -a.z
 	tmp.w =  a.w
-	return tmp:normalize()
+	return tmp:normalized()
 end
 
 --- Return the reciprocal of a quaternion.
@@ -283,7 +283,7 @@ end
 -- @tparam number s Step value
 -- @treturn quat out
 function quat.lerp(a, b, s)
-	return (a + (b - a) * s):normalize()
+	return (a + (b - a) * s):normalized()
 end
 
 --- Slerp between two quaternions.
@@ -306,7 +306,7 @@ function quat.slerp(a, b, s)
 	dot = min(max(dot, -1), 1)
 
 	local theta = acos(dot) * s
-	local c = (b - a * dot):normalize()
+	local c = (b - a * dot):normalized()
 	return a * cos(theta) + c * sin(theta)
 end
 
@@ -383,7 +383,7 @@ end
 -- @treturn z axis-z
 function quat.to_angle_axis_unpack(a, identityAxis)
 	if a.w > 1 or a.w < -1 then
-		a = a:normalize()
+		a = a:normalized()
 	end
 
 	-- If length of xyz components is less than DBL_EPSILON, this is zero or close enough (an identity quaternion)

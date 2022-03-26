@@ -289,7 +289,7 @@ describe("mat4:", function()
 
 	it("reflects a matrix along a plane", function()
 		local origin = vec3(5, 1, 0)
-		local normal = vec3(0, -1, 0):normalize()
+		local normal = vec3(0, -1, 0):normalized()
 		local a = mat4():reflect(mat4(), origin, normal)
 		local p = a * vec3(-5, 2, 5)
 		assert.is.equal(p.x, -5)

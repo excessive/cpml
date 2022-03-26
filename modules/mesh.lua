@@ -20,7 +20,7 @@ end
 function mesh.normal(triangle)
 	local ba = triangle[2] - triangle[1]
 	local ca = triangle[3] - triangle[1]
-	return ba:cross(ca):normalize()
+	return ba:cross(ca):normalized()
 end
 
 -- triangle[1] is a vec3

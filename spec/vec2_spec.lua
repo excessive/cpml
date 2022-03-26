@@ -111,7 +111,7 @@ describe("vec2:", function()
 
 	it("normalizes a vector", function()
 		local a = vec2(3, 5)
-		local b = a:normalize()
+		local b = a:normalized()
 		assert.is_true(abs(b:len()-1) < DBL_EPSILON)
 		end)
 

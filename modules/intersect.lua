@@ -181,7 +181,7 @@ end
 -- aabb.min      is a vec3
 -- aabb.max      is a vec3
 function intersect.ray_aabb(ray, aabb)
-	local dir     = ray.direction:normalize()
+	local dir     = ray.direction:normalized()
 	local dirfrac = vec3(
 		1 / dir.x,
 		1 / dir.y,
