@@ -36,7 +36,7 @@ local function identity(m)
 end
 
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
-local status, ffi, the_type
+local status, ffi
 if type(jit) == "table" and jit.status() then
    --  status, ffi = pcall(require, "ffi")
     if status then
@@ -49,7 +49,6 @@ end
 local tmp = new()
 local tm4 = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 local tv4 = { 0, 0, 0, 0 }
-local forward, side, new_up = vec3(), vec3(), vec3()
 
 --- The public constructor.
 -- @param a Can be of four types: </br>
@@ -237,10 +236,10 @@ function mat4.from_hmd_perspective(tanHalfFov, zNear, zFar, flipZ, farAtInfinity
 	local isOpenGL    = true
 
 	local function CreateNDCScaleAndOffsetFromFov(tanHalfFov)
-		x_scale  = 2 / (tanHalfFov.LeftTan + tanHalfFov.RightTan)
-		x_offset =     (tanHalfFov.LeftTan - tanHalfFov.RightTan) * x_scale * 0.5
-		y_scale  = 2 / (tanHalfFov.UpTan   + tanHalfFov.DownTan )
-		y_offset =     (tanHalfFov.UpTan   - tanHalfFov.DownTan ) * y_scale * 0.5
+		local x_scale  = 2 / (tanHalfFov.LeftTan + tanHalfFov.RightTan)
+		local x_offset =     (tanHalfFov.LeftTan - tanHalfFov.RightTan) * x_scale * 0.5
+		local y_scale  = 2 / (tanHalfFov.UpTan   + tanHalfFov.DownTan )
+		local y_offset =     (tanHalfFov.UpTan   - tanHalfFov.DownTan ) * y_scale * 0.5
 
 		local result = {
 			Scale  = vec2(x_scale, y_scale),
@@ -448,7 +447,7 @@ function mat4.rotate(out, a, angle, axis)
 	tmp[3]  = x * z * (1 - c) - y * s
 	tmp[5]  = x * y * (1 - c) - z * s
 	tmp[6]  = y * y * (1 - c) + c
- 	tmp[7]  = y * z * (1 - c) + x * s
+	tmp[7]  = y * z * (1 - c) + x * s
 	tmp[9]  = x * z * (1 - c) + y * s
 	tmp[10] = y * z * (1 - c) - x * s
 	tmp[11] = z * z * (1 - c) + c
