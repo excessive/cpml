@@ -116,6 +116,18 @@ describe("color:", function()
 		assert.is.equal(r[1], 0)
 	end)
 
+	it("multiply a color by a scalar", function()
+		local c = color(1, 1, 1, 1)
+		local r = c:multiply(0.04)
+		assert.is.equal(r[1], 0.04)
+
+		r = c:multiply(0)
+		for i=1,3 do
+			assert.is.equal(0, r[i])
+		end
+		assert.is.equal(1, r[4])
+	end)
+
 	it("modify alpha", function()
 		local c = color(1, 1, 1, 1)
 		local r = c:alpha(0.1)
@@ -127,12 +139,39 @@ describe("color:", function()
 		assert.is.equal(r[4], 0.25)
 	end)
 
+	it("invert", function()
+		local c = color(1, 0.6, 0.25, 1)
+		local r = c:invert()
+		assert_is_float_equal(r[1], 0)
+		assert_is_float_equal(r[2], 0.4)
+		assert_is_float_equal(r[3], 0.75)
+		assert_is_float_equal(r[4], 1)
+		r = c:invert()
+			:invert()
+		for i=1,4 do
+			assert.is.equal(c[i], r[i])
+		end
+	end)
+
+	it("lerp", function()
+		local a = color(1, 0.6, 0.25, 1)
+		local b = color(1, 0.8, 0.75, 0.5)
+		local r = a:lerp(b, 0.5)
+		assert_is_float_equal(r[1], 1)
+		assert_is_float_equal(r[2], 0.7)
+		assert_is_float_equal(r[3], 0.5)
+		assert_is_float_equal(r[4], 0.75)
+		local r_a = a:lerp(b, 0)
+		local r_b = a:lerp(b, 1)
+		for i=1,4 do
+			assert.is.equal(a[i], r_a[i])
+			assert.is.equal(b[i], r_b[i])
+		end
+	end)
+
 end)
 
 --[[
-invert(c)
-lerp(a, b, s)
-multiply(c, v)
 gamma_to_linear(r, g, b, a)
 linear_to_gamma(r, g, b, a)
 to_string(a)

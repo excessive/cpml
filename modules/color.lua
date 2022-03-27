@@ -174,6 +174,11 @@ function color.lighten(c, v)
 	)
 end
 
+--- Interpolate between two colors.
+-- @tparam color at start
+-- @tparam color at end
+-- @tparam number s in 0-1 progress between the two colors
+-- @treturn color out
 function color.lerp(a, b, s)
 	return a + s * (b - a)
 end
