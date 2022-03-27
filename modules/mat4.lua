@@ -6,6 +6,7 @@ local vec2      = require(modules .. "vec2")
 local vec3      = require(modules .. "vec3")
 local quat      = require(modules .. "quat")
 local utils     = require(modules .. "utils")
+local precond   = require(modules .. "_private_precond")
 local private   = require(modules .. "_private_utils")
 local sqrt      = math.sqrt
 local cos       = math.cos
@@ -861,7 +862,7 @@ function mat4_mt.__eq(a, b)
 end
 
 function mat4_mt.__mul(a, b)
-	assert(mat4.is_mat4(a), "__mul: Wrong argument type for left hand operand. (<cpml.mat4> expected)")
+	precond.assert(mat4.is_mat4(a), "__mul: Wrong argument type '%s' for left hand operand. (<cpml.mat4> expected)", type(a))
 
 	if vec3.is_vec3(b) then
 		return vec3(mat4.mul_vec4({}, a, { b.x, b.y, b.z, 1 }))

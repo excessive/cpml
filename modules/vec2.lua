@@ -3,6 +3,7 @@
 
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local vec3    = require(modules .. "vec3")
+local precond = require(modules .. "_private_precond")
 local private = require(modules .. "_private_utils")
 local acos    = math.acos
 local atan2   = math.atan2
@@ -49,16 +50,16 @@ vec2.zero   = new(0, 0)
 function vec2.new(x, y)
 	-- number, number
 	if x and y then
-		assert(type(x) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
+		precond.typeof(x, "number", "new: Wrong argument type for x")
+		precond.typeof(y, "number", "new: Wrong argument type for y")
 
 		return new(x, y)
 
 	-- {x, y} or {x=x, y=y}
 	elseif type(x) == "table" or type(x) == "cdata" then -- table in vanilla lua, cdata in luajit
 		local xx, yy = x.x or x[1], x.y or x[2]
-		assert(type(xx) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(yy) == "number", "new: Wrong argument type for y (<number> expected)")
+		precond.typeof(xx, "number", "new: Wrong argument type for x")
+		precond.typeof(yy, "number", "new: Wrong argument type for y")
 
 		return new(xx, yy)
 
@@ -401,19 +402,19 @@ function vec2_mt.__eq(a, b)
 end
 
 function vec2_mt.__add(a, b)
-	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
-	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operand. (<cpml.vec2> expected)")
+	precond.assert(vec2.is_vec2(a), "__add: Wrong argument type '%s' for left hand operand. (<cpml.vec2> expected)", type(a))
+	precond.assert(vec2.is_vec2(b), "__add: Wrong argument type '%s' for right hand operand. (<cpml.vec2> expected)", type(b))
 	return a:add(b)
 end
 
 function vec2_mt.__sub(a, b)
-	assert(vec2.is_vec2(a), "__add: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
-	assert(vec2.is_vec2(b), "__add: Wrong argument type for right hand operand. (<cpml.vec2> expected)")
+	precond.assert(vec2.is_vec2(a), "__add: Wrong argument type '%s' for left hand operand. (<cpml.vec2> expected)", type(a))
+	precond.assert(vec2.is_vec2(b), "__add: Wrong argument type '%s' for right hand operand. (<cpml.vec2> expected)", type(b))
 	return a:sub(b)
 end
 
 function vec2_mt.__mul(a, b)
-	assert(vec2.is_vec2(a), "__mul: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
+	precond.assert(vec2.is_vec2(a), "__mul: Wrong argument type '%s' for left hand operand. (<cpml.vec2> expected)", type(a))
 	assert(vec2.is_vec2(b) or type(b) == "number", "__mul: Wrong argument type for right hand operand. (<cpml.vec2> or <number> expected)")
 
 	if vec2.is_vec2(b) then
@@ -424,7 +425,7 @@ function vec2_mt.__mul(a, b)
 end
 
 function vec2_mt.__div(a, b)
-	assert(vec2.is_vec2(a), "__div: Wrong argument type for left hand operand. (<cpml.vec2> expected)")
+	precond.assert(vec2.is_vec2(a), "__div: Wrong argument type '%s' for left hand operand. (<cpml.vec2> expected)", type(a))
 	assert(vec2.is_vec2(b) or type(b) == "number", "__div: Wrong argument type for right hand operand. (<cpml.vec2> or <number> expected)")
 
 	if vec2.is_vec2(b) then
