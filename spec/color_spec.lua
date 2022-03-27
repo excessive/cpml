@@ -169,10 +169,16 @@ describe("color:", function()
 		end
 	end)
 
+	it("linear_to_gamma -> gamma_to_linear round trip", function()
+		local c = color(0.25, 0.25, 0.25, 1)
+		local r = color.gamma_to_linear(c:linear_to_gamma())
+		for i=1,4 do
+			assert_is_approx_equal(c[i], r[i])
+		end
+	end)
+
 end)
 
 --[[
-gamma_to_linear(r, g, b, a)
-linear_to_gamma(r, g, b, a)
 to_string(a)
 --]]

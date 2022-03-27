@@ -294,7 +294,7 @@ function color.value(col, percent)
 	return hsv_to_color(c)
 end
 
--- http://en.wikipedia.org/wiki/SRGB#The_reverse_transformation
+-- https://en.wikipedia.org/wiki/SRGB#From_sRGB_to_CIE_XYZ
 function color.gamma_to_linear(r, g, b, a)
 	local function convert(c)
 		if c > 1.0 then
@@ -314,14 +314,14 @@ function color.gamma_to_linear(r, g, b, a)
 			c[i] = convert(r[i])
 		end
 
-		c[4] = convert(r[4])
+		c[4] = r[4]
 		return c
 	else
 		return convert(r), convert(g), convert(b), a or 1
 	end
 end
 
--- http://en.wikipedia.org/wiki/SRGB#The_forward_transformation_.28CIE_xyY_or_CIE_XYZ_to_sRGB.29
+-- https://en.wikipedia.org/wiki/SRGB#From_CIE_XYZ_to_sRGB
 function color.linear_to_gamma(r, g, b, a)
 	local function convert(c)
 		if c > 1.0 then
@@ -341,7 +341,7 @@ function color.linear_to_gamma(r, g, b, a)
 			c[i] = convert(r[i])
 		end
 
-		c[4] = convert(r[4])
+		c[4] = r[4]
 		return c
 	else
 		return convert(r), convert(g), convert(b), a or 1
