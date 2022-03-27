@@ -326,6 +326,14 @@ function vec2.is_zero(a)
 	return a.x == 0 and a.y == 0
 end
 
+--- Return whether either value is NaN
+-- @tparam vec2 a Vector to be tested
+-- @treturn boolean if x or y is nan
+function vec2.has_nan(a)
+	return private.is_nan(a.x) or
+		private.is_nan(a.y)
+end
+
 --- Convert point from cartesian to polar.
 -- @tparam vec2 a Vector to convert
 -- @treturn number radius

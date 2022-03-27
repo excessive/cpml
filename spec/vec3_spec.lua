@@ -40,6 +40,11 @@ describe("vec3:", function()
 		assert.is.equal(7, a.z)
 	end)
 
+	it("creates a vector from nan", function()
+		local a = vec3(0/0)
+		assert.is_true(a:has_nan())
+	end)
+
 	it("clones a vector", function()
 		local a = vec3(3, 5, 7)
 		local b = a:clone()

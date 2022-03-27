@@ -339,6 +339,15 @@ function vec3.is_zero(a)
 	return a.x == 0 and a.y == 0 and a.z == 0
 end
 
+--- Return whether any component is NaN
+-- @tparam vec3 a Vector to be tested
+-- @treturn boolean if x,y, or z are nan
+function vec3.has_nan(a)
+	return private.is_nan(a.x) or
+		private.is_nan(a.y) or
+		private.is_nan(a.z)
+end
+
 --- Return a formatted string.
 -- @tparam vec3 a Vector to be turned into a string
 -- @treturn string formatted
