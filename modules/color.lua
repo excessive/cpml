@@ -21,7 +21,7 @@ local function hsv_to_color(hsv)
 	local i
 	local f, q, p, t
 	local h, s, v
-	local a = hsv[4] or 255
+	local a = hsv[4] or 1
 	s = hsv[2]
 	v = hsv[3]
 
@@ -29,10 +29,10 @@ local function hsv_to_color(hsv)
 		return new(v, v, v, a)
 	end
 
-	h = hsv[1] / 60
+	h = hsv[1] / 60 -- sector 0 to 5
 
 	i = math.floor(h)
-	f = h - i
+	f = h - i -- factorial part of h
 	p = v * (1-s)
 	q = v * (1-s*f)
 	t = v * (1-s*(1-f))
@@ -52,7 +52,7 @@ local function color_to_hsv(c)
 	local r = c[1]
 	local g = c[2]
 	local b = c[3]
-	local a = c[4] or 255
+	local a = c[4] or 1
 	local h, s, v
 
 	local min = math.min(r, g, b)
@@ -72,7 +72,7 @@ local function color_to_hsv(c)
 		-- r = g = b = 0 s = 0, v is undefined
 		s = 0
 		h = -1
-		return { h, s, v, 255 }
+		return { h, s, v, 1 }
 	end
 
 	if r == max then
@@ -94,12 +94,12 @@ end
 
 --- The public constructor.
 -- @param x Can be of three types: </br>
--- number red component 0-255
+-- number red component 0-1
 -- table {r, g, b, a}
 -- nil for {0,0,0,0}
--- @tparam number g Green component 0-255
--- @tparam number b Blue component 0-255
--- @tparam number a Alpha component 0-255
+-- @tparam number g Green component 0-1
+-- @tparam number b Blue component 0-1
+-- @tparam number a Alpha component 0-1
 -- @treturn color out
 function color.new(r, g, b, a)
 	-- number, number, number, number
@@ -126,13 +126,13 @@ function color.new(r, g, b, a)
 end
 
 --- Convert hue,saturation,value table to color object.
--- @tparam table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-255}
+-- @tparam table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-1}
 -- @treturn color out
 color.hsv_to_color_table = hsv_to_color
 
 --- Convert color to hue,saturation,value table
 -- @tparam color in
--- @treturn table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-255}
+-- @treturn table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-1}
 color.color_to_hsv_table = color_to_hsv
 
 --- Convert hue,saturation,value to color object.
@@ -148,7 +148,7 @@ end
 -- @tparam number h hue 0-359
 -- @tparam number s saturation 0-1
 -- @tparam number v value 0-1
--- @tparam number a alpha 0-255
+-- @tparam number a alpha 0-1
 -- @treturn color out
 function color.from_hsva(h, s, v, a)
 	return hsv_to_color { h, s, v, a }
@@ -158,18 +158,18 @@ end
 -- @tparam color to invert
 -- @treturn color out
 function color.invert(c)
-	return new(255 - c[1], 255 - c[2], 255 - c[3], c[4])
+	return new(1 - c[1], 1 - c[2], 1 - c[3], c[4])
 end
 
 --- Lighten a color by a component-wise fixed amount (alpha unchanged)
 -- @tparam color to lighten
--- @tparam number amount to increase each component by, 0-255 scale
+-- @tparam number amount to increase each component by, 0-1 scale
 -- @treturn color out
 function color.lighten(c, v)
 	return new(
-		utils.clamp(c[1] + v, 0, 255),
-		utils.clamp(c[2] + v, 0, 255),
-		utils.clamp(c[3] + v, 0, 255),
+		utils.clamp(c[1] + v, 0, 1),
+		utils.clamp(c[2] + v, 0, 1),
+		utils.clamp(c[3] + v, 0, 1),
 		c[4]
 	)
 end
@@ -178,15 +178,35 @@ function color.lerp(a, b, s)
 	return a + s * (b - a)
 end
 
+--- Unpack a color into individual components in 0-1.
+-- @tparam color to unpack
+-- @treturn number r in 0-1
+-- @treturn number g in 0-1
+-- @treturn number b in 0-1
+-- @treturn number a in 0-1
+function color.unpack(c)
+	return c[1], c[2], c[3], c[4]
+end
+
+--- Unpack a color into individual components in 0-255.
+-- @tparam color to unpack
+-- @treturn number r in 0-255
+-- @treturn number g in 0-255
+-- @treturn number b in 0-255
+-- @treturn number a in 0-255
+function color.as_255(c)
+	return c[1] * 255, c[2] * 255, c[3] * 255, c[4] * 255
+end
+
 --- Darken a color by a component-wise fixed amount (alpha unchanged)
 -- @tparam color to darken
--- @tparam number amount to decrease each component by, 0-255 scale
+-- @tparam number amount to decrease each component by, 0-1 scale
 -- @treturn color out
 function color.darken(c, v)
 	return new(
-		utils.clamp(c[1] - v, 0, 255),
-		utils.clamp(c[2] - v, 0, 255),
-		utils.clamp(c[3] - v, 0, 255),
+		utils.clamp(c[1] - v, 0, 1),
+		utils.clamp(c[2] - v, 0, 1),
+		utils.clamp(c[3] - v, 0, 1),
 		c[4]
 	)
 end
@@ -207,7 +227,7 @@ end
 
 -- directly set alpha channel
 -- @tparam color to alter
--- @tparam number new alpha 0-255
+-- @tparam number new alpha 0-1
 -- @treturn color out
 function color.alpha(c, v)
 	local t = color.new()
@@ -280,13 +300,13 @@ function color.gamma_to_linear(r, g, b, a)
 	if type(r) == "table" then
 		local c = {}
 		for i = 1, 3 do
-			c[i] = convert(r[i] / 255) * 255
+			c[i] = convert(r[i])
 		end
 
-		c[4] = convert(r[4] / 255) * 255
+		c[4] = convert(r[4])
 		return c
 	else
-		return convert(r / 255) * 255, convert(g / 255) * 255, convert(b / 255) * 255, a or 255
+		return convert(r), convert(g), convert(b), a or 1
 	end
 end
 
@@ -307,13 +327,13 @@ function color.linear_to_gamma(r, g, b, a)
 	if type(r) == "table" then
 		local c = {}
 		for i = 1, 3 do
-			c[i] = convert(r[i] / 255) * 255
+			c[i] = convert(r[i])
 		end
 
-		c[4] = convert(r[4] / 255) * 255
+		c[4] = convert(r[4])
 		return c
 	else
-		return convert(r / 255) * 255, convert(g / 255) * 255, convert(b / 255) * 255, a or 255
+		return convert(r), convert(g), convert(b), a or 1
 	end
 end
 
