@@ -10,7 +10,7 @@ local color_mt = {}
 local function new(r, g, b, a)
 	local c = { r, g, b, a }
 	c._c = c
-	return setmetatable(c, color)
+	return setmetatable(c, color_mt)
 end
 
 -- HSV utilities (adapted from http://www.cs.rit.edu/~ncs/color/t_convert.html)
@@ -341,24 +341,7 @@ function color.to_string(a)
 	return string.format("[ %3.0f, %3.0f, %3.0f, %3.0f ]", a[1], a[2], a[3], a[4])
 end
 
-function color_mt.__index(t, k)
-	if type(t) == "cdata" then
-		if type(k) == "number" then
-			return t._c[k-1]
-		end
-	end
-
-	return rawget(color, k)
-end
-
-function color_mt.__newindex(t, k, v)
-	if type(t) == "cdata" then
-		if type(k) == "number" then
-			t._c[k-1] = v
-		end
-	end
-end
-
+color_mt.__index = color
 color_mt.__tostring = color.to_string
 
 function color_mt.__call(_, r, g, b, a)
