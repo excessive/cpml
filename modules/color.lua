@@ -167,9 +167,9 @@ end
 -- @treturn color out
 function color.lighten(c, v)
 	return new(
-		utils.clamp(c[1] + v * 255, 0, 255),
-		utils.clamp(c[2] + v * 255, 0, 255),
-		utils.clamp(c[3] + v * 255, 0, 255),
+		utils.clamp(c[1] + v, 0, 255),
+		utils.clamp(c[2] + v, 0, 255),
+		utils.clamp(c[3] + v, 0, 255),
 		c[4]
 	)
 end
@@ -184,9 +184,9 @@ end
 -- @treturn color out
 function color.darken(c, v)
 	return new(
-		utils.clamp(c[1] - v * 255, 0, 255),
-		utils.clamp(c[2] - v * 255, 0, 255),
-		utils.clamp(c[3] - v * 255, 0, 255),
+		utils.clamp(c[1] - v, 0, 255),
+		utils.clamp(c[2] - v, 0, 255),
+		utils.clamp(c[3] - v, 0, 255),
 		c[4]
 	)
 end
@@ -215,7 +215,7 @@ function color.alpha(c, v)
 		t[i] = c[i]
 	end
 
-	t[4] = v * 255
+	t[4] = v
 	return t
 end
 
@@ -245,7 +245,7 @@ end
 
 --- Set a color's saturation (hue, value, alpha unchanged)
 -- @tparam color to alter
--- @tparam hue to set 0-359
+-- @tparam saturation to set 0-1
 -- @treturn color out
 function color.saturation(col, percent)
 	local c = color_to_hsv(col)
@@ -255,7 +255,7 @@ end
 
 --- Set a color's value (saturation, hue, alpha unchanged)
 -- @tparam color to alter
--- @tparam hue to set 0-359
+-- @tparam value to set 0-1
 -- @treturn color out
 function color.value(col, percent)
 	local c = color_to_hsv(col)
