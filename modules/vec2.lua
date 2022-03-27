@@ -97,6 +97,8 @@ function vec2.add(a, b)
 end
 
 --- Subtract one vector from another.
+-- Order: If a and b are positions, computes the direction and distance from b
+-- to a.
 -- @tparam vec2 a Left hand operand
 -- @tparam vec2 b Right hand operand
 -- @treturn vec2 out
@@ -108,6 +110,7 @@ function vec2.sub(a, b)
 end
 
 --- Multiply a vector by another vector.
+-- Component-size multiplication not matrix multiplication.
 -- @tparam vec2 a Left hand operand
 -- @tparam vec2 b Right hand operand
 -- @treturn vec2 out
@@ -119,6 +122,7 @@ function vec2.mul(a, b)
 end
 
 --- Divide a vector by another vector.
+-- Component-size inv multiplication. Like a non-uniform scale().
 -- @tparam vec2 a Left hand operand
 -- @tparam vec2 b Right hand operand
 -- @treturn vec2 out
@@ -148,6 +152,8 @@ function vec2.trim(a, len)
 end
 
 --- Get the cross product of two vectors.
+-- Order: Positive if a is clockwise from b. Magnitude is the area spanned by
+-- the parallelograms that a and b span.
 -- @tparam vec2 a Left hand operand
 -- @tparam vec2 b Right hand operand
 -- @treturn number magnitude
@@ -333,7 +339,7 @@ end
 
 -- Round all components to nearest int (or other precision).
 -- @tparam vec2 a Vector to round.
--- @tparam precision Digits after the decimal (round numebr if unspecified)
+-- @tparam precision Digits after the decimal (integer if unspecified)
 -- @treturn vec2 Rounded vector
 function vec2.round(a, precision)
 	return vec2.new(private.round(a.x, precision), private.round(a.y, precision))

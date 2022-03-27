@@ -93,6 +93,8 @@ function vec3.add(a, b)
 end
 
 --- Subtract one vector from another.
+-- Order: If a and b are positions, computes the direction and distance from b
+-- to a.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
@@ -105,6 +107,7 @@ function vec3.sub(a, b)
 end
 
 --- Multiply a vector by another vectorr.
+-- Component-size multiplication not matrix multiplication.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
@@ -117,6 +120,7 @@ function vec3.mul(a, b)
 end
 
 --- Divide a vector by a scalar.
+-- Component-size inv multiplication. Like a non-uniform scale().
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
@@ -147,6 +151,9 @@ function vec3.trim(a, len)
 end
 
 --- Get the cross product of two vectors.
+-- Resulting direction is right-hand rule normal of plane defined by a and b.
+-- Magnitude is the area spanned by the parallelograms that a and b span.
+-- Order: Direction determined by right-hand rule.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
