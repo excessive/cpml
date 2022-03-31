@@ -4,6 +4,7 @@
 local modules       = (...):gsub('%.[^%.]+$', '') .. "."
 local constants     = require(modules .. "constants")
 local vec3          = require(modules .. "vec3")
+local precond       = require(modules .. "_private_precond")
 local private       = require(modules .. "_private_utils")
 local DOT_THRESHOLD = constants.DOT_THRESHOLD
 local DBL_EPSILON   = constants.DBL_EPSILON
@@ -58,20 +59,20 @@ quat.zero = new(0, 0, 0, 0)
 function quat.new(x, y, z, w)
 	-- number, number, number, number
 	if x and y and z and w then
-		assert(type(x) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
-		assert(type(z) == "number", "new: Wrong argument type for z (<number> expected)")
-		assert(type(w) == "number", "new: Wrong argument type for w (<number> expected)")
+		precond.typeof(x, "number", "new: Wrong argument type for x")
+		precond.typeof(y, "number", "new: Wrong argument type for y")
+		precond.typeof(z, "number", "new: Wrong argument type for z")
+		precond.typeof(w, "number", "new: Wrong argument type for w")
 
 		return new(x, y, z, w)
 
 	-- {x, y, z, w} or {x=x, y=y, z=z, w=w}
 	elseif type(x) == "table" then
 		local xx, yy, zz, ww = x.x or x[1], x.y or x[2], x.z or x[3], x.w or x[4]
-		assert(type(xx) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(yy) == "number", "new: Wrong argument type for y (<number> expected)")
-		assert(type(zz) == "number", "new: Wrong argument type for z (<number> expected)")
-		assert(type(ww) == "number", "new: Wrong argument type for w (<number> expected)")
+		precond.typeof(xx, "number", "new: Wrong argument type for x")
+		precond.typeof(yy, "number", "new: Wrong argument type for y")
+		precond.typeof(zz, "number", "new: Wrong argument type for z")
+		precond.typeof(ww, "number", "new: Wrong argument type for w")
 
 		return new(xx, yy, zz, ww)
 	end
@@ -456,19 +457,19 @@ function quat_mt.__eq(a,b)
 end
 
 function quat_mt.__add(a, b)
-	assert(quat.is_quat(a), "__add: Wrong argument type for left hand operand. (<cpml.quat> expected)")
-	assert(quat.is_quat(b), "__add: Wrong argument type for right hand operand. (<cpml.quat> expected)")
+	precond.assert(quat.is_quat(a), "__add: Wrong argument type '%s' for left hand operand. (<cpml.quat> expected)", type(a))
+	precond.assert(quat.is_quat(b), "__add: Wrong argument type '%s' for right hand operand. (<cpml.quat> expected)", type(b))
 	return a:add(b)
 end
 
 function quat_mt.__sub(a, b)
-	assert(quat.is_quat(a), "__sub: Wrong argument type for left hand operand. (<cpml.quat> expected)")
-	assert(quat.is_quat(b), "__sub: Wrong argument type for right hand operand. (<cpml.quat> expected)")
+	precond.assert(quat.is_quat(a), "__sub: Wrong argument type '%s' for left hand operand. (<cpml.quat> expected)", type(a))
+	precond.assert(quat.is_quat(b), "__sub: Wrong argument type '%s' for right hand operand. (<cpml.quat> expected)", type(b))
 	return a:sub(b)
 end
 
 function quat_mt.__mul(a, b)
-	assert(quat.is_quat(a), "__mul: Wrong argument type for left hand operand. (<cpml.quat> expected)")
+	precond.assert(quat.is_quat(a), "__mul: Wrong argument type '%s' for left hand operand. (<cpml.quat> expected)", type(a))
 	assert(quat.is_quat(b) or vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operand. (<cpml.quat> or <cpml.vec3> or <number> expected)")
 
 	if quat.is_quat(b) then
@@ -483,8 +484,8 @@ function quat_mt.__mul(a, b)
 end
 
 function quat_mt.__pow(a, n)
-	assert(quat.is_quat(a), "__pow: Wrong argument type for left hand operand. (<cpml.quat> expected)")
-	assert(type(n) == "number", "__pow: Wrong argument type for right hand operand. (<number> expected)")
+	precond.assert(quat.is_quat(a), "__pow: Wrong argument type '%s' for left hand operand. (<cpml.quat> expected)", type(a))
+	precond.typeof(n, "number", "__pow: Wrong argument type for right hand operand.")
 	return a:pow(n)
 end
 

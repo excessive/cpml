@@ -3,6 +3,7 @@
 
 local modules  = (...):gsub('%.[^%.]+$', '') .. "."
 local utils    = require(modules .. "utils")
+local precond  = require(modules .. "_private_precond")
 local color    = {}
 local color_mt = {}
 
@@ -103,20 +104,20 @@ end
 function color.new(r, g, b, a)
 	-- number, number, number, number
 	if r and g and b and a then
-		assert(type(r) == "number", "new: Wrong argument type for r (<number> expected)")
-		assert(type(g) == "number", "new: Wrong argument type for g (<number> expected)")
-		assert(type(b) == "number", "new: Wrong argument type for b (<number> expected)")
-		assert(type(a) == "number", "new: Wrong argument type for a (<number> expected)")
+		precond.typeof(r, "number", "new: Wrong argument type for r")
+		precond.typeof(g, "number", "new: Wrong argument type for g")
+		precond.typeof(b, "number", "new: Wrong argument type for b")
+		precond.typeof(a, "number", "new: Wrong argument type for a")
 
 		return new(r, g, b, a)
 
 	-- {r, g, b, a}
 	elseif type(r) == "table" then
 		local rr, gg, bb, aa = r[1], r[2], r[3], r[4]
-		assert(type(rr) == "number", "new: Wrong argument type for r (<number> expected)")
-		assert(type(gg) == "number", "new: Wrong argument type for g (<number> expected)")
-		assert(type(bb) == "number", "new: Wrong argument type for b (<number> expected)")
-		assert(type(aa) == "number", "new: Wrong argument type for a (<number> expected)")
+		precond.typeof(rr, "number", "new: Wrong argument type for r")
+		precond.typeof(gg, "number", "new: Wrong argument type for g")
+		precond.typeof(bb, "number", "new: Wrong argument type for b")
+		precond.typeof(aa, "number", "new: Wrong argument type for a")
 
 		return new(rr, gg, bb, aa)
 	end

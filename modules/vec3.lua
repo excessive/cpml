@@ -2,6 +2,7 @@
 -- @module vec3
 
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
+local precond = require(modules .. "_private_precond")
 local private = require(modules .. "_private_utils")
 local sqrt    = math.sqrt
 local cos     = math.cos
@@ -50,18 +51,18 @@ vec3.zero   = new(0, 0, 0)
 function vec3.new(x, y, z)
 	-- number, number, number
 	if x and y and z then
-		assert(type(x) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(y) == "number", "new: Wrong argument type for y (<number> expected)")
-		assert(type(z) == "number", "new: Wrong argument type for z (<number> expected)")
+		precond.typeof(x, "number", "new: Wrong argument type for x")
+		precond.typeof(y, "number", "new: Wrong argument type for y")
+		precond.typeof(z, "number", "new: Wrong argument type for z")
 
 		return new(x, y, z)
 
 	-- {x, y, z} or {x=x, y=y, z=z}
 	elseif type(x) == "table" or type(x) == "cdata" then -- table in vanilla lua, cdata in luajit
 		local xx, yy, zz = x.x or x[1], x.y or x[2], x.z or x[3]
-		assert(type(xx) == "number", "new: Wrong argument type for x (<number> expected)")
-		assert(type(yy) == "number", "new: Wrong argument type for y (<number> expected)")
-		assert(type(zz) == "number", "new: Wrong argument type for z (<number> expected)")
+		precond.typeof(xx, "number", "new: Wrong argument type for x")
+		precond.typeof(yy, "number", "new: Wrong argument type for y")
+		precond.typeof(zz, "number", "new: Wrong argument type for z")
 
 		return new(xx, yy, zz)
 
@@ -374,20 +375,20 @@ function vec3_mt.__eq(a, b)
 end
 
 function vec3_mt.__add(a, b)
-	assert(vec3.is_vec3(a), "__add: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b), "__add: Wrong argument type for right hand operand. (<cpml.vec3> expected)")
+	precond.assert(vec3.is_vec3(a), "__add: Wrong argument type '%s' for left hand operand. (<cpml.vec3> expected)", type(a))
+	precond.assert(vec3.is_vec3(b), "__add: Wrong argument type '%s' for right hand operand. (<cpml.vec3> expected)", type(b))
 	return a:add(b)
 end
 
 function vec3_mt.__sub(a, b)
-	assert(vec3.is_vec3(a), "__sub: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b), "__sub: Wrong argument type for right hand operand. (<cpml.vec3> expected)")
+	precond.assert(vec3.is_vec3(a), "__sub: Wrong argument type '%s' for left hand operand. (<cpml.vec3> expected)", type(a))
+	precond.assert(vec3.is_vec3(b), "__sub: Wrong argument type '%s' for right hand operand. (<cpml.vec3> expected)", type(b))
 	return a:sub(b)
 end
 
 function vec3_mt.__mul(a, b)
-	assert(vec3.is_vec3(a), "__mul: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type for right hand operand. (<cpml.vec3> or <number> expected)")
+	precond.assert(vec3.is_vec3(a), "__mul: Wrong argument type '%s' for left hand operand. (<cpml.vec3> expected)", type(a))
+	precond.assert(vec3.is_vec3(b) or type(b) == "number", "__mul: Wrong argument type '%s' for right hand operand. (<cpml.vec3> or <number> expected)", type(b))
 
 	if vec3.is_vec3(b) then
 		return a:mul(b)
@@ -397,8 +398,8 @@ function vec3_mt.__mul(a, b)
 end
 
 function vec3_mt.__div(a, b)
-	assert(vec3.is_vec3(a), "__div: Wrong argument type for left hand operand. (<cpml.vec3> expected)")
-	assert(vec3.is_vec3(b) or type(b) == "number", "__div: Wrong argument type for right hand operand. (<cpml.vec3> or <number> expected)")
+	precond.assert(vec3.is_vec3(a), "__div: Wrong argument type '%s' for left hand operand. (<cpml.vec3> expected)", type(a))
+	precond.assert(vec3.is_vec3(b) or type(b) == "number", "__div: Wrong argument type '%s' for right hand operand. (<cpml.vec3> or <number> expected)", type(b))
 
 	if vec3.is_vec3(b) then
 		return a:div(b)
