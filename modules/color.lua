@@ -2,6 +2,7 @@
 -- @module color
 
 local modules  = (...):gsub('%.[^%.]+$', '') .. "."
+local constants = require(modules .. "constants")
 local utils    = require(modules .. "utils")
 local precond  = require(modules .. "_private_precond")
 local color    = {}
@@ -73,6 +74,11 @@ local function color_to_hsv(c)
 		s = 0
 		h = -1
 		return { h, s, v, 1 }
+	end
+
+	-- Prevent division by zero.
+	if delta == 0 then
+		delta = constants.DBL_EPSILON
 	end
 
 	if r == max then
