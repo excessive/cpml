@@ -55,7 +55,7 @@ describe("color:", function()
 
 	it("hsv -> rgb -> hsv", function()
 		local hsv1 = { 0, 0.3, 0.8, 0.9 }
-		for h=0,359, 10 do
+		for h=0,1, 0.1 do
 			hsv1[1] = h
 			local cc = color.hsv_to_color_table(hsv1)
 			local hsv2 = cc:color_to_hsv_table()
@@ -83,10 +83,10 @@ describe("color:", function()
 		-- hsv value conversion values from http://colorizer.org/
 		local c = color(122/255, 20/255, 122/255, 1)
 		local hsv = c:color_to_hsv_table()
-		assert_is_approx_equal(hsv[1], 300)
+		assert_is_approx_equal(hsv[1], 300/360)
 		assert_is_approx_equal(hsv[2], 0.8361)
 		assert_is_approx_equal(hsv[3], 0.4784)
-		local r = c:hue(200)
+		local r = c:hue(200/360)
 		assert_is_approx_equal(r[1], 20/255)
 		assert_is_approx_equal(r[2], 88/255)
 		assert_is_approx_equal(r[3], 122/255)

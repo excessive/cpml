@@ -30,7 +30,7 @@ local function hsv_to_color(hsv)
 		return new(v, v, v, a)
 	end
 
-	h = hsv[1] / 60 -- sector 0 to 5
+	h = hsv[1] * 6 -- sector 0 to 5
 
 	i = math.floor(h)
 	f = h - i -- factorial part of h
@@ -89,10 +89,10 @@ local function color_to_hsv(c)
 		h = 4 + ( r - g ) / delta -- magenta/cyan
 	end
 
-	h = h * 60 -- degrees
+	h = h / 6 -- normalize from segment 0..5
 
 	if h < 0 then
-		h = h + 360
+		h = h + 1
 	end
 
 	return { h, s, v, a }
@@ -132,17 +132,17 @@ function color.new(r, g, b, a)
 end
 
 --- Convert hue,saturation,value table to color object.
--- @tparam table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-1}
+-- @tparam table hsva {hue 0-1, saturation 0-1, value 0-1, alpha 0-1}
 -- @treturn color out
 color.hsv_to_color_table = hsv_to_color
 
 --- Convert color to hue,saturation,value table
 -- @tparam color in
--- @treturn table hsva {hue 0-359, saturation 0-1, value 0-1, alpha 0-1}
+-- @treturn table hsva {hue 0-1, saturation 0-1, value 0-1, alpha 0-1}
 color.color_to_hsv_table = color_to_hsv
 
 --- Convert hue,saturation,value to color object.
--- @tparam number h hue 0-359
+-- @tparam number h hue 0-1
 -- @tparam number s saturation 0-1
 -- @tparam number v value 0-1
 -- @treturn color out
@@ -151,7 +151,7 @@ function color.from_hsv(h, s, v)
 end
 
 --- Convert hue,saturation,value to color object.
--- @tparam number h hue 0-359
+-- @tparam number h hue 0-1
 -- @tparam number s saturation 0-1
 -- @tparam number v value 0-1
 -- @tparam number a alpha 0-1
@@ -266,11 +266,11 @@ end
 
 --- Set a color's hue (saturation, value, alpha unchanged)
 -- @tparam color to alter
--- @tparam hue to set 0-359
+-- @tparam hue to set 0-1
 -- @treturn color out
 function color.hue(col, hue)
 	local c = color_to_hsv(col)
-	c[1] = (hue + 360) % 360
+	c[1] = (hue + 1) % 1
 	return hsv_to_color(c)
 end
 
