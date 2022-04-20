@@ -161,23 +161,29 @@ end
 -- @tparam vec3 scale Scale vector
 -- @treturn mat4 out
 function mat4.from_transform(trans, rot, scale)
-	local angle, axis = rot:to_angle_axis()
-	local l = axis:len()
+	local rx, ry, rz, rw = rot.x, rot.y, rot.z, rot.w
 
-	if l == 0 then
-		return new()
-	end
-
-	local x, y, z = axis.x / l, axis.y / l, axis.z / l
-	local c = cos(angle)
-	local s = sin(angle)
-
-	return new {
-		x*x*(1-c)+c,   y*x*(1-c)+z*s, x*z*(1-c)-y*s, 0,
-		x*y*(1-c)-z*s, y*y*(1-c)+c,   y*z*(1-c)+x*s, 0,
-		x*z*(1-c)+y*s, y*z*(1-c)-x*s, z*z*(1-c)+c,   0,
-		trans.x, trans.y, trans.z, 1
+	local sm = new {
+		scale.x, 0,       0,       0,
+		0,       scale.y, 0,       0,
+		0,       0,       scale.z, 0,
+		0,       0,       0,       1,
 	}
+
+	local rm = new {
+		1-2*(ry*ry+rz*rz), 2*(rx*ry-rz*rw), 2*(rx*rz+ry*rw), 0,
+		2*(rx*ry+rz*rw), 1-2*(rx*rx+rz*rz), 2*(ry*rz-rx*rw), 0,
+		2*(rx*rz-ry*rw), 2*(ry*rz+rx*rw), 1-2*(rx*rx+ry*ry), 0,
+		0, 0, 0, 1
+	}
+
+	local rsm = rm * sm
+
+	rsm[13] = trans.x
+	rsm[14] = trans.y
+	rsm[15] = trans.z
+
+	return rsm
 end
 
 --- Create matrix from orthogonal.
