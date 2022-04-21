@@ -326,7 +326,7 @@ describe("mat4:", function()
 		local e = vec3(0, 0, 1.55)
 		local c = vec3(4, 7, 1)
 		local u = vec3(0, 0, 1)
-		local a = mat4():look_at(mat4(), e, c, u)
+		local a = mat4():look_at(e, c, u)
 
 		assert.is_true(utils.tolerance( 0.868-a[1], 0.001))
 		assert.is_true(utils.tolerance( 0.034-a[2], 0.001))

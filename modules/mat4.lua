@@ -524,12 +524,11 @@ end
 
 --- Transform matrix to look at a point.
 -- @tparam mat4 out Matrix to store result
--- @tparam mat4 a Matrix to transform
 -- @tparam vec3 eye Location of viewer's view plane
 -- @tparam vec3 center Location of object to view
 -- @tparam vec3 up Up direction
 -- @treturn mat4 out
-function mat4.look_at(out, a, eye, look_at, up)
+function mat4.look_at(out, eye, look_at, up)
 	local z_axis = (eye - look_at):normalize()
 	local x_axis = up:cross(z_axis):normalize()
 	local y_axis = z_axis:cross(x_axis)
@@ -549,7 +548,6 @@ function mat4.look_at(out, a, eye, look_at, up)
 	out[14] = -out[  2]*eye.x - out[4+2]*eye.y - out[8+2]*eye.z
 	out[15] = -out[  3]*eye.x - out[4+3]*eye.y - out[8+3]*eye.z
 	out[16] = -out[  4]*eye.x - out[4+4]*eye.y - out[8+4]*eye.z + 1
-
   return out
 end
 
