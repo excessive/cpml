@@ -44,6 +44,12 @@ describe("utils:", function()
 		v = utils.round(1.3242525)
 		assert.is_true(tolerance(v, 1))
 	end)
+
+	it("checks sign", function()
+		assert.is.equal(utils.sign(-9), -1)
+		assert.is.equal(utils.sign(0), 0)
+		assert.is.equal(utils.sign(12), 1)
+	end)
 end)
 
 --[[

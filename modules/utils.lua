@@ -211,4 +211,18 @@ function utils.refract(i, n, ior)
 	return vec3()
 end
 
+--- Get the sign of a number
+-- returns 1 for positive values, -1 for negative and 0 for zero.
+-- @param value
+-- @return number
+function utils.sign(n)
+	if n > 0 then
+		return 1
+	elseif n < 0 then
+		return -1
+	else
+		return 0
+	end
+end
+
 return utils
