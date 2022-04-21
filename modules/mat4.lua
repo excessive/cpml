@@ -39,11 +39,11 @@ end
 -- Do the check to see if JIT is enabled. If so use the optimized FFI structs.
 local status, ffi
 if type(jit) == "table" and jit.status() then
-   --  status, ffi = pcall(require, "ffi")
-    if status then
-        ffi.cdef "typedef struct { double _m[16]; } cpml_mat4;"
-        new = ffi.typeof("cpml_mat4")
-    end
+	--  status, ffi = pcall(require, "ffi")
+	if status then
+		ffi.cdef "typedef struct { double _m[16]; } cpml_mat4;"
+		new = ffi.typeof("cpml_mat4")
+	end
 end
 
 -- Statically allocate a temporary variable used in some of our functions.
@@ -548,7 +548,7 @@ function mat4.look_at(out, eye, look_at, up)
 	out[14] = -out[  2]*eye.x - out[4+2]*eye.y - out[8+2]*eye.z
 	out[15] = -out[  3]*eye.x - out[4+3]*eye.y - out[8+3]*eye.z
 	out[16] = -out[  4]*eye.x - out[4+4]*eye.y - out[8+4]*eye.z + 1
-  return out
+	return out
 end
 
 --- Transpose a matrix.
