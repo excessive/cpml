@@ -94,6 +94,18 @@
 	<td class="summary">Lighten a color by a component-wise fixed amount (alpha unchanged)</td>
 	</tr>
 	<tr>
+	<td class="name" nowrap><a href="#lerp">lerp (at, at, s)</a></td>
+	<td class="summary">Interpolate between two colors.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#unpack">unpack (to)</a></td>
+	<td class="summary">Unpack a color into individual components in 0-1.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#as_255">as_255 (to)</a></td>
+	<td class="summary">Unpack a color into individual components in 0-255.</td>
+	</tr>
+	<tr>
 	<td class="name" nowrap><a href="#darken">darken (to, amount)</a></td>
 	<td class="summary">Darken a color by a component-wise fixed amount (alpha unchanged)</td>
 	</tr>
@@ -157,21 +169,21 @@
     <ul>
         <li><span class="parameter">x</span>
          Can be of three types: </br>
- number red component 0-255
+ number red component 0-1
  table {r, g, b, a}
  nil for {0,0,0,0}
         </li>
         <li><span class="parameter">g</span>
             <span class="types"><span class="type">number</span></span>
-         Green component 0-255
+         Green component 0-1
         </li>
         <li><span class="parameter">b</span>
             <span class="types"><span class="type">number</span></span>
-         Blue component 0-255
+         Blue component 0-1
         </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">number</span></span>
-         Alpha component 0-255
+         Alpha component 0-1
         </li>
     </ul>
 
@@ -198,7 +210,7 @@
     <ul>
         <li><span class="parameter">h</span>
             <span class="types"><span class="type">number</span></span>
-         hue 0-359
+         hue 0-1
         </li>
         <li><span class="parameter">s</span>
             <span class="types"><span class="type">number</span></span>
@@ -233,7 +245,7 @@
     <ul>
         <li><span class="parameter">h</span>
             <span class="types"><span class="type">number</span></span>
-         hue 0-359
+         hue 0-1
         </li>
         <li><span class="parameter">s</span>
             <span class="types"><span class="type">number</span></span>
@@ -245,7 +257,7 @@
         </li>
         <li><span class="parameter">a</span>
             <span class="types"><span class="type">number</span></span>
-         alpha 0-255
+         alpha 0-1
         </li>
     </ul>
 
@@ -303,7 +315,7 @@
         </li>
         <li><span class="parameter">amount</span>
             <span class="types"><span class="type">number</span></span>
-         to increase each component by, 0-255 scale
+         to increase each component by, 0-1 scale
         </li>
     </ul>
 
@@ -312,6 +324,113 @@
 
            <span class="types"><span class="type">color</span></span>
         out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "lerp"></a>
+    <strong>lerp (at, at, s)</strong>
+    </dt>
+    <dd>
+    Interpolate between two colors.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">at</span>
+            <span class="types"><span class="type">color</span></span>
+         end
+        </li>
+        <li><span class="parameter">at</span>
+            <span class="types"><span class="type">color</span></span>
+         end
+        </li>
+        <li><span class="parameter">s</span>
+            <span class="types"><span class="type">number</span></span>
+         in 0-1 progress between the two colors
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">color</span></span>
+        out
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "unpack"></a>
+    <strong>unpack (to)</strong>
+    </dt>
+    <dd>
+    Unpack a color into individual components in 0-1.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">color</span></span>
+         unpack
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        r in 0-1</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        g in 0-1</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        b in 0-1</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        a in 0-1</li>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "as_255"></a>
+    <strong>as_255 (to)</strong>
+    </dt>
+    <dd>
+    Unpack a color into individual components in 0-255.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">to</span>
+            <span class="types"><span class="type">color</span></span>
+         unpack
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        r in 0-255</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        g in 0-255</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        b in 0-255</li>
+        <li>
+           <span class="types"><span class="type">number</span></span>
+        a in 0-255</li>
     </ol>
 
 
@@ -334,7 +453,7 @@
         </li>
         <li><span class="parameter">amount</span>
             <span class="types"><span class="type">number</span></span>
-         to decrease each component by, 0-255 scale
+         to decrease each component by, 0-1 scale
         </li>
     </ul>
 
@@ -423,11 +542,11 @@
     <ul>
         <li><span class="parameter">to</span>
             <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
-         set 0-359
+         set 0-1
         </li>
         <li><span class="parameter">to</span>
             <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
-         set 0-359
+         set 0-1
         </li>
     </ul>
 
@@ -453,12 +572,12 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">to</span>
-            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
-         set 0-359
+            <span class="types"><a class="type" href="../modules/color.html#saturation">saturation</a></span>
+         set 0-1
         </li>
         <li><span class="parameter">to</span>
-            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
-         set 0-359
+            <span class="types"><a class="type" href="../modules/color.html#saturation">saturation</a></span>
+         set 0-1
         </li>
     </ul>
 
@@ -484,12 +603,12 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">to</span>
-            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
-         set 0-359
+            <span class="types"><a class="type" href="../modules/color.html#value">value</a></span>
+         set 0-1
         </li>
         <li><span class="parameter">to</span>
-            <span class="types"><a class="type" href="../modules/color.html#hue">hue</a></span>
-         set 0-359
+            <span class="types"><a class="type" href="../modules/color.html#value">value</a></span>
+         set 0-1
         </li>
     </ul>
 
@@ -573,7 +692,7 @@
     <ul>
         <li><span class="parameter">hsva</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         {hue 0-359, saturation 0-1, value 0-1, alpha 0-255}
+         {hue 0-1, saturation 0-1, value 0-1, alpha 0-1}
         </li>
     </ul>
 
@@ -611,7 +730,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-04-21 17:46:32 </i>
+<i style="float:right;">Last updated 2022-04-21 17:48:25 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
