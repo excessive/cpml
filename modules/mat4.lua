@@ -27,7 +27,8 @@ local function new(m)
 	m._m = m
 	return setmetatable(m, mat4_mt)
 end
- -- Convert matrix into identity
+
+-- Convert matrix into identity
 local function identity(m)
 	m[1],  m[2],  m[3],  m[4]  = 1, 0, 0, 0
 	m[5],  m[6],  m[7],  m[8]  = 0, 1, 0, 0
@@ -356,11 +357,32 @@ function mat4.mul(out, a, b)
 	return out
 end
 
+--- Multiply a matrix and a vec3, with perspective division.
+-- This function uses an implicit 1 for the fourth component.
+-- @tparam vec3 out vec3 to store the result
+-- @tparam mat4 a Left hand operand
+-- @tparam vec3 b Right hand operand
+-- @treturn vec3 out
+function mat4.mul_vec3_perspective(out, a, b)
+	local v4x = b.x * a[1] + b.y * a[5] + b.z * a[9]  + a[13]
+	local v4y = b.x * a[2] + b.y * a[6] + b.z * a[10] + a[14]
+	local v4z = b.x * a[3] + b.y * a[7] + b.z * a[11] + a[15]
+	local v4w = b.x * a[4] + b.y * a[8] + b.z * a[12] + a[16]
+	local inv_w = 0
+	if v4w ~= 0 then
+		inv_w = utils.sign(v4w) / v4w
+	end
+	out.x = v4x * inv_w
+	out.y = v4y * inv_w
+	out.z = v4z * inv_w
+	return out
+end
+
 --- Multiply a matrix and a vec4.
--- @tparam mat4 out Matrix to store the result
+-- @tparam table out table to store the result
 -- @tparam mat4 a Left hand operand
 -- @tparam table b Right hand operand
--- @treturn mat4 out
+-- @treturn vec4 out
 function mat4.mul_vec4(out, a, b)
 	tv4[1] = b[1] * a[1] + b[2] * a[5] + b [3] * a[9]  + b[4] * a[13]
 	tv4[2] = b[1] * a[2] + b[2] * a[6] + b [3] * a[10] + b[4] * a[14]
