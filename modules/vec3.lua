@@ -108,7 +108,7 @@ function vec3.sub(a, b)
 end
 
 --- Multiply a vector by another vectorr.
--- Component-size multiplication not matrix multiplication.
+-- Component-wise multiplication not matrix multiplication.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
@@ -121,7 +121,7 @@ function vec3.mul(a, b)
 end
 
 --- Divide a vector by a scalar.
--- Component-size inv multiplication. Like a non-uniform scale().
+-- Component-wise inv multiplication. Like a non-uniform scale().
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
 -- @treturn vec3 out
@@ -133,8 +133,8 @@ function vec3.div(a, b)
 	)
 end
 
---- Get the normal of a vector.
--- @tparam vec3 a Vector to normalize
+--- Scale a vector to unit length (1).
+-- @tparam vec3 a vector to normalize
 -- @treturn vec3 out
 function vec3.normalize(a)
 	if a:is_zero() then
@@ -143,8 +143,20 @@ function vec3.normalize(a)
 	return a:scale(1 / a:len())
 end
 
+--- Scale a vector to unit length (1), and return the input length.
+-- @tparam vec3 a vector to normalize
+-- @treturn vec3 out
+-- @treturn number input vector length
+function vec3.normalize_len(a)
+	if a:is_zero() then
+		return new(), 0
+	end
+	local len = a:len()
+	return a:scale(1 / len), len
+end
+
 --- Trim a vector to a given length
--- @tparam vec3 a Vector to be trimmed
+-- @tparam vec3 a vector to be trimmed
 -- @tparam number len Length to trim the vector to
 -- @treturn vec3 out
 function vec3.trim(a, len)
@@ -298,22 +310,22 @@ function vec3.component_max(a, b)
 end
 
 -- Negate x axis only of vector.
--- @tparam vec2 a Vector to x-flip.
--- @treturn vec2 x-flipped vector
+-- @tparam vec3 a Vector to x-flip.
+-- @treturn vec3 x-flipped vector
 function vec3.flip_x(a)
 	return vec3.new(-a.x, a.y, a.z)
 end
 
 -- Negate y axis only of vector.
--- @tparam vec2 a Vector to y-flip.
--- @treturn vec2 y-flipped vector
+-- @tparam vec3 a Vector to y-flip.
+-- @treturn vec3 y-flipped vector
 function vec3.flip_y(a)
 	return vec3.new(a.x, -a.y, a.z)
 end
 
 -- Negate z axis only of vector.
--- @tparam vec2 a Vector to z-flip.
--- @treturn vec2 z-flipped vector
+-- @tparam vec3 a Vector to z-flip.
+-- @treturn vec3 z-flipped vector
 function vec3.flip_z(a)
 	return vec3.new(a.x, a.y, -a.z)
 end
