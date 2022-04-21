@@ -158,7 +158,7 @@ end
 --- Multiply a quaternion and a vec3.
 -- @tparam quat a Left hand operand
 -- @tparam vec3 b Right hand operand
--- @treturn quat out
+-- @treturn vec3 out
 function quat.mul_vec3(a, b)
 	qv.x = a.x
 	qv.y = a.y
