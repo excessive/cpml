@@ -887,7 +887,7 @@ function mat4_mt.__mul(a, b)
 	precond.assert(mat4.is_mat4(a), "__mul: Wrong argument type '%s' for left hand operand. (<cpml.mat4> expected)", type(a))
 
 	if vec3.is_vec3(b) then
-		return vec3(mat4.mul_vec4({}, a, { b.x, b.y, b.z, 1 }))
+		return mat4.mul_vec3_perspective(vec3(), a, b)
 	end
 
 	assert(mat4.is_mat4(b) or #b == 4, "__mul: Wrong argument type for right hand operand. (<cpml.mat4> or table #4 expected)")
