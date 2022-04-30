@@ -410,7 +410,7 @@ function mat4.mul_vec4(out, a, b)
 	tv4[3] = b[1] * a[3] + b[2] * a[7] + b [3] * a[11] + b[4] * a[15]
 	tv4[4] = b[1] * a[4] + b[2] * a[8] + b [3] * a[12] + b[4] * a[16]
 
-	for i=1, 4 do
+	for i = 1, 4 do
 		out[i] = tv4[i]
 	end
 
@@ -645,7 +645,7 @@ function mat4.transpose(out, a)
 	tm4[15] = a[12]
 	tm4[16] = a[16]
 
-	for i=1, 16 do
+	for i = 1, 16 do
 		out[i] = tm4[i]
 	end
 
@@ -727,7 +727,7 @@ end
 -- @tparam mat4 a Matrix to be tested
 -- @treturn boolean if any component is NaN
 function vec2.has_nan(a)
-	for i=1, 16 do
+	for i = 1, 16 do
 		if private.is_nan(a[i]) then
 			return true
 		end
