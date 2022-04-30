@@ -661,6 +661,7 @@ function mat4.project(obj, mvp, viewport)
 	local point = mat4.mul_vec3_perspective(vec3(), mvp, obj)
 	point.x = point.x * 0.5 + 0.5
 	point.y = point.y * 0.5 + 0.5
+	point.z = point.z * 0.5 + 0.5
 	point.x = point.x * viewport[3] + viewport[1]
 	point.y = point.y * viewport[4] + viewport[2]
 	return point
@@ -681,6 +682,7 @@ function mat4.unproject(win, mvp, viewport)
 	-- 0..1 -> -1..1
 	point.x = point.x * 2 - 1
 	point.y = point.y * 2 - 1
+	point.z = point.z * 2 - 1
 
 	return mat4.mul_vec3_perspective(point, tmp:invert(mvp), point)
 end
