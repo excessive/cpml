@@ -652,54 +652,37 @@ function mat4.transpose(out, a)
 	return out
 end
 
--- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L518
---- Project a matrix from world space to screen space.
+--- Project a point into screen space
 -- @tparam vec3 obj Object position in world space
--- @tparam mat4 view View matrix
--- @tparam mat4 projection Projection matrix
+-- @tparam mat4 mvp Projection matrix
 -- @tparam table viewport XYWH of viewport
 -- @treturn vec3 win
-function mat4.project(obj, view, projection, viewport)
-	local position = { obj.x, obj.y, obj.z, 1 }
-
-	mat4.mul_vec4(position, view,       position)
-	mat4.mul_vec4(position, projection, position)
-
-	position[1] = position[1] / position[4] * 0.5 + 0.5
-	position[2] = position[2] / position[4] * 0.5 + 0.5
-	position[3] = position[3] / position[4] * 0.5 + 0.5
-
-	position[1] = position[1] * viewport[3] + viewport[1]
-	position[2] = position[2] * viewport[4] + viewport[2]
-
-	return vec3(position[1], position[2], position[3])
+function mat4.project(obj, mvp, viewport)
+	local point = mat4.mul_vec3_perspective(vec3(), mvp, obj)
+	point.x = point.x * 0.5 + 0.5
+	point.y = point.y * 0.5 + 0.5
+	point.x = point.x * viewport[3] + viewport[1]
+	point.y = point.y * viewport[4] + viewport[2]
+	return point
 end
 
--- https://github.com/g-truc/glm/blob/master/glm/gtc/matrix_transform.inl#L544
---- Unproject a matrix from screen space to world space.
+--- Unproject a point from screen space to world space.
 -- @tparam vec3 win Object position in screen space
--- @tparam mat4 view View matrix
--- @tparam mat4 projection Projection matrix
+-- @tparam mat4 mvp Projection matrix
 -- @tparam table viewport XYWH of viewport
 -- @treturn vec3 obj
-function mat4.unproject(win, view, projection, viewport)
-	local position = { win.x, win.y, win.z, 1 }
+function mat4.unproject(win, mvp, viewport)
+	local point = vec3.clone(win)
 
-	position[1] = (position[1] - viewport[1]) / viewport[3]
-	position[2] = (position[2] - viewport[2]) / viewport[4]
+	-- 0..n -> 0..1
+	point.x = (point.x - viewport[1]) / viewport[3]
+	point.y = (point.y - viewport[2]) / viewport[4]
 
-	position[1] = position[1] * 2 - 1
-	position[2] = position[2] * 2 - 1
-	position[3] = position[3] * 2 - 1
+	-- 0..1 -> -1..1
+	point.x = point.x * 2 - 1
+	point.y = point.y * 2 - 1
 
-	tmp:mul(projection, view):invert(tmp)
-	mat4.mul_vec4(position, tmp, position)
-
-	position[1] = position[1] / position[4]
-	position[2] = position[2] / position[4]
-	position[3] = position[3] / position[4]
-
-	return vec3(position[1], position[2], position[3])
+	return mat4.mul_vec3_perspective(point, tmp:invert(mvp), point)
 end
 
 --- Return a boolean showing if a table is or is not a mat4.
