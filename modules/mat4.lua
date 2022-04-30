@@ -327,12 +327,7 @@ function mat4.clone(a)
 	return new(a)
 end
 
---- Multiply two matrices.
--- @tparam mat4 out Matrix to store the result
--- @tparam mat4 a Left hand operand
--- @tparam mat4 b Right hand operand
--- @treturn mat4 out Matrix equivalent to "apply b, then a"
-function mat4.mul(out, a, b)
+function mul_internal(out, a, b)
 	tm4[1]  = b[1]  * a[1] + b[2]  * a[5] + b[3]  * a[9]  + b[4]  * a[13]
 	tm4[2]  = b[1]  * a[2] + b[2]  * a[6] + b[3]  * a[10] + b[4]  * a[14]
 	tm4[3]  = b[1]  * a[3] + b[2]  * a[7] + b[3]  * a[11] + b[4]  * a[15]
@@ -350,10 +345,36 @@ function mat4.mul(out, a, b)
 	tm4[15] = b[13] * a[3] + b[14] * a[7] + b[15] * a[11] + b[16] * a[15]
 	tm4[16] = b[13] * a[4] + b[14] * a[8] + b[15] * a[12] + b[16] * a[16]
 
-	for i=1, 16 do
+	for i = 1, 16 do
 		out[i] = tm4[i]
 	end
+end
 
+--- Multiply N matrices.
+-- @tparam mat4 out Matrix to store the result
+-- @tparam mat4 or {mat4, ...} left hand operand(s)
+-- @tparam mat4 right hand operand if a is not table
+-- @treturn mat4 out multiplied matrix result
+function mat4.mul(out, a, b)
+	if mat4.is_mat4(a) then
+		mul_internal(out, a, b)
+		return out
+	end
+	if #a == 0 then
+		identity(out)
+	elseif #a == 1 then
+		-- only one matrix, just copy
+		for i = 1, 16 do
+			out[i] = a[i]
+		end
+	else
+		local ma = a[1]
+		local mb = a[2]
+		for i = 2, #a do
+			mul_internal(out, ma, mb)
+			ma = out
+		end
+	end
 	return out
 end
 

@@ -146,6 +146,7 @@ describe("mat4:", function()
 		}
 		local c = mat4():mul(a, b)
 		local d = a * b
+		local e = mat4():mul{a, b}
 		assert.is.equal(30,  c[1])
 		assert.is.equal(70,  c[2])
 		assert.is.equal(110, c[3])
@@ -163,6 +164,7 @@ describe("mat4:", function()
 		assert.is.equal(614, c[15])
 		assert.is.equal(846, c[16])
 		assert.is.equal(c, d)
+		assert.is.equal(c, e)
 	end)
 
 	it("multiplies a matrix and a vec4", function()
