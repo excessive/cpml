@@ -120,7 +120,7 @@ function vec3.mul(a, b)
 	)
 end
 
---- Divide a vector by a scalar.
+--- Divide a vector by another.
 -- Component-wise inv multiplication. Like a non-uniform scale().
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
