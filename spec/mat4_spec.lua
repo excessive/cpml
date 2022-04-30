@@ -302,24 +302,40 @@ describe("mat4:", function()
 	end)
 
 	it("projects a point into screen space", function()
-		local p = vec3(0, 0, 10)
-		local proj = mat4.from_perspective(45, 1, 0.1, 1000)
+		local znear = 0.1
+		local zfar = 1000
+		local proj = mat4.from_perspective(45, 1, znear, zfar)
 		local vp = { 0, 0, 400, 400 }
-		local c = mat4.project(p, proj, vp)
-		assert.is.equal(200, c.x)
-		assert.is.equal(200, c.y)
-		assert.is_true(utils.tolerance(1.0101-c.z, 0.001))
+
+		-- -z is away from the viewer into the far plane
+		local p1 = vec3(0, 0, -znear)
+		local c1 = mat4.project(p1, proj, vp)
+		assert.is.near(0, c1.z, 0.0001)
+		assert.is.equal(200, c1.x)
+		assert.is.equal(200, c1.y)
+
+		local p2 = vec3(0, 0, -zfar)
+		local c2 = mat4.project(p2, proj, vp)
+		assert.is.near(1, c2.z, 0.0001)
+		assert.is.equal(200, c2.x)
+		assert.is.equal(200, c2.y)
+
+		local p3 = vec3(0, 0, zfar)
+		local c3 = mat4.project(p3, proj, vp)
+		assert.is_true(c3.z < 0)
+		assert.is.equal(200, c3.x)
+		assert.is.equal(200, c3.y)
 	end)
 
 	it("unprojects a point into world space", function()
-		local p  = vec3(0, 0, 10)
-		local proj  = mat4.from_perspective(45, 1, 0.1, 1000)
+		local p  = vec3(0, 0, -10)
+		local proj = mat4.from_perspective(45, 1, 0.1, 1000)
 		local vp = { 0, 0, 400, 400 }
 		local c  = mat4.project(p, proj, vp)
 		local d  = mat4.unproject(c, proj, vp)
-		assert.is_true(utils.tolerance(p.x-d.x, 0.001))
-		assert.is_true(utils.tolerance(p.y-d.y, 0.001))
-		assert.is_true(utils.tolerance(p.z-d.z, 0.001))
+		assert.is.near(0.0, p.x-d.x, 0.0001)
+		assert.is.near(0.0, p.y-d.y, 0.0001)
+		assert.is.near(0.0, p.z-d.z, 0.0001)
 	end)
 
 	it("transforms a matrix to look at a point", function()
