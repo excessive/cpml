@@ -107,7 +107,7 @@ function vec3.sub(a, b)
 	)
 end
 
---- Multiply a vector by another vectorr.
+--- Multiply a vector by another vector.
 -- Component-wise multiplication not matrix multiplication.
 -- @tparam vec3 a Left hand operand
 -- @tparam vec3 b Right hand operand
