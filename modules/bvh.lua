@@ -23,17 +23,17 @@ local function new(triangles, maxTrianglesPerNode)
 		local p2 = triangle[2]
 		local p3 = triangle[3]
 
-		table.insert(trianglesArray, p1.x)
-		table.insert(trianglesArray, p1.y)
-		table.insert(trianglesArray, p1.z)
+		table.insert(trianglesArray, p1.x or p1[1])
+		table.insert(trianglesArray, p1.y or p1[2])
+		table.insert(trianglesArray, p1.z or p1[3])
 
-		table.insert(trianglesArray, p2.x)
-		table.insert(trianglesArray, p2.y)
-		table.insert(trianglesArray, p2.z)
+		table.insert(trianglesArray, p2.x or p2[1])
+		table.insert(trianglesArray, p2.y or p2[2])
+		table.insert(trianglesArray, p2.z or p2[3])
 
-		table.insert(trianglesArray, p3.x)
-		table.insert(trianglesArray, p3.y)
-		table.insert(trianglesArray, p3.z)
+		table.insert(trianglesArray, p3.x or p3[1])
+		table.insert(trianglesArray, p3.y or p3[2])
+		table.insert(trianglesArray, p3.z or p3[3])
 	end
 
 	tree._trianglesArray      = trianglesArray
@@ -51,18 +51,11 @@ local function new(triangles, maxTrianglesPerNode)
 	local extents = tree:calcExtents(1, triangleCount, EPSILON)
 	tree._rootNode = Node(extents[1], extents[2], 1, triangleCount, 1)
 
-	local function split_r(node)
-		local left, right = tree:splitNode(tree._rootNode)
-		if left then
-			split_r(left)
-		end
-		if right then
-			split_r(right)
-		end
+	tree._nodes_to_split = { tree._rootNode }
+	while #tree._nodes_to_split > 0 do
+		local node = table.remove(tree._nodes_to_split)
+		tree:splitNode(node)
 	end
-
-	split_r(tree._rootNode)
-
 	return tree
 end
 
@@ -169,7 +162,7 @@ end
 function BVH:calcExtents(startIndex, endIndex, expandBy)
 	expandBy = expandBy or 0
 
-	if startIndex >= endIndex then
+	if startIndex > endIndex then
 		return { vec3(), vec3() }
 	end
 
@@ -197,7 +190,7 @@ end
 
 function BVH:splitNode(node)
 	local num_elements = node:elementCount()
-	if (num_elements <= self._maxTrianglesPerNode) or (num_elements == 0) then
+	if (num_elements <= self._maxTrianglesPerNode) or (num_elements <= 0) then
 		return
 	end
 
@@ -245,7 +238,7 @@ function BVH:splitNode(node)
 	-- choose the longest split axis. if we can't split by it, choose next best one.
 	local splitOrder = { 1, 2, 3 }
 	table.sort(splitOrder, function(a, b)
-		return extentsLength[b] - extentsLength[a]
+		return extentsLength[a] > extentsLength[b]
 	end)
 
 	local leftElements
@@ -262,9 +255,9 @@ function BVH:splitNode(node)
 
 	-- sort the elements in range (startIndex, endIndex) according to which node they should be at
 	local node0Start = startIndex
-	local node0End   = node0Start + #leftElements
-	local node1Start = node0End
-	local node1End   = endIndex
+	local node1Start = node0Start + #leftElements
+	local node0End = node1Start - 1
+	local node1End = endIndex
 	local currElement
 
 	local helperPos = node._startIndex
@@ -287,7 +280,7 @@ function BVH:splitNode(node)
 	end
 
 	-- copy results back to main array
-	for i=1+(node._startIndex-1)*7, 1+(node._endIndex-1)*7 do
+	for i=1+(node._startIndex-1)*7, node._endIndex*7 do
 		self._bboxArray[i] = self._bboxHelper[i]
 	end
 
@@ -303,7 +296,8 @@ function BVH:splitNode(node)
 	node:clearShapes()
 
 	-- add new nodes to the split queue
-	return node0, node1
+	table.insert(self._nodes_to_split, node0)
+	table.insert(self._nodes_to_split, node1)
 end
 
 function BVH._calcTValues(minVal, maxVal, rayOriginCoord, invdir)
@@ -403,7 +397,7 @@ local function new_node(extentsMin, extentsMax, startIndex, endIndex, level)
 end
 
 function BVHNode:elementCount()
-	return self._endIndex - self._startIndex
+	return (self._endIndex + 1) - self._startIndex
 end
 
 function BVHNode:centerX()
@@ -419,7 +413,7 @@ function BVHNode:centerZ()
 end
 
 function BVHNode:clearShapes()
-	self._startIndex = -1
+	self._startIndex =  0
 	self._endIndex   = -1
 end
 
