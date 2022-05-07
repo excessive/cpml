@@ -365,7 +365,7 @@ function mat4.mul(out, a, b)
 	elseif #a == 1 then
 		-- only one matrix, just copy
 		for i = 1, 16 do
-			out[i] = a[i]
+			out[i] = a[1][i]
 		end
 	else
 		local ma = a[1]
