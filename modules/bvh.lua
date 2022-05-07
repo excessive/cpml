@@ -59,6 +59,62 @@ local function new(triangles, maxTrianglesPerNode)
 	return tree
 end
 
+function BVH:intersectAABB(aabb)
+	local nodesToIntersect             = { self._rootNode }
+	local trianglesInIntersectingNodes = {} -- a list of nodes that intersect the ray (according to their bounding box)
+	local intersectingTriangles        = {}
+
+	-- go over the BVH tree, and extract the list of triangles that lie in nodes that intersect the box.
+	-- note: these triangles may not intersect the box themselves
+	while #nodesToIntersect > 0 do
+		local node = table.remove(nodesToIntersect)
+
+		local node_aabb = {
+			min = node._extentsMin,
+			max = node._extentsMax
+		}
+
+		if intersect.aabb_aabb(aabb, node_aabb) then
+			if node._node0 then
+				table.insert(nodesToIntersect, node._node0)
+			end
+
+			if node._node1 then
+				table.insert(nodesToIntersect, node._node1)
+			end
+
+			for i=node._startIndex, node._endIndex do
+				table.insert(trianglesInIntersectingNodes, self._bboxArray[1+(i-1)*7])
+			end
+		end
+	end
+
+	-- insert all node triangles, don't bother being more specific yet.
+	local triangle = { vec3(), vec3(), vec3() }
+
+	for i=1, #trianglesInIntersectingNodes do
+		local triIndex = trianglesInIntersectingNodes[i]
+
+		-- print(triIndex, #self._trianglesArray)
+		triangle[1].x = self._trianglesArray[1+(triIndex-1)*9]
+		triangle[1].y = self._trianglesArray[1+(triIndex-1)*9+1]
+		triangle[1].z = self._trianglesArray[1+(triIndex-1)*9+2]
+		triangle[2].x = self._trianglesArray[1+(triIndex-1)*9+3]
+		triangle[2].y = self._trianglesArray[1+(triIndex-1)*9+4]
+		triangle[2].z = self._trianglesArray[1+(triIndex-1)*9+5]
+		triangle[3].x = self._trianglesArray[1+(triIndex-1)*9+6]
+		triangle[3].y = self._trianglesArray[1+(triIndex-1)*9+7]
+		triangle[3].z = self._trianglesArray[1+(triIndex-1)*9+8]
+
+		table.insert(intersectingTriangles, {
+			triangle             = { triangle[1]:clone(), triangle[2]:clone(), triangle[3]:clone() },
+			triangleIndex        = triIndex
+		})
+	end
+
+	return intersectingTriangles
+end
+
 function BVH:intersectRay(rayOrigin, rayDirection, backfaceCulling)
 	local nodesToIntersect             = { self._rootNode }
 	local trianglesInIntersectingNodes = {} -- a list of nodes that intersect the ray (according to their bounding box)
