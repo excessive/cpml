@@ -424,6 +424,41 @@ function quat.to_angle_axis(a, identityAxis)
 	return angle, vec3(x, y, z)
 end
 
+--- Convert a quaternion into euler angle components
+-- @tparam quat a Quaternion to convert
+-- @treturn roll
+-- @treturn pitch
+-- @treturn yaw
+function quat.to_euler_angles_unpack(q)
+    -- roll (x-axis rotation)
+    local sinr_cosp = 2 * (q.w * q.x + q.y * q.z)
+    local cosr_cosp = 1 - 2 * (q.x * q.x + q.y * q.y)
+    local roll = math.atan2(sinr_cosp, cosr_cosp)
+
+    -- pitch (y-axis rotation)
+    local sinp = 2 * (q.w * q.y - q.z * q.x)
+    local pitch
+    if math.abs(sinp) >= 1 then
+        pitch = math.pi / 2 * ((sinp > 0) and 1 or -1) -- Use 90 degrees if out of range
+    else
+        pitch = math.asin(sinp)
+    end
+
+    -- yaw (z-axis rotation)
+    local siny_cosp = 2 * (q.w * q.z + q.x * q.y)
+    local cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
+    local yaw = math.atan2(siny_cosp, cosy_cosp)
+
+    return roll, pitch, yaw
+end
+
+--- Convert a quaternion into euler angles
+-- @tparam quat a Quaternion to convert
+-- @treturn result a {roll, pitch, yaw} table
+function quat.to_euler_angles(a)
+	return {quat.to_euler_angles_unpack(a)}
+end
+
 --- Convert a quaternion into a vec3.
 -- @tparam quat a Quaternion to convert
 -- @treturn vec3 out
