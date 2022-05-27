@@ -4,6 +4,7 @@
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local precond = require(modules .. "_private_precond")
 local private = require(modules .. "_private_utils")
+local vec2    = require(modules .. "vec2")
 local sqrt    = math.sqrt
 local cos     = math.cos
 local sin     = math.sin
@@ -371,6 +372,35 @@ end
 -- @treturn string formatted
 function vec3.to_string(a)
 	return string.format("(%+0.3f,%+0.3f,%+0.3f)", a.x, a.y, a.z)
+end
+
+--- Return the x and y components as a vec2
+-- @tparam vec3 a Vector to be reduced to a vec2
+-- @treturn vec2
+function vec3.to_xy(a)
+	return vec2.new(a.x, a.y)
+end
+
+--- Return the x and z components as a vec2
+-- @tparam vec3 a Vector to be reduced to a vec2
+-- @treturn vec2
+function vec3.to_xz(a)
+	return vec2.new(a.x, a.z)
+end
+
+--- Return a simple table representation of vector.
+-- @tparam vec3 a Vector to be turned into a table
+-- @treturn table
+function vec3.to_table(a)
+	return {x = a.x, y = a.y, z = a.z}
+end
+
+--- Create a vec3 from a table.
+-- @tparam table a table to supply the values
+-- @treturn vec3
+function vec3.from_table(a)
+	assert(a.x and a.y, "from_table: Wrong argument type for right hand operand.")
+	return new(a.x, a.y, a.z or 0)
 end
 
 vec3_mt.__index    = vec3
