@@ -257,18 +257,14 @@ end
 
 --- Unsigned angle between two vectors.
 -- Directionless and thus commutative.
+-- Input vectors must be non-zero.
 -- @tparam vec2 a Vector
 -- @tparam vec2 b Vector
 -- @treturn number angle in [0, pi]
 function vec2.angle_between(a, b)
 	if b then
-		if vec2.is_vec2(a) then
-			return acos(a:dot(b) / (a:len() * b:len()))
-		end
-
-		return acos(vec3.dot(a, b) / (vec3.len(a) * vec3.len(b)))
+		return acos(a:dot(b) / (a:len() * b:len()))
 	end
-
 	return 0
 end
 

@@ -4,6 +4,7 @@
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
 local precond = require(modules .. "_private_precond")
 local private = require(modules .. "_private_utils")
+local acos    = math.acos
 local sqrt    = math.sqrt
 local cos     = math.cos
 local sin     = math.sin
@@ -330,9 +331,20 @@ function vec3.flip_z(a)
 	return vec3.new(a.x, a.y, -a.z)
 end
 
-function vec3.angle_to(a, b)
-	local v = a:normalize():dot(b:normalize())
-	return math.acos(v)
+-- No angle_to because that requires defining an axis of rotation. Instead you
+-- likely want to convert both into vec2 and use vec2.angle_to.
+
+--- Unsigned angle between two vectors.
+-- Directionless and thus commutative.
+-- Input vectors must be non-zero.
+-- @tparam vec3 a Vector
+-- @tparam vec3 b Vector
+-- @treturn number angle in [0, pi]
+function vec3.angle_between(a, b)
+	if b then
+		return acos(a:dot(b) / (a:len() * b:len()))
+	end
+	return 0
 end
 
 --- Return a boolean showing if a table is or is not a vec3.
