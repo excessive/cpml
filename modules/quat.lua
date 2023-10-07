@@ -67,7 +67,7 @@ function quat.new(x, y, z, w)
 		return new(x, y, z, w)
 
 	-- {x, y, z, w} or {x=x, y=y, z=z, w=w}
-	elseif type(x) == "table" then
+	elseif type(x) == "table" or type (x) == "cdata" then
 		local xx, yy, zz, ww = x.x or x[1], x.y or x[2], x.z or x[3], x.w or x[4]
 		precond.typeof(xx, "number", "new: Wrong argument type for x")
 		precond.typeof(yy, "number", "new: Wrong argument type for y")
@@ -75,9 +75,11 @@ function quat.new(x, y, z, w)
 		precond.typeof(ww, "number", "new: Wrong argument type for w")
 
 		return new(xx, yy, zz, ww)
-	end
 
-	return new(0, 0, 0, 1)
+	else
+		precond.assert(x == nil, "new: Wrong arguments")
+		return new(0, 0, 0, 1)
+	end
 end
 
 --- Create a quaternion from an angle/axis pair.
