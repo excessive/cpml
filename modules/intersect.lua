@@ -13,6 +13,25 @@ local min         = math.min
 local max         = math.max
 local intersect   = {}
 
+-- Checks if a point belongs to the segment
+-- p is a vec3
+-- seg[1] is a vec3
+-- seg[2] is a vec3
+-- Returns a boolean
+function intersect.point_segment(p, seg)
+	local min, max = vec3.component_sort(seg[1], seg[2])
+	if min.x <= p.x and
+		min.y <= p.y and
+		min.z <= p.z and
+		p.x <= max.x and
+		p.y <= max.y and
+		p.z <= max.z
+	then
+		return true
+	end
+	return false
+end
+
 -- https://blogs.msdn.microsoft.com/rezanour/2011/08/07/barycentric-coordinates-and-point-in-triangle-tests/
 -- point       is a vec3
 -- triangle[1] is a vec3
@@ -305,39 +324,13 @@ end
 -- e    is a number
 function intersect.segment_segment(a, b, e)
 	local c, d = intersect.line_line(a, b, e)
-
-	if c and ((
-		a[1].x <= c[1].x and
-		a[1].y <= c[1].y and
-		a[1].z <= c[1].z and
-		c[1].x <= a[2].x and
-		c[1].y <= a[2].y and
-		c[1].z <= a[2].z
-	) or (
-		a[1].x >= c[1].x and
-		a[1].y >= c[1].y and
-		a[1].z >= c[1].z and
-		c[1].x >= a[2].x and
-		c[1].y >= a[2].y and
-		c[1].z >= a[2].z
-	)) and ((
-		b[1].x <= c[2].x and
-		b[1].y <= c[2].y and
-		b[1].z <= c[2].z and
-		c[2].x <= b[2].x and
-		c[2].y <= b[2].y and
-		c[2].z <= b[2].z
-	) or (
-		b[1].x >= c[2].x and
-		b[1].y >= c[2].y and
-		b[1].z >= c[2].z and
-		c[2].x >= b[2].x and
-		c[2].y >= b[2].y and
-		c[2].z >= b[2].z
-	)) then
+	if c and
+		intersect.point_segment(c[1], a) and
+		intersect.point_segment(c[2], a) and
+		intersect.point_segment(c[1], b) and
+		intersect.point_segment(c[2], b) then
 		return c, d
 	end
-
 	-- segments do not intersect
 	return false
 end

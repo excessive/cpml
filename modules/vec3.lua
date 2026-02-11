@@ -309,6 +309,14 @@ function vec3.component_max(a, b)
 	return new(math.max(a.x, b.x), math.max(a.y, b.y), math.max(a.z, b.z))
 end
 
+--- Return the component-wise minimum and maximum of two vectors.
+-- @tparam vec3 a Left hand operand
+-- @tparam vec3 b Right hand operand
+-- @treturn vec3, vec3 sorted vectors
+function vec3.component_sort(a, b)
+	return vec3.component_min(a, b), vec3.component_max(a, b)
+end
+
 -- Negate x axis only of vector.
 -- @tparam vec3 a Vector to x-flip.
 -- @treturn vec3 x-flipped vector
