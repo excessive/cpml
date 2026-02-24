@@ -264,15 +264,24 @@ describe("vec2:", function()
 		assert.is.equal(math.deg(d.up:angle_between(d.up)), 0.0)
 	end)
 
-	-- Do this last, to insulate tests from accidental state contamination
 	-- Do vec3 tests last, to insulate tests from accidental state contamination
 	it("converts a 2-vector to a 3-vector", function()
 		local vec3 = require "modules.vec3"
 		local a = vec2(1,2)
-		local b = a:to_vec3()
-		local c = a:to_vec3(3)
+		local b = vec3.from_table(a)
+		local c = vec3.from_table(vec2(3,4))
 		assert.is.equal(b, vec3(1,2,0))
-		assert.is.equal(c, vec3(1,2,3))
+		assert.is.equal(c, vec3(3,4,0))
+		assert.is.equal(c:len(), 5)
+	end)
+
+	it("converts a 3-vector to a 2-vector", function()
+		local vec3 = require "modules.vec3"
+		local a = vec3(1,2,3)
+		local b = vec3.to_xy(a)
+		local c = vec3.to_xz(a)
+		assert.is.equal(b, vec2(1,2))
+		assert.is.equal(c, vec2(1,3))
 	end)
 
 	it("converts a vec3 to vec2 using the constructor", function()

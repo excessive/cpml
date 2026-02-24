@@ -2,7 +2,6 @@
 -- @module vec2
 
 local modules = (...):gsub('%.[^%.]+$', '') .. "."
-local vec3    = require(modules .. "vec3")
 local precond = require(modules .. "_private_precond")
 local private = require(modules .. "_private_utils")
 local acos    = math.acos
@@ -368,13 +367,17 @@ function vec2.flip_y(a)
 	return vec2.new(a.x, -a.y)
 end
 
--- Convert vec2 to vec3.
--- @tparam vec2 a Vector to convert.
--- @tparam number the new z component, or nil for 0
--- @treturn vec3 Converted vector
-function vec2.to_vec3(a, z)
-	return vec3(a.x, a.y, z or 0)
+-- No to_vec3 to avoid circular dependency. Use
+-- vec3.from_table(a) instead.
+
+--- Return a simple table representation of vector.
+-- @tparam vec2 a Vector to be turned into a table
+-- @treturn table
+function vec2.to_table(a)
+	return {x = a.x, y = a.y}
 end
+
+-- No from_table -- it's the same as vec2.new(a).
 
 --- Return a formatted string.
 -- @tparam vec2 a Vector to be turned into a string
